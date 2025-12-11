@@ -70,7 +70,7 @@ public class SessionControllerIT extends BaseSpringIT {
 
         // not connected
         mockMvc.perform(get("/internal/session"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
 
         // with user connected
         mockMvc.perform(get("/internal/session").with(getUserSecurityMock(user1)))
@@ -125,7 +125,7 @@ public class SessionControllerIT extends BaseSpringIT {
                 .andExpect(jsonPath("$.userlevel").value(UserLevel.Beginner.toString()));
 
         // of course without cookies it fails!
-        mockMvc.perform(get("/internal/session")).andExpect(status().isForbidden());
+        mockMvc.perform(get("/internal/session")).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -160,7 +160,7 @@ public class SessionControllerIT extends BaseSpringIT {
         mockMvc.perform(get("/internal/session")
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .cookie(result.getResponse().getCookies()))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

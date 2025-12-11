@@ -5,9 +5,11 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -22,9 +24,11 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final AuthenticationProvider authenticationProvider;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    public SessionAuthenticationFilter(AuthenticationProvider authenticationProvider) {
+    public SessionAuthenticationFilter(AuthenticationProvider authenticationProvider, AuthenticationEntryPoint authenticationEntryPoint) {
         this.authenticationProvider = authenticationProvider;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Override
@@ -48,7 +52,14 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(result);
                     } catch (AuthenticationException e) {
                         SecurityContextHolder.clearContext();
+
                         logger.debug("Session authentication failed for session: {}", cookie.getValue(), e);
+                        authenticationEntryPoint.commence(request, response, e);
+                    } catch (Exception e) {
+                        SecurityContextHolder.clearContext();
+
+                        logger.error("Unexpected error while authenticating ", e);
+                        authenticationEntryPoint.commence(request, response, new AuthenticationServiceException("Internal Authentication Error"));
                     }
                 }
             }

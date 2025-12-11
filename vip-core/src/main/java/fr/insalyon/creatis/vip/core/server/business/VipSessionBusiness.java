@@ -49,37 +49,6 @@ public class VipSessionBusiness {
         this.configurationBusiness = configurationBusiness;
     }
 
-    @VIPCheckRemoval
-    public void setVIPSession(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            User user) throws BusinessException, CoreException {
-        try {
-            boolean isSecure = server.isDevMode();
-            configurationBusiness.updateUserLastLogin(user.getEmail());
-            user = setUserInSession(user, request.getSession());
-
-            Cookie userCookie = new Cookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
-            userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
-            userCookie.setPath("/");
-            userCookie.setHttpOnly(true);
-            userCookie.setSecure(isSecure);
-
-            response.addCookie(userCookie);
-    
-            Cookie sessionCookie = new Cookie(CoreConstants.COOKIES_SESSION, user.getSession());
-            sessionCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
-            sessionCookie.setPath("/");
-            sessionCookie.setHttpOnly(true);
-            sessionCookie.setSecure(isSecure);
-
-            response.addCookie(sessionCookie);
-        } catch (UnsupportedEncodingException ex) {
-            logger.error("Error setting VIP session for {} ",user, ex);
-            throw new BusinessException(ex);
-        }
-    }
-
     public User getUserFromSession(HttpServletRequest request) throws CoreException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute(CoreConstants.SESSION_USER);

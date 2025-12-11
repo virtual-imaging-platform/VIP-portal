@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+
 import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationFilter;
 import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationProvider;
 
@@ -21,10 +22,12 @@ import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticatio
 public class InternalSecurityConfig {
 
     private final SessionAuthenticationProvider sessionAuthenticationProvider;
+    private final VipAuthenticationEntryPoint vipAuthenticationEntryPoint;
 
     @Autowired
-    public InternalSecurityConfig(SessionAuthenticationProvider sessionAuthenticationProvider) {
+    public InternalSecurityConfig(SessionAuthenticationProvider sessionAuthenticationProvider, VipAuthenticationEntryPoint vipAuthenticationEntryPoint) {
         this.sessionAuthenticationProvider = sessionAuthenticationProvider;
+        this.vipAuthenticationEntryPoint = vipAuthenticationEntryPoint;
     }
 
     @Bean
@@ -43,11 +46,12 @@ public class InternalSecurityConfig {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         // we could active CSRF protection on whole endpoint but we will need a
                         // /internal/csrf GET endpoint
-                        .ignoringRequestMatchers(antMatcher(HttpMethod.POST, "/internal/session")));
+                        .ignoringRequestMatchers(antMatcher(HttpMethod.POST, "/internal/session")))
+                .exceptionHandling((handler) -> handler.authenticationEntryPoint(vipAuthenticationEntryPoint));
         return http.build();
     }
 
     private SessionAuthenticationFilter getSessionAuthenticationFilter() {
-        return new SessionAuthenticationFilter(sessionAuthenticationProvider);
+        return new SessionAuthenticationFilter(sessionAuthenticationProvider, vipAuthenticationEntryPoint);
     }
 }
