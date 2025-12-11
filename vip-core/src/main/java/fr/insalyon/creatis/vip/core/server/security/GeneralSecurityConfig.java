@@ -36,7 +36,7 @@ public class GeneralSecurityConfig {
     }
 
     @Bean
-    @Order(2)
+    @Order(3)
     public SecurityFilterChain generalFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll())
                 .cors(Customizer.withDefaults())

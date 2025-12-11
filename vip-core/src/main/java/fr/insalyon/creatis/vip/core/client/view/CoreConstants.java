@@ -84,6 +84,7 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SIMULATION_EXEC_MODE = "workflows.exec.mode";
     public static final String LAB_APACHE_HOST = "apache.host";
     public static final String LAB_APACHE_SSL_PORT = "apache.ssl.port";
+    public static final String LAB_DEV_MODE = "dev";
     // Tabs
     public static final String TAB_ACCOUNT = "account_tab";
     public static final String TAB_ACTIVATION = "activation_tab";
@@ -158,8 +159,10 @@ public class CoreConstants implements IsSerializable {
     // Session Attributes
     public static final String COOKIES_USER = "vip-cookie-user";
     public static final String COOKIES_SESSION = "vip-cookie-session";
+    public static final String COOKIES_CSRF_TOKEN = "XSRF-TOKEN";
     public static final String SESSION_USER = "vip-user";
     public static final String SESSION_GROUPS = "vip-groups";
+    public static final int COOKIES_DURATION = 86400 * 7;
     public static final Date COOKIES_EXPIRATION_DATE = new Date(new Date().getTime() + (1000l * 60 * 60 * 24 * 7)); //cookies are valid for a week
     // application,Gatelab
     public static final String RESULTS_DIRECTORY_PARAM_NAME = "results-directory";

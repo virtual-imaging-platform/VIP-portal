@@ -1,11 +1,9 @@
 package fr.insalyon.creatis.vip.api.controller;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,22 +14,26 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriUtils;
 
-import jakarta.servlet.http.HttpServletResponse;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.SessionBusiness;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.model.Session;
 import jakarta.servlet.http.HttpServletRequest;
-import java.security.Principal;
-import java.util.Map;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 public class OidcLoginController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final VipSessionBusiness vipSessionBusiness;
+    private final SessionBusiness sessionBusiness;
     private final ConfigurationBusiness configurationBusiness;
 
     @Autowired
-    public OidcLoginController(VipSessionBusiness vipSessionBusiness, ConfigurationBusiness configurationBusiness) {
-        this.vipSessionBusiness = vipSessionBusiness;
+    public OidcLoginController(SessionBusiness sessionBusiness, ConfigurationBusiness configurationBusiness) {
+        this.sessionBusiness = sessionBusiness;
         this.configurationBusiness = configurationBusiness;
     }
 
@@ -65,9 +67,15 @@ public class OidcLoginController {
 
         try {
             User vipUser = configurationBusiness.getOrCreateUser((String) userAttributes.get("email"), domainName, null);
+            Session session = new Session();
+
+            session.id = vipUser.getSession();
+            session.email = vipUser.getEmail();
+            
             SecurityContextHolder.clearContext(); // destroy spring session and use VIP own session mechanism
-            vipSessionBusiness.setVIPSession(request, response, vipUser); // creates VIP cookies and session
-        } catch (BusinessException | CoreException e) {
+
+            sessionBusiness.createLoginCookies(request, response, session); // creates VIP cookies and session
+        } catch (BusinessException | UnsupportedEncodingException e) {
             throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN, e);
         }
 
