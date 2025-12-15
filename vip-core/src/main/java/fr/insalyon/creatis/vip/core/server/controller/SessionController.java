@@ -72,10 +72,8 @@ public class SessionController {
     public void deleteSession(HttpServletRequest request, HttpServletResponse response) throws ApiException {
         try {
             sessionBusiness.signout();
+            sessionBusiness.clearLoginCookies(response);
 
-            response.addCookie(sessionBusiness.createCookie(CoreConstants.COOKIES_SESSION, null, 0, true));
-            response.addCookie(sessionBusiness.createCookie(CoreConstants.COOKIES_USER, null, 0, true));
-            response.addCookie(sessionBusiness.createCookie(CoreConstants.COOKIES_CSRF_TOKEN, null, 0, false));
         } catch (BusinessException e) {
             throw new ApiException(e); // change
         }

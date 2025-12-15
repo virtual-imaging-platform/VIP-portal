@@ -56,7 +56,7 @@ import java.util.Set;
 public class SocialModule extends Module {
 
     private static ToolStripButton socialButton;
-    private Timer timer;
+    private static Timer timer;
 
     @Override
     public void load() {
@@ -101,6 +101,7 @@ public class SocialModule extends Module {
 
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Connection lost with the server.", 20);
+                timer.cancel();
             }
 
             public void onSuccess(Integer result) {

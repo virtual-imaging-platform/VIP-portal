@@ -2,9 +2,7 @@ package fr.insalyon.creatis.vip.core.server.business;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,14 +40,16 @@ public class VipSessionBusiness {
 
     protected Server server;
     protected ConfigurationBusiness configurationBusiness;
+    private SessionBusiness sessionBusiness;
 
     @Autowired
-    public VipSessionBusiness(Server server, ConfigurationBusiness configurationBusiness) {
+    public VipSessionBusiness(Server server, ConfigurationBusiness configurationBusiness, SessionBusiness sessionBusiness) {
         this.server = server;
         this.configurationBusiness = configurationBusiness;
+        this.sessionBusiness = sessionBusiness;
     }
 
-    public User getUserFromSession(HttpServletRequest request) throws CoreException {
+    public User getUserFromSession(HttpServletRequest request, HttpServletResponse response) throws CoreException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute(CoreConstants.SESSION_USER);
         if (user != null) {
@@ -60,13 +60,16 @@ public class VipSessionBusiness {
         user = resetSessionFromCookie(request);
         if (user != null) {
             return user;
+        } else {
+            // still not there -> no user info available -> no user logged in
+            // we clear cookies to avoid blocking account with repeated calls
+            logger.error("No VIP user found in session {}. Attributes : {}",
+                    session.getId(), enumerationToString(session.getAttributeNames()));
+            sessionBusiness.clearLoginCookies(response);
+                    
+            throw new CoreException("User not logged in.");  
         }
-        // still not there -> no user info available -> no user logged in
-        logger.error("No VIP user found in session {}. Attributes : {}",
-                session.getId(), enumerationToString(session.getAttributeNames()));
-        throw new CoreException("User not logged in.");
     }
-
 
     public Map<Group, GROUP_ROLE> getUserGroupsFromSession(HttpServletRequest request)
             throws CoreException {
