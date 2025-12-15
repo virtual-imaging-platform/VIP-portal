@@ -366,6 +366,7 @@ public class DebugLayout extends VLayout {
                     @Override
                     public void onFailure(Throwable caught) {
                         Layout.getInstance().setWarningMessage("Unable to load tasks:<br />" + caught.getMessage());
+                        refresher.cancel();
                     }
 
                     @Override

@@ -87,6 +87,7 @@ public class TimelineLayout extends VLayout {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load executions:<br />" + caught.getMessage());
+                timer.cancel();
             }
 
             @Override

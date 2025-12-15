@@ -67,7 +67,13 @@ public class SessionBusiness {
                 CoreConstants.COOKIES_CSRF_TOKEN, token.getToken(), CoreConstants.COOKIES_DURATION, false));
     }
 
-    public Cookie createCookie(String name, String value, int maxAge, boolean httpOnly) {
+    public void clearLoginCookies(HttpServletResponse response) {
+        response.addCookie(createCookie(CoreConstants.COOKIES_SESSION, null, 0, true));
+        response.addCookie(createCookie(CoreConstants.COOKIES_USER, null, 0, true));
+        response.addCookie(createCookie(CoreConstants.COOKIES_CSRF_TOKEN, null, 0, false));
+    }
+
+    private Cookie createCookie(String name, String value, int maxAge, boolean httpOnly) {
         Cookie cookie = new Cookie(name, value);
         boolean isSecure = server.isDevMode();
 

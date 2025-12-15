@@ -206,6 +206,7 @@ public class SimulationBoxLayout extends HLayout {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load simulation info:<br />" + caught.getMessage());
+                timer.cancel();
             }
 
             @Override
