@@ -88,23 +88,6 @@ public class ResourceIT extends BaseSpringIT {
     }
 
     @Test
-    public void getAllVisible() throws VipException {
-        resource.setName("resourceB");
-        resourceBusiness.add(resource);
-
-        assertEquals(2, resourceBusiness.getAll(true).size());
-    }
-
-    @Test
-    public void getActiveResources() throws VipException {
-        resource.setName("resourceB");
-        resource.setStatus(true);
-        resourceBusiness.add(resource);
-
-        assertEquals(1, resourceBusiness.getActiveResources().size());
-    }
-
-    @Test
     public void getDeleteAddWithGroup() throws VipException {
         createGroup("resourcetest");
         Group group = groupBusiness.get("resourcetest");
@@ -116,7 +99,7 @@ public class ResourceIT extends BaseSpringIT {
     }
 
     @Test
-    public void getAvailableForUser() throws VipException, GRIDAClientException {
+    public void getAvailableForExecution() throws VipException, GRIDAClientException {
         createGroup("resourcetest");
         createUserInGroup("super@test.insa", "resourcetest");
         Group group = groupBusiness.get("resourcetest");
@@ -124,12 +107,12 @@ public class ResourceIT extends BaseSpringIT {
 
         resource.setGroups(Arrays.asList(group));
         resourceBusiness.update(resource);
-        assertEquals(0, resourceBusiness.getAvailableForUser(user).size());
+        assertEquals(0, resourceBusiness.getAvailableForExecution(user).size());
 
         resource.setStatus(true);
         resourceBusiness.update(resource);
 
-        assertEquals(1, resourceBusiness.getAvailableForUser(user).size());
+        assertEquals(1, resourceBusiness.getAvailableForExecution(user).size());
     }
 
     @Test

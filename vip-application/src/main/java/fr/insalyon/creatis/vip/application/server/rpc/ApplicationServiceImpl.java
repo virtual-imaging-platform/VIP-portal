@@ -365,7 +365,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public Pair<Boolean, String> isAppUsableWithCurrentUser(String appName, String version) throws VipException {
         AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
-        List<Resource> usableResource = resourceBusiness.getUsableResources(getSessionUser(), appVersion);
+        List<Resource> usableResource = resourceBusiness.getAvailableForExecution(getSessionUser(), appVersion);
         List<Engine> usableEngines;
 
         if (usableResource.isEmpty()) {

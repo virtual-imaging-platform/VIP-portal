@@ -80,7 +80,7 @@ public class GroupInterfaceImpl implements GroupInterface {
         // show which resources are missing depending on user application groups
         Set<String> result = new HashSet<>();
         List<Application> userApps = applicationBusiness.getApplications(user);
-        List<Resource> userResources = resourceBusiness.getAvailableForUser(user);
+        List<Resource> userResources = resourceBusiness.getAvailableForExecution(user);
         Set<Resource> missingResources = new HashSet<>();
 
         for (Application app : userApps) {

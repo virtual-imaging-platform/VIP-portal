@@ -58,8 +58,15 @@ public class CorePermissions {
         if (user.isSystemAdministrator()) {
             result.addAll(toFilter);
         } else {
-            result = toFilter.stream().filter((g) -> userGroups.contains(g)).toList();
+            result = filterOnlySame(toFilter, new ArrayList<>(userGroups));
         }
+        return result;
+    }
+
+    public <T> List<T> filterOnlySame(List<T> a, List<T> b) {
+        List<T> result = new ArrayList<>(a);
+
+        result.retainAll(b);
         return result;
     }
 
