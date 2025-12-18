@@ -11,4 +11,8 @@
 .flattened-pom.xml
 target/
 
-/.metadata/
+/.metadata
+
+#vscode
+.vscode
+
