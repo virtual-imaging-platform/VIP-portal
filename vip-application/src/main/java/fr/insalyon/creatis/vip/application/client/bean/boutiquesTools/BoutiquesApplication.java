@@ -9,17 +9,10 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput.InputType;
 
-/**
- * Representation of an application Boutiques descriptor
- *
- * @author Guillaume Vanel
- * @version %I%, %G%
- */
 public class BoutiquesApplication implements IsSerializable {
 
     private String name;

@@ -188,7 +188,8 @@ public class CoreConstants implements IsSerializable {
     public static final String MOTEUR_REST_PASSWORD = "moteur.rest.password";
     public static final String HOST_URL = "host.url";
 
-
+    // permissions
+    public static final String NOT_RIGHT = "You do not have the right to do that!";
 
     public static enum GROUP_ROLE implements IsSerializable {
 

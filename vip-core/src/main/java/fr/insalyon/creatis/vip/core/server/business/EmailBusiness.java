@@ -1,11 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import fr.insalyon.creatis.sma.client.SMAClient;
-import fr.insalyon.creatis.sma.client.SMAClientException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import fr.insalyon.creatis.sma.client.SMAClient;
+import fr.insalyon.creatis.sma.client.SMAClientException;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
 @Service
 public class EmailBusiness {
@@ -32,7 +33,7 @@ public class EmailBusiness {
     }
 
     public void sendEmail(String subject, String content, String[] recipients,
-                                 boolean direct, String username) throws BusinessException {
+                                 boolean direct, String username) throws VipException {
         if (server.useSMA()) {
             sendWithSMA(subject, content, recipients, direct, username);
         } else {
@@ -43,23 +44,23 @@ public class EmailBusiness {
         }
     }
 
-    private void sendWithSMA(String subject, String content, String[] recipients, boolean direct, String username) throws BusinessException {
+    private void sendWithSMA(String subject, String content, String[] recipients, boolean direct, String username) throws VipException {
         try {
             smaClient.sendEmail(subject, content, recipients, direct, username);
         } catch (SMAClientException ex) {
             logger.error("Error sending {} email to {}", subject, Arrays.toString(recipients), ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void sendEmailToAdmins(String subject, String content, boolean direct, String userEmail) throws BusinessException {
+    public void sendEmailToAdmins(String subject, String content, boolean direct, String userEmail) throws VipException {
         try {
             for (String adminEmail : getAdministratorsEmails()) {
                 sendEmail(subject, content, new String[] {adminEmail}, direct, userEmail);
             }
         } catch (DAOException e) {
             logger.error("Error sending {} to admins !", subject, e);
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 

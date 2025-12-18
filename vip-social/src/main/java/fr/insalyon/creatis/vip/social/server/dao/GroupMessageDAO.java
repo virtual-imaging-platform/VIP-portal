@@ -5,10 +5,6 @@ import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author Rafael Silva
- */
 public interface GroupMessageDAO {
     
     public long add(String sender, String groupName, String title, String message) throws DAOException;

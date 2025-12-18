@@ -6,10 +6,6 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public interface SimulationDAO {
 
     public List<Task> getTasks() throws DAOException;

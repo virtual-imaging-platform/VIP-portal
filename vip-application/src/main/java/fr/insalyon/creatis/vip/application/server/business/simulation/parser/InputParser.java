@@ -1,8 +1,11 @@
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.io.FileReader;
 import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -12,18 +15,14 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
+import fr.insalyon.creatis.vip.core.client.VipException;
 
 /**
  * Parse a input file.
  *
  * This stores data in fields and this is not threadsafe. So it cannot be used
  * as a spring singleton and this needs prototype scope.
- *
- * @author Rafael Silva
  */
 @Service
 @Scope("prototype")
@@ -39,7 +38,7 @@ public class InputParser extends DefaultHandler {
         inputs = new StringBuilder();
     }
 
-    public String parse(String fileName) throws BusinessException {
+    public String parse(String fileName) throws VipException {
         try {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             parserFactory.setNamespaceAware(true);
@@ -51,7 +50,7 @@ public class InputParser extends DefaultHandler {
 
         } catch (IOException | SAXException | ParserConfigurationException ex) {
             logger.error("Error parsing file {}", fileName, ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 

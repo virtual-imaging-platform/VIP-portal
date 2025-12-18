@@ -1,39 +1,27 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.api.business;
 
+import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.INPUT_VALID_CHARS;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.api.model.*;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
+import fr.insalyon.creatis.vip.api.model.Execution;
+import fr.insalyon.creatis.vip.api.model.ExecutionStatus;
+import fr.insalyon.creatis.vip.api.model.PathProperties;
+import fr.insalyon.creatis.vip.api.model.Pipeline;
+import fr.insalyon.creatis.vip.api.model.PipelineParameter;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
@@ -41,22 +29,13 @@ import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Supplier;
-
 import fr.insalyon.creatis.vip.core.server.CarminProperties;
-import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.INPUT_VALID_CHARS;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 
 /**
  *
@@ -92,11 +71,11 @@ public class ExecutionBusiness {
         this.dataApiBusiness = dataApiBusiness;
     }
 
-    public String getLog(String executionId, String type) throws ApiException {
+    public String getLog(String executionId, String type) throws VipException {
         return getLog(executionId, null, type);
     }
 
-    public String getLog(String executionId, Integer invocationId, String type) throws ApiException {
+    public String getLog(String executionId, Integer invocationId, String type) throws VipException {
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
             List<Task> tasks = simulationBusiness.getJobsList(s.getID());
@@ -136,48 +115,44 @@ public class ExecutionBusiness {
             if (fileName != null) {
                 return simulationBusiness.readFile(executionId, type, fileName, extension);
             } else {
-                throw new ApiException("no file name for job " + invocationId + " in execution " + executionId);
+                throw new VipException("no file name for job " + invocationId + " in execution " + executionId);
             }
-
-        } catch (BusinessException e) {
-            throw new ApiException(e);
+        } catch (VipException e) {
+            throw new VipException(e);
         }
     }
 
 
-    public Execution getExample(String executionId) throws ApiException {
+
+    public Execution getExample(String executionId) throws VipException {
         return getExecution(executionId, false, true);
     }
 
-    public Execution getExecution(String executionId, boolean summarize) throws ApiException {
+    public Execution getExecution(String executionId, boolean summarize) throws VipException {
         return getExecution(executionId, summarize, false);
     }
 
     public Execution getExecution(String executionId, boolean summarize, boolean onlyExample)
-            throws ApiException {
-        try {
-            // Get simulation object
-            Simulation s = workflowBusiness.getSimulation(executionId, true); // check running execution for update
+            throws VipException {
+        // Get simulation object
+        Simulation s = workflowBusiness.getSimulation(executionId, true); // check running execution for update
 
-            // Return null if execution doesn't exist or is cleaned (cleaned status is not supported in Carmin)
-            if (s == null || s.getStatus() == SimulationStatus.Cleaned) {
-                logger.error("Error accessing invalid execution {}. (is cleaned : {})", executionId, s != null);
-                throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_ID, executionId);
-            }
-
-            if (onlyExample && ! isSimulationAnExample(s)) {
-                logger.error("Error trying to get an non-example execution as example : {}", executionId);
-                throw new ApiException(ApiException.ApiError.INVALID_EXAMPLE_ID, executionId);
-            }
-
-            return getExecutionFromSimulation(s, summarize);
-
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+        // Return null if execution doesn't exist or is cleaned (cleaned status is not
+        // supported in Carmin)
+        if (s == null || s.getStatus() == SimulationStatus.Cleaned) {
+            logger.error("Error accessing invalid execution {}. (is cleaned : {})", executionId, s != null);
+            throw new VipException(ApiError.INVALID_EXECUTION_ID, executionId);
         }
+
+        if (onlyExample && !isSimulationAnExample(s)) {
+            logger.error("Error trying to get an non-example execution as example : {}", executionId);
+            throw new VipException(ApiError.INVALID_EXAMPLE_ID, executionId);
+        }
+
+        return getExecutionFromSimulation(s, summarize);
     }
 
-    private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws BusinessException {
+    private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws VipException {
         // Build Carmin's execution object
         Execution e = new Execution(
                 s.getID(),
@@ -251,7 +226,7 @@ public class ExecutionBusiness {
                 simulation.getTags().contains(ApplicationConstants.WORKKFLOW_EXAMPLE_TAG);
     }
 
-    public List<Execution> listExecutions(int maxReturned) throws ApiException {
+    public List<Execution> listExecutions(int maxReturned) throws VipException {
         try {
 
             List<Simulation> simulations = workflowBusiness.getSimulations(
@@ -277,12 +252,12 @@ public class ExecutionBusiness {
             }
             logger.debug("Returning {} executions", executions.size());
             return executions;
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+        } catch (VipException ex) {
+            throw new VipException(ex);
         }
     }
 
-    public List<Execution> listExamples() throws ApiException {
+    public List<Execution> listExamples() throws VipException {
         try {
             List<Simulation> simulations = workflowBusiness.getSimulations(
                     null, // User must be null to take examples from other users
@@ -297,12 +272,12 @@ public class ExecutionBusiness {
                 executions.add(getExecutionFromSimulation(simulation, true));
             }
             return executions;
-        } catch (BusinessException e) {
-            throw new ApiException(e);
+        } catch (VipException e) {
+            throw new VipException(e);
         }
     }
 
-    public int countExecutions() throws ApiException {
+    public int countExecutions() throws VipException {
         try {
 
             List<Simulation> simulations = workflowBusiness.getSimulations(
@@ -322,28 +297,28 @@ public class ExecutionBusiness {
             }
             logger.debug("After removing null and cleaned, found {}", count);
             return count;
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+        } catch (VipException ex) {
+            throw new VipException(ex);
         }
     }
 
-    public void updateExecution(Execution execution) throws ApiException {
+    public void updateExecution(Execution execution) throws VipException {
         try {
             if (execution.getTimeout() > 0) {
                 logger.error("Unsupported change of execution timeout {}",
                         execution.getIdentifier());
-                throw new ApiException("Update of execution timeout is not supported.");
+                throw new VipException("Update of execution timeout is not supported.");
             }
             checkInputExecNameIsValid(execution.getName());
             logger.info("updating execution " + execution.getIdentifier()
                     + " name to " + execution.getName());
             workflowBusiness.updateDescription(execution.getIdentifier(), execution.getName());
-        } catch (BusinessException e) {
-            throw new ApiException(e);
+        } catch (VipException e) {
+            throw new VipException(e);
         }
     }
 
-    public String initExecution(Execution execution) throws ApiException {
+    public String initExecution(Execution execution) throws VipException {
         Map<String, String> inputMap = new HashMap<>();
 
         for (Entry<String,Object> restInput : execution.getInputValues().entrySet()) {
@@ -363,7 +338,7 @@ public class ExecutionBusiness {
     }
 
     private String handleRestParameter(String parameterName, Object restParameterValue)
-            throws ApiException {
+            throws VipException {
         if (restParameterValue instanceof List) {
             StringBuilder paramBuilder = new StringBuilder();
             boolean isFirst = true;
@@ -385,20 +360,20 @@ public class ExecutionBusiness {
         }
     }
 
-    private void checkInputIsValid(String inputName, String inputValue) throws ApiException {
+    private void checkInputIsValid(String inputName, String inputValue) throws VipException {
         String validChars = INPUT_VALID_CHARS + CarminProperties.ADDITIONNAL_INPUT_VALID_CHARS;
         if( ! inputValue.matches("[" + validChars + "]+")) {
             logger.error("Input {} is not valid. Value : {}, Authorized characters are {}",
                     inputName, inputValue, validChars);
-            throw new ApiException(ApiException.ApiError.INPUT_FIELD_NOT_VALID, inputName, "Authorized characters are " + validChars);
+            throw new VipException(DefaultError.BAD_INPUT_FIELD, inputName, "Authorized characters are " + validChars);
         }
     }
 
-    private void checkInputExecNameIsValid(String input) throws ApiException {
+    private void checkInputExecNameIsValid(String input) throws VipException {
         if( ! input.matches("[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]+")) {
             logger.error("Execution name {} is not valid. Authorized characters are {}",
                     input, ApplicationConstants.EXEC_NAME_VALID_CHARS);
-            throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_NAME, "Authorized characters are " + ApplicationConstants.EXEC_NAME_VALID_CHARS);
+            throw new VipException(ApiError.INVALID_EXECUTION_NAME, "Authorized characters are " + ApplicationConstants.EXEC_NAME_VALID_CHARS);
         }
     }
 
@@ -406,7 +381,7 @@ public class ExecutionBusiness {
                                 Map<String,String> inputValues,
                                 Integer timeoutInSeconds,
                                 String executionName,
-                                String studyId) throws ApiException {
+                                String studyId) throws VipException {
         try {
             // We cannot easily initialize an execution without starting it.
             // So we will just launch the execution, and launch an error in case playExecution is not true.
@@ -440,7 +415,7 @@ public class ExecutionBusiness {
                 }
                 // error : pp is an empty input with no default value and it is not optional
                 logger.error("Error initialising {}, missing {} parameter", pipelineId, pp.getName());
-                throw new ApiException(ApiException.ApiError.INPUT_FIELD_MISSING, pp.getName());
+                throw new VipException(ApiError.INPUT_FIELD_MISSING, pp.getName());
             }
 
             // fill in overriddenInputs from explicit inputs
@@ -452,7 +427,7 @@ public class ExecutionBusiness {
                         inputValues.put(key, inputValues.get(value));
                     } else {
                         logger.error("Error initialising {}, missing {} parameter", pipelineId, value);
-                        throw new ApiException(ApiException.ApiError.INPUT_FIELD_MISSING, value);
+                        throw new VipException(ApiError.INPUT_FIELD_MISSING, value);
                     }
                 }
             }
@@ -463,7 +438,7 @@ public class ExecutionBusiness {
 
             if (inputsContainsResultsDirectoryInput && ! pipelineHasResultsDirectoryInput) {
                 logger.error("Missing results-directory for {}", pipelineId);
-                throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_INIT,
+                throw new VipException(ApiError.INVALID_EXECUTION_INIT,
                     "Input has parameter results-directory but it is not defined in pipeline.");
             }
 
@@ -496,45 +471,45 @@ public class ExecutionBusiness {
                     applicationName,
                     applicationVersion,
                     executionName);
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+        } catch (VipException ex) {
+            throw new VipException(ex);
         }
     }
 
-    public void killExecution(String executionId) throws ApiException {
+    public void killExecution(String executionId) throws VipException {
         try {
             workflowBusiness.kill(executionId);
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+        } catch (VipException ex) {
+            throw new VipException(ex);
         }
     }
 
-    public void deleteExecution(String executionId, Boolean deleteFiles) throws ApiException {
+    public void deleteExecution(String executionId, Boolean deleteFiles) throws VipException {
         checkIfUserCanAccessExecution(executionId);
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
             if (s.getStatus() != SimulationStatus.Completed && s.getStatus() != SimulationStatus.Killed) {
                 logger.error("Cannot delete exec {}, it is {}", executionId, s.getStatus());
-                throw new ApiException("Cannot delete execution " + executionId + " because status is " + s.getStatus().toString());
+                throw new VipException("Cannot delete execution " + executionId + " because status is " + s.getStatus().toString());
             }
             // Note: this won't delete the intermediate files in case the execution was run locally, which violates the spec.
             // Purge should be called in that case but purge also violates the spec.
             workflowBusiness.clean(executionId, currentUserProvider.get().getEmail(), deleteFiles);
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+        } catch (VipException ex) {
+            throw new VipException(ex);
         }
     }
 
     public List<PathProperties> getExecutionResultsPaths(String executionId)
-            throws ApiException {
+            throws VipException {
 
         List<PathProperties> pathResults = new ArrayList<>();
         List<InOutData> outputs;
         try {
             outputs = workflowBusiness.getOutputData(
                 executionId, currentUserProvider.get().getFolder());
-        } catch (BusinessException e) {
-            throw new ApiException(e);
+        } catch (VipException e) {
+            throw new VipException(e);
         }
         for (InOutData output : outputs) {
             String outputPath = output.getPath();
@@ -563,7 +538,7 @@ public class ExecutionBusiness {
         }
     }
 
-    public void checkIfUserCanAccessExecution(String executionId) throws ApiException {
+    public void checkIfUserCanAccessExecution(String executionId) throws VipException {
         try {
             User user = currentUserProvider.get();
             if (user.isSystemAdministrator()) {
@@ -574,9 +549,9 @@ public class ExecutionBusiness {
                 return;
             }
             logger.error("Permission denied for {} on exec {}", user, executionId);
-            throw new ApiException("Permission denied");
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+            throw new VipException("Permission denied");
+        } catch (VipException ex) {
+            throw new VipException(ex.getMessage(), ex);
         }
 
     }

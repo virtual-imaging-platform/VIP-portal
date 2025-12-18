@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
  * The default is to access the h2 database through an h2 server via tcp,
  * but this is changeable to use (for instance) a memory or a local h2
  * database for testing or local use
- * @author Rafael Ferreira da Silva
  */
 @Component
 @Scope("prototype")

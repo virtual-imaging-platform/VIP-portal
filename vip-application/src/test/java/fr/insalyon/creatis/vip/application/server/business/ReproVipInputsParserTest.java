@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputFileParser;
 import fr.insalyon.creatis.vip.application.server.business.util.ReproVipInputsParser;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
@@ -33,7 +33,7 @@ public class ReproVipInputsParserTest {
     private ReproVipInputsParser reproVipInputsParser;
 
     @BeforeEach
-    public void init() throws BusinessException, DAOException {
+    public void init() throws VipException, DAOException {
         mocks();
 
         parser = new InputFileParser();
@@ -41,7 +41,7 @@ public class ReproVipInputsParserTest {
         reproVipInputsParser = new ReproVipInputsParser(externalPlatformBusiness, "localhost");
     }
 
-    public void mocks() throws BusinessException, DAOException {
+    public void mocks() throws VipException, DAOException {
         ExternalPlatform platform = new ExternalPlatform();
         platform.setIdentifier("testGirder");
         platform.setUrl("https://example.girder");
@@ -53,7 +53,7 @@ public class ReproVipInputsParserTest {
     }
 
     @Test
-    public void girderWorkflowInput() throws BusinessException, IOException {
+    public void girderWorkflowInput() throws VipException, IOException {
         ObjectMapper mapper = new ObjectMapper();
         var values = parser.parse(Path.of("src/test/resources/repro_vip/girder.xml"));
         File example = new File("src/test/resources/repro_vip/girder.json");
@@ -67,7 +67,7 @@ public class ReproVipInputsParserTest {
     }
 
     @Test
-    public void localWorkflowInput() throws BusinessException, IOException {
+    public void localWorkflowInput() throws VipException, IOException {
         ObjectMapper mapper = new ObjectMapper();
         var values = parser.parse(Path.of("src/test/resources/repro_vip/local.xml"));
         File example = new File("src/test/resources/repro_vip/local.json");

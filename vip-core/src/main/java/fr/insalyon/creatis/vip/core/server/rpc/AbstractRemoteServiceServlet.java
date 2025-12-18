@@ -23,8 +23,6 @@ import java.util.Map;
  *
  * Includes the mechanism to access spring managed beans in all subclasses,
  * as the Server bean here.
- *
- * @author Rafael Silva
  */
 public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet {
 

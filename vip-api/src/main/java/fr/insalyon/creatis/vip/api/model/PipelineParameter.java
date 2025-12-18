@@ -1,13 +1,7 @@
 package fr.insalyon.creatis.vip.api.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.lang.*;
-
-/**
- *
- * @author Tristan Glatard
- */
 public class PipelineParameter {
 
     private String name;

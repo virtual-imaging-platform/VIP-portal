@@ -5,10 +5,6 @@ import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 
 import java.util.List;
 
-/**
- *
- * @author Nouha Boujelben
- */
 public interface PublicationDAO {
 
     public void add(Publication publication) throws DAOException;

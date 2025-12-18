@@ -19,8 +19,6 @@ import org.springframework.security.web.firewall.DefaultHttpFirewall;
  *
  * Defines Spring security settings for all inbound requests on paths other than /rest/**,
  * which is handled in {@link RestApiSecurityConfig}
- *
- * Created by abonnet on 7/22/16.
  */
 
 @Configuration
