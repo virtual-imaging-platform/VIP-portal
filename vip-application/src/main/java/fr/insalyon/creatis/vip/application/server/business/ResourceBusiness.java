@@ -1,10 +1,7 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +13,18 @@ import fr.insalyon.creatis.vip.application.models.Engine;
 import fr.insalyon.creatis.vip.application.models.Resource;
 import fr.insalyon.creatis.vip.application.server.dao.ResourceDAO;
 import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.models.Group;
 import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
+import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPExternalSafe;
+import fr.insalyon.creatis.vip.core.server.model.PrecisePage;
 
 @Service
 @Transactional
-public class ResourceBusiness {
+public class ResourceBusiness extends CommonBusiness {
 
     private ResourceDAO resourceDAO;
     private EngineBusiness engineBusiness;
@@ -36,7 +37,80 @@ public class ResourceBusiness {
         this.groupBusiness = groupBusiness;
     }
 
+    // the resource<list> here is not safe to be returned to the user
+    // this SHOULD be only for server-side context
+    // use `getUserContextResources` if you want to return data to the user
+    public List<Resource> getAvailableForExecution(User user) throws VipException {
+        List<Resource> result;
+        try {
+            if (user.isSystemAdministrator()) {
+                result = getAll();
+            } else {
+                result = mapAssociated(resourceDAO.getByUser(user));
+            }
+            return result
+                .stream()
+                .filter(Resource::getStatus)
+                .collect(Collectors.toList());
+        } catch (DAOException e) {
+            throw new VipException(e);
+        }
+    }
+
+    public List<Resource> getAvailableForExecution(User user, AppVersion appVersion) throws VipException {
+        List<String> resourcesName = appVersion.getResourcesNames();
+
+        return getAvailableForExecution(user).stream()
+                .filter((resource) -> resourcesName.contains(resource.getName()))
+                .distinct()
+                .toList();
+    }
+
+    @VIPExternalSafe
+    public Resource get(String name) throws VipException {
+        return getUserContextResources().stream().filter(
+                (resource) -> resource.getName().equals(name))
+                .findFirst().orElse(null);
+    }
+
+    @VIPExternalSafe
+    public PrecisePage<Resource> get(int offset, int quantity, String group) throws VipException {
+        List<Resource> context = getUserContextResources();
+
+        if (group != null) {
+            context = context.stream().filter((r) -> r.getGroupsNames().contains(group)).toList();
+        }
+
+        return pageBuilder.doPrecise(offset, quantity, context);
+    }
+
+    // use this method for returning data to the user
+    // prefer use `getAvailableForExecution` for workflow management
+    // this method applies more filters
+    @VIPExternalSafe
+    public List<Resource> getUserContextResources() throws VipException {
+        User user = userSupplier.get();
+        List<Resource> resources;
+
+        if (user.isSystemAdministrator()) {
+            return getAll();
+        } else if (user.isDeveloper()) {
+            resources = mapAssociated(resourceDAO.getByUser(user));
+            // developers can only see resources that only belongs to private groups
+            // developers can't see engines!
+            return resources.stream()
+                .filter((r) -> r.getGroups().stream().noneMatch(Group::isPublicGroup))
+                .peek((r) -> r.setEngines(null))
+                .toList();
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    @VIPExternalSafe
     public void add(Resource resource) throws VipException {
+        permissions.checkLevel(UserLevel.Administrator);
+
         try {
             resourceDAO.add(resource);
 
@@ -51,9 +125,12 @@ public class ResourceBusiness {
         }
     }
 
+    @VIPExternalSafe
     public void update(Resource resource) throws VipException {
+        permissions.checkLevel(UserLevel.Administrator);
+
         try {
-            Resource before = getByName(resource.getName());
+            Resource before = mapAssociated(resourceDAO.getByName(resource.getName()));
             List<String> beforeEnginesNames = before.getEngines();
             List<String> beforeGroupsNames = before.getGroupsNames();
 
@@ -79,7 +156,10 @@ public class ResourceBusiness {
         }
     }
 
+    @VIPExternalSafe
     public void remove(Resource resource) throws VipException {
+        permissions.checkLevel(UserLevel.Administrator);
+
         try {
             resourceDAO.remove(resource);
         } catch (DAOException e){
@@ -87,50 +167,9 @@ public class ResourceBusiness {
         }
     }
 
-    public Resource getByName(String name) throws VipException {
-        try {
-            return mapAssociated(resourceDAO.getAll().stream()
-                .filter(e -> e.getName().equalsIgnoreCase(name))
-                .findFirst().get());
-        } catch (DAOException | NoSuchElementException e){
-            throw new VipException(e);
-        }
-    }
-
     public List<Resource> getAll() throws VipException {
         try {
             return mapAssociated(resourceDAO.getAll());
-        } catch (DAOException e){
-            throw new VipException(e);
-        }
-    }
-
-    public List<Resource> getAll(boolean isPublic) throws VipException {
-        return getAll()
-            .stream()
-            .collect(Collectors.toList());
-    }
-
-    public List<Resource> getActiveResources() throws VipException {
-        return getAll()
-            .stream()
-            .filter(Resource::getStatus)
-            .collect(Collectors.toList());
-    }
-
-    public List<Resource> getAvailableForUser(User user) throws VipException {
-        try {
-            if (user.isSystemAdministrator()) {
-                return getAll()
-                    .stream()
-                    .filter(Resource::getStatus)
-                    .collect(Collectors.toList());
-            } else {
-                return mapAssociated(resourceDAO.getByUser(user)
-                    .stream()
-                    .filter(Resource::getStatus)
-                    .collect(Collectors.toList()));
-            }
         } catch (DAOException e){
             throw new VipException(e);
         }
@@ -161,9 +200,6 @@ public class ResourceBusiness {
     }
 
     public void associate(Resource resource, Group group) throws VipException {
-        resource = getByName(resource.getName());
-        group = groupBusiness.get(group.getName());
-
         try {
             resourceDAO.associate(resource, group);
         } catch (DAOException e) {
@@ -215,25 +251,13 @@ public class ResourceBusiness {
         }
     }
 
-    public List<Resource> getUsableResources(User user, AppVersion appVersion) throws VipException {
-        Set<Resource> usableResource = new HashSet<>();
-        List<String> userResources = getAvailableForUser(user)
-            .stream()
-            .map((r) -> r.getName())
-            .collect(Collectors.toList());
-
-        for (String r : userResources) {
-            if (appVersion.getResourcesNames().contains(r)) {
-                usableResource.add(getByName(r));
-            }
-        }
-
-        return new ArrayList<>(usableResource);
-    }
-
     private Resource mapAssociated(Resource resource) throws VipException {
+        // engines should be filtered/cleared, if returning data to user
         resource.setEngines(engineBusiness.getByResource(resource).stream().map((e) -> e.getName()).collect(Collectors.toList()));
-        resource.setGroups(groupBusiness.getByResource(resource.getName()));
+
+        // filter groups to avoid permissions leaks
+        resource.setGroups(
+            permissions.filterOnlyUserGroups(groupBusiness.getByResource(resource.getName())));
 
         return resource;
     }

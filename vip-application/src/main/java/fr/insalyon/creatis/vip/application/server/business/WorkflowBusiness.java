@@ -149,7 +149,7 @@ public class WorkflowBusiness {
             AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
             Map<String, List<String>> parameters = getParameters(appVersion.getDescriptor(), parametersMap, user, groups);
 
-            List<Resource> resources = resourceBusiness.getUsableResources(user, appVersion);
+            List<Resource> resources = resourceBusiness.getAvailableForExecution(user, appVersion);
             if (resources.isEmpty()) {
                 throw new VipException("There are no ressources available for the moment !");
             }

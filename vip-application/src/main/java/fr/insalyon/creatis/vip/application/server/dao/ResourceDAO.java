@@ -17,6 +17,8 @@ public interface ResourceDAO {
 
     public void remove(Resource resource) throws DAOException;
 
+    public Resource getByName(String name) throws DAOException;
+
     public List<Resource> getAll() throws DAOException;
 
     public List<Resource> getByUser(User user) throws DAOException;
