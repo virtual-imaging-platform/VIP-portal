@@ -1,11 +1,12 @@
 package fr.insalyon.creatis.vip.api.controller;
 
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import java.util.function.Supplier;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 
-import java.util.function.Supplier;
+import fr.insalyon.creatis.vip.core.models.User;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 
 public abstract class ApiController {
 

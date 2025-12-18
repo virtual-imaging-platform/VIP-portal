@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.models.AppVersion;
+import fr.insalyon.creatis.vip.application.models.Tag;
 import fr.insalyon.creatis.vip.application.server.dao.TagDAO;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 @Service
@@ -23,15 +23,15 @@ public class TagBusiness {
         this.tagDAO = tagDAO;
     }
 
-    public void add(Tag tag) throws BusinessException {
+    public void add(Tag tag) throws VipException {
         try {
             tagDAO.add(tag);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public void addOrUpdate(Tag tag) throws BusinessException {
+    public void addOrUpdate(Tag tag) throws VipException {
         if ( ! exist(tag)) {
             add(tag);
         } else {
@@ -39,43 +39,43 @@ public class TagBusiness {
         }
     }
 
-    public void update(Tag oldTag, Tag newTag) throws BusinessException {
+    public void update(Tag oldTag, Tag newTag) throws VipException {
         try {
             tagDAO.update(oldTag, newTag);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public void remove(Tag tag) throws BusinessException {
+    public void remove(Tag tag) throws VipException {
         try {
             tagDAO.remove(tag);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public boolean exist(Tag tag) throws BusinessException {
+    public boolean exist(Tag tag) throws VipException {
         try {
             return tagDAO.get(tag.getKey(), tag.getValue(), tag.getApplication(), tag.getVersion()) != null;
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public List<Tag> getAll() throws BusinessException {
+    public List<Tag> getAll() throws VipException {
         try {
             return tagDAO.getAll();
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public List<Tag> getTags(AppVersion appVersion) throws BusinessException {
+    public List<Tag> getTags(AppVersion appVersion) throws VipException {
         try {
             return tagDAO.getTags(appVersion);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 }

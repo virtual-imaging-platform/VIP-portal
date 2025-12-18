@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +15,13 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Engine;
-import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.models.AppVersion;
+import fr.insalyon.creatis.vip.application.models.Engine;
+import fr.insalyon.creatis.vip.application.models.Resource;
 import fr.insalyon.creatis.vip.application.server.dao.ResourceDAO;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import javax.sql.DataSource;
 
 @Repository
 @Transactional
@@ -84,6 +85,24 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
 
         } catch (SQLException e) {
             logger.error("Error removing resource " + resource.getName(), e);
+            throw new DAOException(e);
+        }
+    }
+
+    @Override
+    public Resource getByName(String name) throws DAOException {
+        String query = "SELECT * FROM VIPResources WHERE name = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, name);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.first()) {
+                return resultsetToResource(rs);
+            }
+            return null;
+        } catch (SQLException e) {
+            logger.error("Error retrieving resource " + name, e);
             throw new DAOException(e);
         }
     }

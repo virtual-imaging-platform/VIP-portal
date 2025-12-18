@@ -1,14 +1,11 @@
 package fr.insalyon.creatis.vip.social.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
+import fr.insalyon.creatis.vip.social.models.GroupMessage;
+
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author Rafael Silva
- */
 public interface GroupMessageDAO {
     
     public long add(String sender, String groupName, String title, String message) throws DAOException;

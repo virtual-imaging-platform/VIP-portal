@@ -8,7 +8,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.security.common.AbstractAuthenticationProvider;
 import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
@@ -35,6 +35,8 @@ public class SessionAuthenticationProvider extends AbstractAuthenticationProvide
             if (user == null) {
                 throw new BadCredentialsException("This session do not exist!");
             } else {
+                user.setGroups(usersGroupsDAO.getUserGroups(user.getEmail()));
+
                 springUser = new SpringPrincipalUser(user);
                 checkUserInfo(springUser);
             }

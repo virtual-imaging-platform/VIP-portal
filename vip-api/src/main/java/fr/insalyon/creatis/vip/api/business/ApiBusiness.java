@@ -1,16 +1,17 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
-import fr.insalyon.creatis.vip.core.server.model.AuthenticationInfo;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import fr.insalyon.creatis.vip.core.client.DefaultError;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.models.User;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
+import fr.insalyon.creatis.vip.core.server.model.AuthenticationInfo;
 
 @Service
 public class ApiBusiness {
@@ -25,16 +26,16 @@ public class ApiBusiness {
         this.configurationBusiness = configurationBusiness;
     }
 
-    public AuthenticationInfo authenticate(AuthenticationCredentials authCreds) throws ApiException {
+    public AuthenticationInfo authenticate(AuthenticationCredentials authCreds) throws VipException {
         return authenticate(authCreds, false);
     }
 
-    public AuthenticationInfo authenticateSession(AuthenticationCredentials authCreds) throws ApiException {
+    public AuthenticationInfo authenticateSession(AuthenticationCredentials authCreds) throws VipException {
         return authenticate(authCreds, true);
     }
 
     public AuthenticationInfo authenticate(AuthenticationCredentials authCreds, boolean initSession)
-            throws ApiException {
+            throws VipException {
         String username = authCreds.getUsername(), password = authCreds.getPassword();
         logger.debug("Verifying credential for " + username);
         User user = signin(username, password);
@@ -51,33 +52,30 @@ public class ApiBusiness {
         return authInfo;
     }
 
-    private User signin(String username, String password) throws ApiException {
+    private User signin(String username, String password) throws VipException {
         try {
             // we do not care about the session, we're not in browser action
             User user = configurationBusiness
                     .signin(username, password);
             logger.info("Credentials OK for " + username);
             return user;
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             if (e.getMessage().startsWith("Authentication failed")) {
-                throw new ApiException(ApiException.ApiError.BAD_CREDENTIALS);
+                throw new VipException(DefaultError.BAD_CREDENTIALS);
             }
-            throw new ApiException("Authentication Error", e);
+            throw new VipException("Authentication Error", e);
         }
     }
 
-    private String getAnApikeyForUser(String email) throws ApiException {
+    private String getAnApikeyForUser(String email) throws VipException {
         boolean generateNewApiKey = server.getCarminApikeyGenerateNewEachTime();
-        try {
-            if (generateNewApiKey) {
-                logger.info("generating a new apikey for " + email);
-                return configurationBusiness.generateNewUserApikey(email);
-            } else {
-                logger.debug("keeping the current api key for " + email);
-                return configurationBusiness.getUserApikey(email);
-            }
-        } catch (BusinessException e) {
-            throw new ApiException(e);
+
+        if (generateNewApiKey) {
+            logger.info("generating a new apikey for " + email);
+            return configurationBusiness.generateNewUserApikey(email);
+        } else {
+            logger.debug("keeping the current api key for " + email);
+            return configurationBusiness.getUserApikey(email);
         }
     }
 }

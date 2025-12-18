@@ -42,10 +42,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- * @author glatard
- */
 public class SamlTokenValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(SamlTokenValidator.class);

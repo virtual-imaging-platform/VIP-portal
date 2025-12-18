@@ -10,7 +10,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
-import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
+import fr.insalyon.creatis.vip.social.models.GroupMessage;
 
 /**
  *

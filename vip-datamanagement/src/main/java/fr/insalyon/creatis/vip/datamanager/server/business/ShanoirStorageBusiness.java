@@ -1,22 +1,20 @@
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
-import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URISyntaxException;
-import java.net.URI;
-import java.util.List;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.datamanager.models.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.models.ExternalPlatform.Type;
 
-/**
- *  Created by Alae Es-saki on 12/04/2022
- */
 @Service
 public class ShanoirStorageBusiness {
 
@@ -65,7 +63,7 @@ public class ShanoirStorageBusiness {
      * - uri.getAuthority() == null, i.e. single or triple slash without a "host" part
      */
     public String generateUri(
-            ExternalPlatform externalPlatform, String parameterName, String parameterValue) throws BusinessException {
+            ExternalPlatform externalPlatform, String parameterName, String parameterValue) throws VipException {
 
         verifyExternalPlatform(externalPlatform);
 
@@ -78,14 +76,14 @@ public class ShanoirStorageBusiness {
             uri = new URI(parameterValue);
         } catch (URISyntaxException e) {
             logger.error("Cannot parse uri", e);
-            throw new BusinessException("Cannot parse uri", e);
+            throw new VipException("Cannot parse uri", e);
         }
 
         // get filename (including the leading slash)
         String fileName = uri.getPath();
         if (fileName == null) {
             logger.error("Cannot get fileName from the uri");
-            throw new BusinessException("Cannot get fileName from the uri");
+            throw new VipException("Cannot get fileName from the uri");
         }
 
         // parse query string parameters: net.java.URI provides no helper for that,
@@ -96,7 +94,7 @@ public class ShanoirStorageBusiness {
             queryParams= UriComponentsBuilder.fromUriString(parameterValue).build().getQueryParams();
         } catch (IllegalArgumentException e) {
             logger.error("Cannot parse query string", e);
-            throw new BusinessException("Cannot parse query string", e);
+            throw new VipException("Cannot parse query string", e);
         }
 
         String keycloakClientId = getParamValue(UrlKeys.KEYCLOAK_CLIENT_ID, queryParams);
@@ -117,19 +115,19 @@ public class ShanoirStorageBusiness {
     }
 
     private void verifyExternalPlatform(ExternalPlatform externalPlatform)
-            throws RuntimeException, BusinessException {
+            throws RuntimeException, VipException {
         if ( ! externalPlatform.getType().equals(Type.SHANOIR)) {
             logger.error("Trying to generate a shanoir URI for a non shanoir storage {}",
                     externalPlatform.getType());
-            throw new BusinessException("Cannot generate shanoir uri");
+            throw new VipException("Cannot generate shanoir uri");
         }
         if (externalPlatform.getUrl() == null) {
             logger.error("A shanoir external storage must have an URL to generate an URI");
-            throw new BusinessException("Cannot generate shanoir uri");
+            throw new VipException("Cannot generate shanoir uri");
         }
         if (externalPlatform.getUploadUrl() == null || externalPlatform.getRefreshTokenUrl() == null) {
             logger.error("Cannot get keycloak informations for shanoir storage from database");
-            throw new BusinessException("Cannot generate shanoir uri");
+            throw new VipException("Cannot generate shanoir uri");
         }
     }
 
@@ -175,7 +173,7 @@ public class ShanoirStorageBusiness {
                 refreshToken;
     }
 
-    private String getParamValue(UrlKeys urlKey, MultiValueMap<String, String> queryParams) throws BusinessException {
+    private String getParamValue(UrlKeys urlKey, MultiValueMap<String, String> queryParams) throws VipException {
         List<String> values = queryParams.get(urlKey.paramName);
         if (values != null && !values.isEmpty()) {
             return values.getFirst();
@@ -183,7 +181,7 @@ public class ShanoirStorageBusiness {
             return urlKey.defaultValue;
         } else {
             logger.error("Cannot get {} from the uri", urlKey.errorKey);
-            throw new BusinessException("Cannot get " + urlKey.errorKey + " from the uri");
+            throw new VipException("Cannot get " + urlKey.errorKey + " from the uri");
         }
     }
 }

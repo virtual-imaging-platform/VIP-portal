@@ -1,18 +1,22 @@
 package fr.insalyon.creatis.vip.core.integrationtest.database;
 
-import fr.insalyon.creatis.grida.client.GRIDAClient;
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
-import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
-import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.function.Supplier;
+
+import javax.sql.DataSource;
 
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -32,17 +36,19 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.sql.DataSource;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.function.Supplier;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.GroupType;
+import fr.insalyon.creatis.vip.core.models.User;
+import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 /*
     Use simple jndi to configure an h2 in-memory database and verify :
@@ -83,7 +89,7 @@ public class SpringJndiIT {
      */
     @Test
     @Order(1)
-    public void testJNDIConfig() throws BusinessException {
+    public void testJNDIConfig() throws VipException {
         // verify the vip-support group created on init is present
         assertNotNull(configurationBusiness);
         List<Group> groups = groupBusiness.get();
@@ -112,7 +118,7 @@ public class SpringJndiIT {
     */
     @Test
     @Order(2)
-    public void addNewGroup() throws BusinessException {
+    public void addNewGroup() throws VipException {
         List<Group> groups = groupBusiness.get();
         assertEquals(0, groups.size());
         groupBusiness.add(new Group("test group", true, GroupType.RESOURCE));
@@ -126,7 +132,7 @@ public class SpringJndiIT {
     */
     @Test
     @Order(3)
-    public void isGroupStillThere() throws BusinessException {
+    public void isGroupStillThere() throws VipException {
         List<Group> groups = groupBusiness.get();
         assertEquals(1, groups.size());
     }
@@ -137,25 +143,25 @@ public class SpringJndiIT {
     @Test
     @Order(4)
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD) // to restart spring
-    public void isGroupStillThereAfterRestart() throws BusinessException {
+    public void isGroupStillThereAfterRestart() throws VipException {
         List<Group> groups = groupBusiness.get();
         assertEquals(1, groups.size());
     }
 
     @Test
     @Order(5)
-    public void shouldRollbackWithRuntimeException() throws BusinessException, GRIDAClientException, DAOException {
+    public void shouldRollbackWithRuntimeException() throws VipException, GRIDAClientException, DAOException {
         testRollbackInTransaction(new RuntimeException(""), true);
     }
 
     @Test
     @Order(6)
-    public void shouldNotRollbackWithCheckedException() throws BusinessException, GRIDAClientException, DAOException {
-        testRollbackInTransaction(new BusinessException(""), false);
+    public void shouldNotRollbackWithCheckedException() throws VipException, GRIDAClientException, DAOException {
+        testRollbackInTransaction(new VipException(""), false);
     }
 
     private void testRollbackInTransaction(
-            Exception exception, boolean shouldRollback) throws BusinessException, GRIDAClientException, DAOException {
+            Exception exception, boolean shouldRollback) throws VipException, GRIDAClientException, DAOException {
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(lazyDataSource);
         Supplier<Integer> countUser = () -> JdbcTestUtils.countRowsInTable(jdbcTemplate, "VIPUsers");        
@@ -190,7 +196,7 @@ public class SpringJndiIT {
         assertEquals(1, countUser.get());
     }
 
-    private void createUser(String testEmail) throws GRIDAClientException, BusinessException {
+    private void createUser(String testEmail) throws GRIDAClientException, VipException {
         User newUser = new User("firstName", "LastName",
                 testEmail, "Test institution",
                 "testPassword", CountryCode.fr,
@@ -208,7 +214,7 @@ public class SpringJndiIT {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(lazyDataSource);
         // close the datasource to make the next request fail
         try { jdbcTemplate.execute("SHUTDOWN"); } catch (Exception e) {e.printStackTrace();}
-        assertThrows(BusinessException.class, () -> configurationBusiness.addTermsUse());
+        assertThrows(VipException.class, () -> configurationBusiness.addTermsUse());
     }
 
     @Test

@@ -1,15 +1,14 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
+import java.util.List;
+
+import fr.insalyon.creatis.vip.application.models.AppVersion;
+import fr.insalyon.creatis.vip.application.models.Application;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+
 public interface ApplicationDAO {
 
     public void add(Application app) throws DAOException;

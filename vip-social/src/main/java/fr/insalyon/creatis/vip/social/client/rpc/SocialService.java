@@ -3,10 +3,12 @@ package fr.insalyon.creatis.vip.social.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
-import fr.insalyon.creatis.vip.social.client.bean.Message;
+
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.social.client.view.SocialException;
+import fr.insalyon.creatis.vip.social.models.GroupMessage;
+import fr.insalyon.creatis.vip.social.models.Message;
+
 import java.util.Date;
 import java.util.List;
 

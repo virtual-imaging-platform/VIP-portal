@@ -1,14 +1,24 @@
 package fr.insalyon.creatis.vip.core.integrationtest;
 
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Beginner;
+import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Developer;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,14 +26,41 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Beginner;
 import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Developer;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang.StringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.GroupType;
+import fr.insalyon.creatis.vip.core.models.User;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 public class UsersAndGroupsIT extends BaseSpringIT {
     private User user5;
@@ -68,7 +105,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testInitialization() throws BusinessException {
+    public void testInitialization() throws VipException {
         assertEquals(2, groupBusiness.get().size(), "incorrect groups number");// group1 + group2
         assertEquals(6, configurationBusiness.getUsers().size(), "incorrect users number");// Created users + admin
         assertEquals(1, user5.getMaxRunningSimulations(), "incorrect max running simulations");// Created users + admin
@@ -79,7 +116,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testCreateUser() throws BusinessException, GRIDAClientException {
+    public void testCreateUser() throws VipException, GRIDAClientException {
         // try all the constructors
         User user6 = new User("firstName", "lastName", "email9@test.fr", "institution", "password", CountryCode.fr, new Timestamp(System.currentTimeMillis()));
         configurationBusiness.signup(user6, "", false, true, group2);
@@ -91,7 +128,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testCatchExistingEmailCreateUser() {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         createUser(emailUser4, "suffix0")
         );
         System.out.println("exception.getMessage() : " + exception.getMessage());
@@ -105,7 +142,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testCreateGroup() throws DAOException, BusinessException {
+    public void testCreateGroup() throws DAOException, VipException {
         Group group = new Group("group3", true, GroupType.APPLICATION);
         groupBusiness.add(group);
         assertNotNull(groupBusiness.get("group3"));
@@ -115,25 +152,25 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     public void testCatchCreateGroupAlreadyExisting() {
         Group group = new Group("group1", true, GroupType.APPLICATION);
 
-        Exception exception = assertThrows(BusinessException.class, () -> groupBusiness.add(group));
+        Exception exception = assertThrows(VipException.class, () -> groupBusiness.add(group));
         // INSERT + existing primary key groupName => Unique index or primary key violation
         assertTrue(StringUtils.contains(exception.getMessage(), "A group named group1 already exists"));
     }
 
     @Test
-    public void testThrowCreateExistingAutoGroup() throws BusinessException {
+    public void testThrowCreateExistingAutoGroup() throws VipException {
         Group group = new Group("test_a", true, GroupType.APPLICATION, true);
         Group groupBis = new Group("test_ab", true, GroupType.APPLICATION, true);
         Group groupR = new Group("test_a_R", true, GroupType.RESOURCE, true);
 
         groupBusiness.add(groupR);
         groupBusiness.add(group);
-        assertThrows(BusinessException.class, () -> groupBusiness.add(groupBis));
+        assertThrows(VipException.class, () -> groupBusiness.add(groupBis));
 
         groupBis.setAuto(false);
         groupBusiness.add(groupBis);
         groupBis.setAuto(true);
-        assertThrows(BusinessException.class, () -> groupBusiness.update(groupBis.getName(), groupBis));
+        assertThrows(VipException.class, () -> groupBusiness.update(groupBis.getName(), groupBis));
     }
 
     /* ********************************************************************************************************************************************** */
@@ -141,14 +178,14 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testCatchGetGroup() throws BusinessException {
+    public void testCatchGetGroup() throws VipException {
         Group group = groupBusiness.get(nameGroup1);
         Assertions.assertEquals(nameGroup1, group.getName(), "Incorrect group name");
         assertTrue(group.isPublicGroup(), "Incorrect group privacy");
     }
 
     @Test
-    public void testCatchGetNonExistentGroup() throws BusinessException {
+    public void testCatchGetNonExistentGroup() throws VipException {
         assertNull(groupBusiness.get("group3"));
     }
 
@@ -157,7 +194,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testCatchGetGroups() throws BusinessException {
+    public void testCatchGetGroups() throws VipException {
         List<Group> groups = groupBusiness.get();
         Assertions.assertEquals(2, groups.size(), "Incorrect groups number");// group1, group2
     }
@@ -168,7 +205,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testUpdateGroup() throws BusinessException {
+    public void testUpdateGroup() throws VipException {
         Group group = groupBusiness.get(nameGroup1);
         group.setPublicGroup(false);
         group.setName("group_name_updated");
@@ -183,7 +220,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
 
     @Test
-    public void testCatchUpdateNonExistentGroup() throws BusinessException {
+    public void testCatchUpdateNonExistentGroup() throws VipException {
         Group group = new Group();
         group.setPublicGroup(false);
         group.setName("group_name_updated");
@@ -197,7 +234,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testUpdateNonExistentGroup() throws BusinessException {
+    public void testUpdateNonExistentGroup() throws VipException {
         // SELECT + nonExistent foreign key / part of primary key groupName => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be selected
         assertNull(groupBusiness.get("nonExistent_group"));
@@ -208,7 +245,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testAddUserToGroup() throws BusinessException {
+    public void testAddUserToGroup() throws VipException {
         configurationBusiness.addUserToGroup(emailUser4, nameGroup1);
 
         List<String> emails = configurationBusiness.getUsersFromGroup(nameGroup1)
@@ -225,7 +262,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testCatchNonExistentUserAddUserToGroup() {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.addUserToGroup("nonExistent user", nameGroup1)
         );
         // INSERT + nonExistent foreign key / part of primary key groupName => user email
@@ -236,7 +273,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     public void testCatchNonExistentGroupAddUserToGroup() {
 
         Exception exception = assertThrows
-                (BusinessException.class, () ->
+                (VipException.class, () ->
                         configurationBusiness.addUserToGroup(emailUser4, "nonExistent group")
                 );
 
@@ -250,7 +287,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testCatchRemoveUser() throws BusinessException {
+    public void testCatchRemoveUser() throws VipException {
         configurationBusiness.removeUser(emailUser1, false);
         assertRowsNbInTable("VIPUsers", 5);
     }
@@ -258,7 +295,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testCatchRemoveNonExistentUser() {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.removeUser("nonExistent user", false)
 
         );
@@ -272,13 +309,13 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testRemoveGroup() throws BusinessException {
+    public void testRemoveGroup() throws VipException {
         groupBusiness.remove(emailUser1, nameGroup1);
         Assertions.assertEquals(1, groupBusiness.get().size(), "incorrect groups number");
     }
 
     @Test
-    public void testCatchRemoveNonExistentGroup() throws BusinessException {
+    public void testCatchRemoveNonExistentGroup() throws VipException {
         // DELETE + nonExistent foreign key / part of primary key groupName => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be deleted
         groupBusiness.remove(emailUser1, "nonExistent group");
@@ -290,7 +327,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testRemoveUserFromGroup() throws BusinessException {
+    public void testRemoveUserFromGroup() throws VipException {
         configurationBusiness.removeUserFromGroup(emailUser1, nameGroup1);
 
         List<String> emails = configurationBusiness.getUsersFromGroup(nameGroup1)
@@ -307,7 +344,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testGetOrCreateExistingUser() throws BusinessException, DAOException {
+    public void testGetOrCreateExistingUser() throws VipException, DAOException {
         User user = configurationBusiness.getOrCreateUser(emailUser2, "test institution", "group1");
 
         Assertions.assertEquals("test firstName suffix2", user.getFirstName(), "incorrect user firstname");
@@ -316,7 +353,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testGetOrCreateNonExistentUser() throws BusinessException, DAOException {
+    public void testGetOrCreateNonExistentUser() throws VipException, DAOException {
         configurationBusiness.getOrCreateUser("nonExistentUser@test.fr", "institution", "group1");
 
         // verify entry numbers in VIPUsers table
@@ -326,7 +363,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testGetOrCreateIncorrectEmailUser() {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.getOrCreateUser("nonExistent_user", "institution", "group1")
         );
 
@@ -341,7 +378,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testGetLastUpdateTermOfUse() throws BusinessException {
+    public void testGetLastUpdateTermOfUse() throws VipException {
         // a term-of-use update must be inserted at database creation
         Timestamp timestamp = configurationBusiness.getLastUpdateTermsOfUse();
         assertEquals(LocalDate.now(), timestamp.toLocalDateTime().toLocalDate(), "Missing default term of use in database");
@@ -355,7 +392,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     public void testCatchGetApiKeyNonExistentUser() {
 
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.getUserApikey("nonExistent_user")
         );
         assertTrue(StringUtils.contains(exception.getMessage(), "Looking for an apikey, but there is no user registered with the email: nonExistent_user"));
@@ -366,7 +403,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testGetUserAdminGroups() throws BusinessException {
+    public void testGetUserAdminGroups() throws VipException {
         Map<Group, CoreConstants.GROUP_ROLE> userGroups = configurationBusiness.getUserGroups(emailUser3);
         assertFalse(userGroups.isEmpty());
 
@@ -378,14 +415,14 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
 
     @Test
-    public void testValidateNonExistentSession() throws BusinessException {
+    public void testValidateNonExistentSession() throws VipException {
         // SELECT + nonExistent primary key session => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be selected
         assertFalse(configurationBusiness.validateSession(emailUser3, "nonExistent session"));
     }
 
     @Test
-    public void testValidateNullSession() throws BusinessException {
+    public void testValidateNullSession() throws VipException {
         assertFalse(configurationBusiness.validateSession(emailUser3, null));
     }
 
@@ -395,7 +432,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testGenerateNewApiKeyUser() throws BusinessException {
+    public void testGenerateNewApiKeyUser() throws VipException {
         String newApiKey = configurationBusiness.generateNewUserApikey(emailUser3);
         assertEquals(configurationBusiness.getUserApikey(emailUser3), newApiKey, "Incorrect new user api key value");
     }
@@ -404,7 +441,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     public void testCatchGenerateNewApiKeyNonExistentUser() {
 
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.generateNewUserApikey("nonExistent_user")
         );
         assertTrue(StringUtils.contains(exception.getMessage(), " Updating an apikey, but there is no user registered with the email: nonExistent_user"));
@@ -415,9 +452,9 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testCatchDeleteApiKeyNonExistentUser() throws BusinessException {
+    public void testCatchDeleteApiKeyNonExistentUser() throws VipException {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.deleteUserApikey("nonExistent_user")
         );
 
@@ -430,7 +467,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testGetPublicGroups() throws BusinessException {
+    public void testGetPublicGroups() throws VipException {
         List<String> groupsNames = groupBusiness.getPublic()
                 .stream()
                 .map(Group::getName)
@@ -446,7 +483,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testGetAutoGroups() throws BusinessException {
+    public void testGetAutoGroups() throws VipException {
         Group auto = new Group("auto", true, GroupType.APPLICATION, true);
         Group nonauto = new Group("nonauto", true, GroupType.APPLICATION, false);
 
@@ -464,7 +501,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testGetUserData() throws BusinessException {
+    public void testGetUserData() throws VipException {
         User user = configurationBusiness.getUserData(emailUser4);
         Assertions.assertEquals("test firstName suffix4", user.getFirstName(), "incorrect user firstname");
         Assertions.assertEquals("test lastName suffix4", user.getLastName(), "incorrect user firstname");
@@ -473,7 +510,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testCatchGetNonExistentUserData() {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.getUserData("nonExistent_user")
         );
 
@@ -483,7 +520,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testCatchNonExistentUserRemoveGroup() throws BusinessException {
+    public void testCatchNonExistentUserRemoveGroup() throws VipException {
         // DELETE + nonExistent foreign key user email => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be deleted
         groupBusiness.remove("nonExistent user", nameGroup1);
@@ -495,7 +532,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testGetUserPropertiesGroup() throws BusinessException {
+    public void testGetUserPropertiesGroup() throws VipException {
         assertTrue(configurationBusiness.getUserPropertiesGroups(emailUser1).get(0)); // isPublic : group is public, it is accessible to every user
 
         assertFalse(configurationBusiness.getUserPropertiesGroups(emailUser4).get(0));
@@ -506,15 +543,15 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testSigninUser() throws BusinessException {
+    public void testSigninUser() throws VipException {
         assertNotNull(configurationBusiness.signin(emailUser3, "testPassword"));
     }
 
     @Test
-    public void testCatchSigninUserWrongPassword() throws BusinessException {
+    public void testCatchSigninUserWrongPassword() throws VipException {
 
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.signin(emailUser3, "test wrong password")
         );
 
@@ -525,7 +562,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
 
     @Test
-    public void testSigninWithoutResetingSessionUser() throws BusinessException {
+    public void testSigninWithoutResetingSessionUser() throws VipException {
         String session = configurationBusiness.getUser(emailUser3).getSession();
         assertNotNull(configurationBusiness.signinWithoutResetingSession(emailUser3, "testPassword"));
         Assertions.assertEquals(session, configurationBusiness.getUser(emailUser3).getSession(), "incorrect session value");
@@ -536,7 +573,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testSendActivationCode() throws BusinessException {
+    public void testSendActivationCode() throws VipException {
         // Reset not to capture the calls to sendEmail in the Setup
         Mockito.reset(emailBusiness);
 
@@ -557,9 +594,9 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testCatchSendActivationCode() throws BusinessException {
+    public void testCatchSendActivationCode() throws VipException {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.sendActivationCode("nonExistentUser@test.fr")
         );
 
@@ -568,7 +605,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testSendResetCode() throws BusinessException {
+    public void testSendResetCode() throws VipException {
         // Reset not to capture the calls to sendEmail in the Setup
         Mockito.reset(emailBusiness);
 
@@ -589,9 +626,9 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testCatchSendResetCode() throws BusinessException {
+    public void testCatchSendResetCode() throws VipException {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.sendResetCode("nonExistentUser@test.fr")
         );
 
@@ -600,7 +637,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testRequestNewEmail() throws BusinessException {
+    public void testRequestNewEmail() throws VipException {
         // Reset not to capture the calls to sendEmail in the Setup
         Mockito.reset(emailBusiness);
 
@@ -625,7 +662,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
 
     @Test
-    public void testSendContactEmail() throws BusinessException, DAOException {
+    public void testSendContactEmail() throws VipException, DAOException {
         // Reset not to capture the calls to sendEmail in the Setup
         Mockito.reset(emailBusiness);
 
@@ -648,7 +685,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testUpdateUser() throws BusinessException {
+    public void testUpdateUser() throws VipException {
         User user = configurationBusiness.getUser(emailUser1);
         user.setFolder("folder_updated");
         configurationBusiness.updateUser(user);
@@ -657,7 +694,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testUpdateUserEmail() throws BusinessException {
+    public void testUpdateUserEmail() throws VipException {
         configurationBusiness.updateUserEmail(emailUser1, "newEmail@test.fr");
 
         // verify users number
@@ -669,7 +706,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testCatchUpdateInexistantUserEmail() throws BusinessException {
+    public void testCatchUpdateInexistantUserEmail() throws VipException {
         configurationBusiness.updateUserEmail("nonExistent email", "newEmail@test.fr");
 
         // verify users number
@@ -677,7 +714,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
         // verify modified user infos
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         Assertions.assertNull(configurationBusiness.getUser("newEmail@test.fr"))
         );
 
@@ -686,7 +723,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testUpdatePassword() throws BusinessException {
+    public void testUpdatePassword() throws VipException {
         configurationBusiness.updateUserPassword(emailUser1, "testPassword", "testPassword updated");
 
         // because getPassword() returns empty, try to signin
@@ -696,9 +733,9 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testCatchUpdateWrongCurrentPassword() throws BusinessException {
+    public void testCatchUpdateWrongCurrentPassword() throws VipException {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.updateUserPassword(emailUser1, "test password", "testPassword updated")
         );
 
@@ -707,7 +744,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testSetRegistrationDate() throws BusinessException {
+    public void testSetRegistrationDate() throws VipException {
         Date now = new Date();
         user1.setRegistration(now);
         Assertions.assertEquals(now, user1.getRegistration(), "incorrect registration date");
@@ -715,7 +752,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testSetLastLogin() throws BusinessException {
+    public void testSetLastLogin() throws VipException {
         Date now = new Date();
         user1.setLastLogin(now);
         Assertions.assertEquals(now, user1.getLastLogin(), "incorrect last login");
@@ -723,7 +760,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testUpdateUserLastLogin() throws BusinessException, InterruptedException {
+    public void testUpdateUserLastLogin() throws VipException, InterruptedException {
         configurationBusiness.signin(emailUser1, "testPassword");
         Date date = user1.getLastLogin();
         configurationBusiness.updateUserLastLogin(emailUser1);
@@ -731,7 +768,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testSetMaxRunningSimulations() throws BusinessException {
+    public void testSetMaxRunningSimulations() throws VipException {
 
         user1.setMaxRunningSimulations(5);
         Assertions.assertEquals(5, user1.getMaxRunningSimulations(), "incorrect max running simulations");
@@ -739,7 +776,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testSetCountryCode() throws BusinessException {
+    public void testSetCountryCode() throws VipException {
 
         user1.setCountryCode(CountryCode.us);
         Assertions.assertEquals(CountryCode.us, user1.getCountryCode(), "incorrect country code");
@@ -747,7 +784,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testUpdateTermsOfUse() throws BusinessException {
+    public void testUpdateTermsOfUse() throws VipException {
         Date oldDateTermeOfUse = configurationBusiness.getUser(emailUser1).getTermsOfUse();
         configurationBusiness.updateTermsOfUse(emailUser1);
         Date newDateTermeOfUse = configurationBusiness.getUser(emailUser1).getTermsOfUse();
@@ -756,7 +793,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testUpdateLastUpdatePublication() throws BusinessException {
+    public void testUpdateLastUpdatePublication() throws VipException {
         Date oldDateTermeOfUse = configurationBusiness.getUser(emailUser1).getLastUpdatePublications();
         configurationBusiness.updateLastUpdatePublication(emailUser1);
         Date newDateTermeOfUse = configurationBusiness.getUser(emailUser1).getLastUpdatePublications();
@@ -769,7 +806,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testResetNextEmail() throws BusinessException {
+    public void testResetNextEmail() throws VipException {
         configurationBusiness.resetNextEmail(emailUser1);
 
         // verify next email is null
@@ -781,7 +818,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testGetUserNames() throws BusinessException {
+    public void testGetUserNames() throws VipException {
         List<String> userNames = configurationBusiness.getAllUserNames();
         Assertions.assertTrue(userNames.containsAll(List.of("test firstName suffix1 test lastName suffix1")), "Incorrect user names");
     }
@@ -792,14 +829,14 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     // TODO : add password verification
     /*@Test
-    public void testResetPasswordCode() throws BusinessException {
+    public void testResetPasswordCode() throws VipException {
         configurationBusiness.resetPassword(emailUser1, configurationBusiness.getUser(emailUser1).getCode(), "test new password");
     }*/
 
     @Test
-    public void testCatchSendResetPasswordWrongCode() throws BusinessException {
+    public void testCatchSendResetPasswordWrongCode() throws VipException {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.resetPassword(emailUser1, "test code", "test new password")
         );
 
@@ -812,24 +849,24 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testIsDeveloper() throws BusinessException {
+    public void testIsDeveloper() throws VipException {
         assertFalse(user3.isDeveloper());
         user3.setLevel(Developer);
         assertTrue(user3.isDeveloper());
     }
 
     @Test
-    public void testIsGroupNotAdmin() throws BusinessException {
+    public void testIsGroupNotAdmin() throws VipException {
         assertFalse(user3.isGroupAdmin());
     }
 
     @Test
-    public void testIsGroupAdmin() throws BusinessException {
+    public void testIsGroupAdmin() throws VipException {
         assertTrue(user4.isGroupAdmin());
     }
 
     @Test
-    public void testAssAcceptedTermOfUses() throws BusinessException {
+    public void testAssAcceptedTermOfUses() throws VipException {
         assertTrue(user4.hasAcceptTermsOfUse());
     }
 
@@ -838,7 +875,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testSignout() throws BusinessException {
+    public void testSignout() throws VipException {
         assertNull(configurationBusiness.getUser(emailUser1).getSession());
         configurationBusiness.signin(emailUser1, "testPassword");
         assertNotNull(configurationBusiness.getUser(emailUser1).getSession());
@@ -854,7 +891,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testCatchActivateIncorrectCode() {
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         configurationBusiness.activate(emailUser1, "incorrect code"));
 
         // Exception added before the beginning of the internship

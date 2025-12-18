@@ -32,9 +32,11 @@
 package fr.insalyon.creatis.vip.datamanager.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+
+import fr.insalyon.creatis.vip.datamanager.models.DMCachedFile;
+import fr.insalyon.creatis.vip.datamanager.models.Data;
+import fr.insalyon.creatis.vip.datamanager.models.PoolOperation;
+
 import java.util.Date;
 import java.util.List;
 

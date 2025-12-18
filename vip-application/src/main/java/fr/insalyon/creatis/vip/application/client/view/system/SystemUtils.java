@@ -3,7 +3,7 @@ package fr.insalyon.creatis.vip.application.client.view.system;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.models.Group;
 
 public class SystemUtils {
     

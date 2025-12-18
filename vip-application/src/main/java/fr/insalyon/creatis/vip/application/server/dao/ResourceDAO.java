@@ -1,11 +1,12 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
 import java.util.List;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Engine;
-import fr.insalyon.creatis.vip.application.client.bean.Resource;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+
+import fr.insalyon.creatis.vip.application.models.AppVersion;
+import fr.insalyon.creatis.vip.application.models.Engine;
+import fr.insalyon.creatis.vip.application.models.Resource;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 public interface ResourceDAO {
@@ -15,6 +16,8 @@ public interface ResourceDAO {
     public void update(Resource resource) throws DAOException;
 
     public void remove(Resource resource) throws DAOException;
+
+    public Resource getByName(String name) throws DAOException;
 
     public List<Resource> getAll() throws DAOException;
 

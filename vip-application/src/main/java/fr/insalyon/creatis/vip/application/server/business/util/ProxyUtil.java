@@ -8,10 +8,6 @@ import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- * @author Rafael Silva
- */
 public class ProxyUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ProxyUtil.class);

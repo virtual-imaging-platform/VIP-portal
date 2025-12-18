@@ -1,26 +1,5 @@
 package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
-import fr.insalyon.creatis.grida.common.bean.Operation;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.business.*;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,10 +7,42 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-    /**
- *
- * @author Rafael Silva
- */
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.grida.common.bean.Operation;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.models.User;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 public class FileDownloadServiceImpl extends HttpServlet {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -101,7 +112,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
 
     private void downloadByPath(
             User user, String vipPath, HttpServletResponse resp)
-            throws IOException, BusinessException, DataManagerException, ServletException {
+            throws IOException, VipException, DataManagerException, ServletException {
         if (vipPath.isEmpty()) {
             logger.warn("Empty operationid for download for user {}", user.getEmail());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Empty operation id");
