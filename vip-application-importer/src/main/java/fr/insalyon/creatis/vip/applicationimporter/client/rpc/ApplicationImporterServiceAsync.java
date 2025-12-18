@@ -31,12 +31,12 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import fr.insalyon.creatis.vip.application.client.bean.Tag;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
-
-import java.util.List;
+import fr.insalyon.creatis.vip.application.models.Tag;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesApplication;
 
 public interface ApplicationImporterServiceAsync {
 

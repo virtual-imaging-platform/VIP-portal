@@ -31,6 +31,11 @@
  */
 package fr.insalyon.creatis.vip.core.client;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Frame;
 import com.smartgwt.client.widgets.Button;
@@ -43,7 +48,7 @@ import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -58,11 +63,7 @@ import fr.insalyon.creatis.vip.core.client.view.main.SystemParser;
 import fr.insalyon.creatis.vip.core.client.view.main.SystemTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
 import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import fr.insalyon.creatis.vip.core.models.User;
 
 /**
  *

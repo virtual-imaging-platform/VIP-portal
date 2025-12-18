@@ -11,14 +11,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.models.AppVersion;
+import fr.insalyon.creatis.vip.application.models.Application;
+import fr.insalyon.creatis.vip.application.models.Tag;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.TagBusiness;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
 public class TagIT extends BaseSpringIT {
 
@@ -32,6 +32,7 @@ public class TagIT extends BaseSpringIT {
 
     @BeforeEach
     public void setUp() throws Exception {
+        setAdminContext();
         super.setUp();
         app = new Application("applicationA", "super citation");
         appVersion = new AppVersion("applicationA", "0.1","{}", false);
@@ -43,19 +44,19 @@ public class TagIT extends BaseSpringIT {
     }
 
     @Test
-    public void add() throws BusinessException {
+    public void add() throws VipException {
         List<Tag> result = tagBusiness.getAll();
 
         assertEquals(1, result.size());
     }
 
     @Test
-    public void addExistingTag() throws BusinessException {
-        assertThrows(BusinessException.class, () -> tagBusiness.add(tag));
+    public void addExistingTag() throws VipException {
+        assertThrows(VipException.class, () -> tagBusiness.add(tag));
     }
 
     @Test
-    public void update() throws BusinessException {
+    public void update() throws VipException {
         Tag copy = new Tag(tag);
 
         copy.setKey("wow");
@@ -69,13 +70,13 @@ public class TagIT extends BaseSpringIT {
     }
 
     @Test
-    public void remove() throws BusinessException {
+    public void remove() throws VipException {
         tagBusiness.remove(tag);
         assertEquals(0, tagBusiness.getAll().size());
     }
 
     @Test
-    public void getAll() throws BusinessException {
+    public void getAll() throws VipException {
         Tag bis = new Tag("bli", "ilb", Tag.ValueType.STRING, appVersion.getApplicationName(), appVersion.getVersion(), false, false);
         Tag bis2 = new Tag("bleu", "uelb", Tag.ValueType.STRING, appVersion.getApplicationName(), appVersion.getVersion(), false, false);
         Tag bis3 = new Tag("blui", "iulb", Tag.ValueType.STRING, appVersion.getApplicationName(), appVersion.getVersion(), false, false);
@@ -87,7 +88,7 @@ public class TagIT extends BaseSpringIT {
     }
 
     @Test
-    public void getTags() throws BusinessException {
+    public void getTags() throws VipException {
         Application app1 = new Application("test", "super citation");
         AppVersion appVersion1 = new AppVersion("test", "0.1", "{}", false);
         Application app2 = new Application("applicationC", "super citation");

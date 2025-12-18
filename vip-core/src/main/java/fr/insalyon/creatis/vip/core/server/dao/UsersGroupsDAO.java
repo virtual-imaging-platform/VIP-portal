@@ -1,15 +1,12 @@
 package fr.insalyon.creatis.vip.core.server.dao;
 
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.User;
+
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Silva
- */
 public interface UsersGroupsDAO {
 
     public void add(String email, String name, CoreConstants.GROUP_ROLE role) throws DAOException;

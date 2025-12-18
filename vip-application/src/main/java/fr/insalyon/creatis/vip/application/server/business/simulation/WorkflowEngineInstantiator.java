@@ -1,17 +1,11 @@
 package fr.insalyon.creatis.vip.application.server.business.simulation;
 
-import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
-
 import java.nio.file.Path;
 
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- * @author kboulebiar
- */
 public abstract class WorkflowEngineInstantiator {
 
     static enum MoteurStatus {
@@ -19,17 +13,17 @@ public abstract class WorkflowEngineInstantiator {
     }
 
     public abstract String launch(String addressWS, String workflowContent, String inputs, String settings, String executorConfig, String proxyFileName)
-            throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, BusinessException;
+            throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, VipException;
 
     public abstract void kill(String addressWS, String workflowID)
             throws
             java.rmi.RemoteException,
-            javax.xml.rpc.ServiceException, BusinessException;
+            javax.xml.rpc.ServiceException, VipException;
 
     public abstract SimulationStatus getStatus(String addressWS, String workflowID)
             throws
             java.rmi.RemoteException,
-            javax.xml.rpc.ServiceException, BusinessException;
+            javax.xml.rpc.ServiceException, VipException;
 
     protected void loadTrustStore(Server server) {
         // Configuration SSL

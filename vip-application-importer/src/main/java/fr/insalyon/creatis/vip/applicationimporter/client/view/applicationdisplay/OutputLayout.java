@@ -1,12 +1,13 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesOutputFile;
+import java.util.Set;
+
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 
-import java.util.Set;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesOutputFile;
+import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 
 public class OutputLayout extends InputOutputLayout {
 

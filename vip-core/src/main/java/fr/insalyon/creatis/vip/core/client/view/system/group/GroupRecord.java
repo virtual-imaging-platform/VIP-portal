@@ -1,7 +1,8 @@
 package fr.insalyon.creatis.vip.core.client.view.system.group;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
+
+import fr.insalyon.creatis.vip.core.models.Group;
 
 /**
  *

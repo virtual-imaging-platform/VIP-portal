@@ -17,11 +17,11 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Type;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.models.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.models.PoolOperation.Status;
+import fr.insalyon.creatis.vip.datamanager.models.PoolOperation.Type;
 
 import java.util.Arrays;
 import java.util.List;

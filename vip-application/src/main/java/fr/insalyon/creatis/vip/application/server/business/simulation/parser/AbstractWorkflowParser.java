@@ -1,15 +1,5 @@
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -17,10 +7,17 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Rafael Silva
- */
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+
+import fr.insalyon.creatis.vip.application.models.Descriptor;
+import fr.insalyon.creatis.vip.application.models.Source;
+
 public abstract class AbstractWorkflowParser extends DefaultHandler {
 
 

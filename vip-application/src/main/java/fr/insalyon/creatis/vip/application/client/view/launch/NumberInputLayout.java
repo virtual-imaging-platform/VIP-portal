@@ -1,20 +1,20 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.form.validator.RequiredIfValidator;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesNumberInput;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesNumberInput;
 
 /**
  * Representation of a number input. Notably allows validation of constraints on the number (integer, minimum, maximum),

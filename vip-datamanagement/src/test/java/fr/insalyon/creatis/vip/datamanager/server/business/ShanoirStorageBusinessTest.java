@@ -1,15 +1,16 @@
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.datamanager.models.ExternalPlatform;
 
 public class ShanoirStorageBusinessTest {
 
     @Test
-    public void testShanoirUri() throws BusinessException {
+    public void testShanoirUri() throws VipException {
         ShanoirStorageBusiness shanoirStorageBusiness = new ShanoirStorageBusiness();
         ExternalPlatform externalPlatform = new ExternalPlatform();
         externalPlatform.setIdentifier("testShanoir");
@@ -42,7 +43,7 @@ public class ShanoirStorageBusinessTest {
     }
 
     @Test
-    public void testShanoirUploadUri() throws BusinessException {
+    public void testShanoirUploadUri() throws VipException {
         ShanoirStorageBusiness shanoirStorageBusiness = new ShanoirStorageBusiness();
         ExternalPlatform externalPlatform = new ExternalPlatform();
         externalPlatform.setIdentifier("testShanoir");
@@ -73,7 +74,7 @@ public class ShanoirStorageBusinessTest {
     }
 
     @Test
-    public void testShanoirInvalidUri() throws BusinessException {
+    public void testShanoirInvalidUri() throws VipException {
         ShanoirStorageBusiness shanoirStorageBusiness = new ShanoirStorageBusiness();
         ExternalPlatform externalPlatform = new ExternalPlatform();
         externalPlatform.setIdentifier("testShanoir");
@@ -84,7 +85,7 @@ public class ShanoirStorageBusinessTest {
 
         String value = " invalid uri://";
 
-        Assertions.assertThrows(BusinessException.class,
+        Assertions.assertThrows(VipException.class,
                 () -> shanoirStorageBusiness.generateUri(externalPlatform, "paramName", value));
     }
 }

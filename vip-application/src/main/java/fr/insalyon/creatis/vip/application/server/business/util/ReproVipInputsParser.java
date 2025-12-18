@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 
 import com.google.web.bindery.requestfactory.server.Pair;
 
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.models.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
 
 
@@ -29,14 +29,14 @@ public class ReproVipInputsParser {
         LOCAL
     }
 
-    public ReproVipInputsParser(ExternalPlatformBusiness externalPlatformBusiness, String vipURL) throws BusinessException {
+    public ReproVipInputsParser(ExternalPlatformBusiness externalPlatformBusiness, String vipURL) throws VipException {
         this.externalPlatformBusiness = externalPlatformBusiness;
         this.providerInformations = new LinkedHashMap<>();
 
         this.providerInformations.put("vip_url", vipURL);
     }
 
-    public void parse(Map<String, String> inputs) throws BusinessException {
+    public void parse(Map<String, String> inputs) throws VipException {
         simplifiedInputs = getExpandedInputs(inputs);
         Pair<ProviderType, Map<String, List<String>>> type = detectType(simplifiedInputs);
         
@@ -82,7 +82,7 @@ public class ReproVipInputsParser {
         return new Pair<ProviderType, Map<String, List<String>>>(providerType, concernedKeys);
     }
 
-    private Map<String, String> getGirderInformations(Map<String, List<String>> filteredInputs) throws BusinessException {
+    private Map<String, String> getGirderInformations(Map<String, List<String>> filteredInputs) throws VipException {
         Map<String, String> result = new HashMap<>();
         Map<String, String> transformUri = transformURItoMap(filteredInputs.values().iterator().next().getFirst());
     
@@ -92,7 +92,7 @@ public class ReproVipInputsParser {
         return result;
     }
 
-    private String getGirderVIPID(Map<String, String> decomposedUri) throws BusinessException {
+    private String getGirderVIPID(Map<String, String> decomposedUri) throws VipException {
         List<ExternalPlatform> platforms = externalPlatformBusiness.listAll();
 
         for (ExternalPlatform platform : platforms) {
@@ -104,7 +104,7 @@ public class ReproVipInputsParser {
         return null;
     }
 
-    private String getGirderURL(Map<String, String> decomposedUri) throws BusinessException {
+    private String getGirderURL(Map<String, String> decomposedUri) throws VipException {
         try {
             URI apiUri = new URI(decomposedUri.get("apiurl"));
 
@@ -112,11 +112,11 @@ public class ReproVipInputsParser {
                 (apiUri.getPort() > 0 ? ":" + apiUri.getPort(): "");
 
         } catch (URISyntaxException e) {
-            throw new BusinessException("Query parameter apiurl isn't accepted by URL!", e);
+            throw new VipException("Query parameter apiurl isn't accepted by URL!", e);
         }
     }
 
-    private Map<String, String> transformURItoMap(String stringUri) throws BusinessException {
+    private Map<String, String> transformURItoMap(String stringUri) throws VipException {
         try {
             URI uri = new URI(stringUri);
             Map<String, String> result = new HashMap<>();
@@ -129,11 +129,11 @@ public class ReproVipInputsParser {
             return result;
 
         } catch (URISyntaxException e) {
-            throw new BusinessException("Failed to parse the girder URI", e);
+            throw new VipException("Failed to parse the girder URI", e);
         }
     }
 
-    private void handleGirderInputs(String girderID, Map<String, List<String>> inputs, Set<String> editKeys) throws BusinessException {
+    private void handleGirderInputs(String girderID, Map<String, List<String>> inputs, Set<String> editKeys) throws VipException {
         Map<String, String> decomposedUri;
         List<String> uris;
 

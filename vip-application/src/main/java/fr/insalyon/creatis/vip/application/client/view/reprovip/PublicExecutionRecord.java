@@ -2,7 +2,7 @@ package fr.insalyon.creatis.vip.application.client.view.reprovip;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
-import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.application.models.PublicExecution;
 
 public class PublicExecutionRecord extends ListGridRecord {
 

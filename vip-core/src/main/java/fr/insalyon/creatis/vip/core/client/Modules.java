@@ -2,9 +2,11 @@ package fr.insalyon.creatis.vip.core.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.models.User;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

@@ -1,12 +1,13 @@
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.application.client.bean.Activity;
+
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.JobStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProgressLayout;
+import fr.insalyon.creatis.vip.application.models.Activity;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.List;
 

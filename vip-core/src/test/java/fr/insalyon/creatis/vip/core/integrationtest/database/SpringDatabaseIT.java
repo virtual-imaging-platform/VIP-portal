@@ -1,9 +1,19 @@
 package fr.insalyon.creatis.vip.core.integrationtest.database;
 
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.function.Supplier;
+
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -15,18 +25,10 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.function.Supplier;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+import fr.insalyon.creatis.vip.core.models.Group;
 
 /**
  * Integration tests that verify the spring database/transactions configuration
@@ -43,7 +45,7 @@ public class SpringDatabaseIT extends BaseSpringIT{
 
     @Test
     @Order(1)
-    public void testTestConfig() throws BusinessException {
+    public void testTestConfig() throws VipException {
         // verify the vip-support group created on init is present
         assertNotNull(configurationBusiness);
         List<Group> groups = groupBusiness.get();
@@ -59,7 +61,7 @@ public class SpringDatabaseIT extends BaseSpringIT{
         verify simple database operation
     @Test
     @Order(2)
-    public void addNewAccount() throws BusinessException {
+    public void addNewAccount() throws VipException {
         List<Account> accounts = configurationBusiness.getAccounts();
         assertEquals(0, accounts.size());
         configurationBusiness.addAccount("test Account", Collections.emptyList());
@@ -73,7 +75,7 @@ public class SpringDatabaseIT extends BaseSpringIT{
         Verify the account is not there anymore as last test method is Transactional and rollbacked
     @Test
     @Order(3)
-    public void isAccountStillThere() throws BusinessException {
+    public void isAccountStillThere() throws VipException {
         List<Account> accounts = configurationBusiness.getAccounts();
         assertEquals(0, accounts.size());
     }
@@ -87,7 +89,7 @@ public class SpringDatabaseIT extends BaseSpringIT{
     @Test
     @Order(4)
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public void shouldRollbackWithRuntimeException() throws BusinessException, GRIDAClientException {
+    public void shouldRollbackWithRuntimeException() throws VipException, GRIDAClientException {
         // a runtime exception must rollback the current transaction
         testRollbackInTransaction(new RuntimeException(""), true);
     }
@@ -95,13 +97,13 @@ public class SpringDatabaseIT extends BaseSpringIT{
     @Test
     @Order(5)
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public void shouldNotRollbackWithCheckedException() throws BusinessException, GRIDAClientException {
+    public void shouldNotRollbackWithCheckedException() throws VipException, GRIDAClientException {
         // a checked exception must NOT rollback the current transaction
-        testRollbackInTransaction(new BusinessException(""), false);
+        testRollbackInTransaction(new VipException(""), false);
     }
 
     private void testRollbackInTransaction(
-            Exception exception, boolean shouldRollback) throws BusinessException, GRIDAClientException {
+            Exception exception, boolean shouldRollback) throws VipException, GRIDAClientException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(lazyDataSource);
         Supplier<Integer> countUser =
                 () -> JdbcTestUtils.countRowsInTable(jdbcTemplate, "VIPUsers");
@@ -141,9 +143,9 @@ public class SpringDatabaseIT extends BaseSpringIT{
     public void shouldHandleConnectionCreationIssue() throws SQLException {
         // as connection are lazy, connections are created when they are actually called
         // and not when the connection is obtained through spring and so errors cause SqlException
-        // and not spring DataAccessException, so vip is able to catch them and transform them in BusinessException
+        // and not spring DataAccessException, so vip is able to catch them and transform them in VipException
         Mockito.doThrow(SQLException.class).when(dataSource).getConnection();
-        assertThrows(BusinessException.class, () -> configurationBusiness.addTermsUse());
+        assertThrows(VipException.class, () -> configurationBusiness.addTermsUse());
         Mockito.reset(dataSource);
     }
 

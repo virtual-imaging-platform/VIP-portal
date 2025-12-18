@@ -3,7 +3,7 @@ package fr.insalyon.creatis.vip.application.client.view.system.tags;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.models.Tag;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
 public class ManageTagsTab extends AbstractManageTab {

@@ -32,8 +32,9 @@
 package fr.insalyon.creatis.vip.visualization.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.visualization.client.bean.Image;
-import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
+
+import fr.insalyon.creatis.vip.visualization.models.Image;
+import fr.insalyon.creatis.vip.visualization.models.VisualizationItem;
 
 public interface VisualizationServiceAsync {
     public void getImageSlicesURL(

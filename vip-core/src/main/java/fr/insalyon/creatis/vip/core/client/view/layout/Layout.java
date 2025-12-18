@@ -44,13 +44,13 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 
 import fr.insalyon.creatis.vip.core.client.Modules;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.MessageWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 import fr.insalyon.creatis.vip.core.client.view.user.ActivationTab;
+import fr.insalyon.creatis.vip.core.models.User;
 
 /**
  *

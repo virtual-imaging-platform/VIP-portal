@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
-import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
+import fr.insalyon.creatis.vip.application.models.Task;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.PreparedStatement;
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
  * The default is to access the h2 database through an h2 server via tcp,
  * but this is changeable to use (for instance) a memory or a local h2
  * database for testing or local use
- * @author Rafael Ferreira da Silva
  */
 @Component
 @Scope("prototype")

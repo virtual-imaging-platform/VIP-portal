@@ -10,7 +10,8 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Service;
 
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.core.server.model.Session;
@@ -34,13 +35,13 @@ public class SessionBusiness {
     }
 
     public Session signin(AuthenticationCredentials creds)
-            throws BusinessException {
+            throws VipException {
         User user = configurationBusiness.signin(creds.getUsername(), creds.getPassword());
 
         return getSession(user);
     }
 
-    public void signout() throws BusinessException {
+    public void signout() throws VipException {
         configurationBusiness.signout(userProvider.get().getEmail());
 
         // remove current user from Spring context

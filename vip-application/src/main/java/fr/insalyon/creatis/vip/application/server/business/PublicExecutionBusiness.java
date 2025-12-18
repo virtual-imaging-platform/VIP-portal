@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.application.models.PublicExecution;
 import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
@@ -24,7 +24,7 @@ public class PublicExecutionBusiness {
         this.emailBusiness = emailBusiness;
     }
 
-    public void create(PublicExecution publicExecution) throws BusinessException {
+    public void create(PublicExecution publicExecution) throws VipException {
         try {
             publicExecutionDAO.add(publicExecution);
 
@@ -53,50 +53,50 @@ public class PublicExecutionBusiness {
                         new String[]{supportEmail}, true, publicExecution.getAuthor());
             }
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public PublicExecution get(String experienceName)  throws BusinessException {
+    public PublicExecution get(String experienceName)  throws VipException {
         try {
             return publicExecutionDAO.get(experienceName);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public List<PublicExecution> getAll() throws BusinessException {
+    public List<PublicExecution> getAll() throws VipException {
         try {
             return publicExecutionDAO.getAll();
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public boolean exist(String experienceName) throws BusinessException {
+    public boolean exist(String experienceName) throws VipException {
         try {
             return publicExecutionDAO.exist(experienceName);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public void update(String experienceName, PublicExecution publicExecution) throws BusinessException {
+    public void update(String experienceName, PublicExecution publicExecution) throws VipException {
         try {
             publicExecutionDAO.update(experienceName, publicExecution);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public void updateStatus(String experienceName, PublicExecution.PublicExecutionStatus newStatus) throws BusinessException {
+    public void updateStatus(String experienceName, PublicExecution.PublicExecutionStatus newStatus) throws VipException {
         try {
             PublicExecution execution = publicExecutionDAO.get(experienceName);
 
             execution.setStatus(newStatus);
             publicExecutionDAO.update(experienceName, execution);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 }

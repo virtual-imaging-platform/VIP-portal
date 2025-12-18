@@ -1,61 +1,26 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.social.server.business;
-
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
-import fr.insalyon.creatis.vip.social.client.SocialConstants;
-import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
-import fr.insalyon.creatis.vip.social.client.bean.Message;
-import fr.insalyon.creatis.vip.social.server.dao.GroupMessageDAO;
-import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.models.User;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
+import fr.insalyon.creatis.vip.social.client.SocialConstants;
+import fr.insalyon.creatis.vip.social.models.GroupMessage;
+import fr.insalyon.creatis.vip.social.models.Message;
+import fr.insalyon.creatis.vip.social.server.dao.GroupMessageDAO;
+import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
+
 @Service
 @Transactional
 public class MessageBusiness {
@@ -78,74 +43,74 @@ public class MessageBusiness {
     }
 
     public List<Message> getMessagesByUser(String email, Date startDate)
-            throws BusinessException {
+            throws VipException {
 
         try {
             return messageDAO.getMessagesByUser(
                     email, SocialConstants.MESSAGE_MAX_DISPLAY, startDate);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public List<Message> getSentMessagesByUser(String email, Date startDate)
-            throws BusinessException {
+            throws VipException {
 
         try {
             return messageDAO.getSentMessagesByUser(
                     email, SocialConstants.MESSAGE_MAX_DISPLAY, startDate);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public List<GroupMessage> getGroupMessages(String groupName, Date startDate)
-            throws BusinessException {
+            throws VipException {
 
         try {
             return groupMessageDAO.getMessageByGroup(
                     groupName, SocialConstants.MESSAGE_MAX_DISPLAY, startDate);
 
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void markAsRead(long id, String receiver) throws BusinessException {
+    public void markAsRead(long id, String receiver) throws VipException {
         try {
             messageDAO.markAsRead(id, receiver);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void remove(long id) throws BusinessException {
+    public void remove(long id) throws VipException {
         try {
             messageDAO.remove(id);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void removeByReceiver(long id, String receiver) throws BusinessException {
+    public void removeByReceiver(long id, String receiver) throws VipException {
         try {
             messageDAO.removeByReceiver(id, receiver);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void removeGroupMessage(long id) throws BusinessException {
+    public void removeGroupMessage(long id) throws VipException {
         try {
            groupMessageDAO.remove(id);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public void sendMessage(
             User user, String[] recipients, String subject, String message)
-            throws BusinessException {
+            throws VipException {
 
         try {
             if (recipients[0].equals("All")) {
@@ -183,13 +148,13 @@ public class MessageBusiness {
                 messageDAO.associateMessageToUser(recipient, messageId);
             }
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public void copyMessageToVipSupport(
             User sender, String[] recipients, String subject, String message)
-            throws BusinessException {
+            throws VipException {
 
         String emailContent = "<html>"
                 + "<head></head>"
@@ -213,7 +178,7 @@ public class MessageBusiness {
 
     public void sendMessageToVipSupport(
             User user, String subject, String message, List<String> workflowIDs,
-            List<String> simulationNames) throws BusinessException {
+            List<String> simulationNames) throws VipException {
 
         String emailContent = "<html>"
                 + "<head></head>"
@@ -234,7 +199,7 @@ public class MessageBusiness {
 
     public void sendGroupMessage(
             User user, String groupName, List<User> users, String subject,
-            String message) throws BusinessException {
+            String message) throws VipException {
 
         try {
             groupMessageDAO.add(user.getEmail(), groupName, subject, message);
@@ -262,16 +227,16 @@ public class MessageBusiness {
                 }
             }
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public int verifyMessages(String email) throws BusinessException {
+    public int verifyMessages(String email) throws VipException {
 
         try {
             return messageDAO.verifyMessages(email);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 }

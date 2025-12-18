@@ -32,7 +32,8 @@
 package fr.insalyon.creatis.vip.visualization.client.view;
 
 import com.smartgwt.client.widgets.HTMLPane;
-import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
+
+import fr.insalyon.creatis.vip.visualization.models.VisualizationItem;
 
 /** @author glatard */
 public class BrainBrowserViewTab extends AbstractViewTab {
