@@ -31,14 +31,54 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.PLATFORM_MAX_EXECS;
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.USER_MAX_EXECS;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.*;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Input;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Output;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Processor;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.ProcessorDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.StatsDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.*;
+import fr.insalyon.creatis.vip.application.client.bean.Activity;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputFileParser;
@@ -58,20 +98,6 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
-import java.util.stream.Collectors;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.util.*;
-
-import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.*;
 
 /**
  *
@@ -171,25 +197,22 @@ public class WorkflowBusiness {
             appVersion.getSettings().put(ApplicationConstants.DEFAULT_EXECUTOR_GASW, resource.getType().toString());
             try {
                 workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, parameters, resource.getConfiguration());
-            } catch (BusinessException be) {
-                logger.error("BusinessException caught on launch workflow, engine {} will be disabled", engine.getName());
+            } catch (BusinessException e) {
+                throw e;
             } catch (Exception e) {
                 logger.error("Unexpected exception caught on launch workflow, engine {} will be disabled", engine.getName(), e);
-            } finally {
-                if (workflow == null) {
-                    engine.setStatus("disabled");
-                    engineBusiness.update(engine);
 
-                    logger.info("Sending warning email to admins !");
-                    emailBusiness.sendEmailToAdmins(
-                        "Urgent: VIP engine disabled", 
-                        "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.", 
-                        true, user.getEmail());
-                    throw new BusinessException("Workflow is null, engine " + engine.getName() + " has been disabled");
-                } else {
-                    logger.info("Launched workflow " + workflow.toString());
-                }
+                engine.setStatus("disabled");
+                engineBusiness.update(engine);
+
+                logger.info("Sending warning email to admins !");
+                emailBusiness.sendEmailToAdmins(
+                    "Urgent: VIP engine disabled", 
+                    "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.", 
+                    true, user.getEmail());
+                throw new BusinessException("Failed to launch workflow! Engine " + engine.getName() + " has been disabled");
             }
+            logger.info("Launched workflow " + workflow.toString());
 
             workflowDAO.add(workflow);
             return workflow.getId();
