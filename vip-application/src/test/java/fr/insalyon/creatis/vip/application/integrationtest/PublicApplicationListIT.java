@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.integrationtest;
 
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
@@ -23,7 +24,8 @@ public class PublicApplicationListIT extends BaseSpringIT {
     @Autowired private AppVersionBusiness appVersionBusiness;
 
     @Test
-    public void shouldNotIncludePrivateGroupsAndClasses() throws BusinessException, ApplicationException {
+    public void shouldNotIncludePrivateGroupsAndClasses() throws BusinessException, ApplicationException, GRIDAClientException {
+        setAdminContext();
         Group publicGroup = new Group("public group", true, GroupType.getDefault());
         Group privateGroup = new Group("private group", false, GroupType.getDefault());
 
