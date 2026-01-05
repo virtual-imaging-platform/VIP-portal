@@ -1,23 +1,24 @@
 package fr.insalyon.creatis.vip.core.server.security.oidc;
 
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Collection;
-import java.net.URI;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 
 /* OidcConfig : defines the list of OIDC bearer token providers,
  * i.e. things that provide a way to generate and validate bearer tokens for authentication on VIP API.
@@ -45,7 +46,7 @@ public class OidcConfig {
     }
 
     @Autowired
-    public OidcConfig(Server server, Resource vipConfigFolder) throws IOException, URISyntaxException, BusinessException {
+    public OidcConfig(Server server, Resource vipConfigFolder) throws IOException, URISyntaxException, VipException {
         this.server = server;
         // Build the list of OIDC servers from config file. If OIDC is disabled, just create an empty list.
         HashMap<String, OidcServer> servers = new HashMap<>();
@@ -75,11 +76,11 @@ public class OidcConfig {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(file);
             if (!(rootNode.hasNonNull("servers") && rootNode.get("servers").isArray())) {
-                throw new BusinessException("Failed parsing " + basename + ": missing mandatory field: servers");
+                throw new VipException("Failed parsing " + basename + ": missing mandatory field: servers");
             }
             for (JsonNode serverNode : rootNode.get("servers")) {
                 if (!(serverNode.hasNonNull("url"))) {
-                    throw new BusinessException("Failed parsing " + basename + ": missing mandatory field: url");
+                    throw new VipException("Failed parsing " + basename + ": missing mandatory field: url");
                 }
                 // url field is mandatory: here we just check for its presence, content will be validated by URI() below
                 String baseURL = serverNode.get("url").asText();
@@ -96,7 +97,7 @@ public class OidcConfig {
                 URI url = new URI(baseURL);
                 String issuer = url.toASCIIString();
                 if (servers.containsKey(issuer)) {
-                    throw new BusinessException("Failed parsing " + basename + ": duplicate issuers");
+                    throw new VipException("Failed parsing " + basename + ": duplicate issuers");
                 }
                 servers.put(issuer, new OidcServer(issuer, useResourceRoleMappings, resourceName));
             }

@@ -1,49 +1,32 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.fileParam;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.flagParam;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.getFullPipeline;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.getPipeline;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.jsonCorrespondsToPipeline;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.optionalTextParam;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.textParam;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser2;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser3;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser4;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.*;
-import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
+import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.application.models.AppVersion;
 
 public class PipelineControllerIT extends BaseWebSpringIT {
 
@@ -79,12 +62,11 @@ public class PipelineControllerIT extends BaseWebSpringIT {
 
     @Test
     public void userGetAPipelineWithBoutiques() throws Exception {
-
         String appName = "testBoutiquesApp", groupName = "testGroup", versionName = "v42";
         AppVersion appVersion = configureBoutiquesTestApp(appName, groupName, versionName);
         String pipelineId = appName + "/" + versionName;
 
-        createUserInGroup(baseUser1.getEmail(), groupName);
+        baseUser1 = createUserInGroup(baseUser1.getEmail(), groupName);
 
         mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
                 .andDo(print())
@@ -98,12 +80,11 @@ public class PipelineControllerIT extends BaseWebSpringIT {
 
     @Test
     public void userGetBoutiquesDescriptor() throws Exception {
-
         String appName = "testBoutiquesApp", groupName = "testGroup", versionName = "v42";
         configureBoutiquesTestApp(appName, groupName, versionName);
         String pipelineId = appName + "/" + versionName;
 
-        createUserInGroup(baseUser1.getEmail(), groupName);
+        baseUser1 = createUserInGroup(baseUser1.getEmail(), groupName);
 
         mockMvc.perform(get("/rest/pipelines/" + pipelineId).param("format", "boutiques").with(baseUser1()))
                 .andDo(print())
@@ -118,6 +99,7 @@ public class PipelineControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldReturnPipelines() throws Exception {
+        setAdminContext();
         createGroup("group1");
         createGroup("group2");
         createGroup("group3");
@@ -142,10 +124,10 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         AppVersion appBC = createAVersion("appBC", "v1", true);
         AppVersion appC = createAVersion("appC", "v1", true);
 
-        createUserInGroup(baseUser1.getEmail(), "test1", "group1");
-        createUserInGroup(baseUser2.getEmail(), "test2", "group2");
-        createUserInGroup(baseUser3.getEmail(), "test3", "group3");
-        createUserInGroups(baseUser4.getEmail(), "test4", "group1", "group2");
+        baseUser1 = createUserInGroup(baseUser1.getEmail(), "test1", "group1");
+        baseUser2 = createUserInGroup(baseUser2.getEmail(), "test2", "group2");
+        baseUser3 = createUserInGroup(baseUser3.getEmail(), "test3", "group3");
+        baseUser4 = createUserInGroups(baseUser4.getEmail(), "test4", "group1", "group2");
 
         // temp trailing slash for shanoir, see fr.insalyon.creatis.vip.api.SpringRestApiConfig::configurePathMatch
         mockMvc.perform(get("/rest/pipelines/").with(baseUser1()))

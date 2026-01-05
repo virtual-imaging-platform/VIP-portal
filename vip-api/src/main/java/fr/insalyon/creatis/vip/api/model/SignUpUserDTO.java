@@ -4,11 +4,6 @@ import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 
 import jakarta.validation.constraints.NotNull;
 
-/**
- * @author KhalilKes
- *
- * DTO to transfer user data
- */
 public class SignUpUserDTO {
 
     @NotNull

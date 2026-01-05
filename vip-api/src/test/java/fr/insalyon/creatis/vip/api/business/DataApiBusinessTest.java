@@ -1,15 +1,14 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.api.model.UploadData;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser2;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -17,19 +16,21 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser2;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import fr.insalyon.creatis.vip.api.model.UploadData;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.datamanager.models.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 
 public class DataApiBusinessTest {
 
     @Test
-    public void testBase64Decoder(@TempDir Path tempDir) throws IOException, ApiException, BusinessException {
+    public void testBase64Decoder(@TempDir Path tempDir) throws IOException, VipException {
 
         // Prepare
         TransferPoolBusiness transferPoolBusiness = Mockito.mock(TransferPoolBusiness.class);

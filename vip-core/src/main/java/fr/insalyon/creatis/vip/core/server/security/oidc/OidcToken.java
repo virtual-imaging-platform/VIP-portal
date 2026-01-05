@@ -3,7 +3,8 @@ package fr.insalyon.creatis.vip.core.server.security.oidc;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+
+import fr.insalyon.creatis.vip.core.models.User;
 
 import java.util.Collection;
 

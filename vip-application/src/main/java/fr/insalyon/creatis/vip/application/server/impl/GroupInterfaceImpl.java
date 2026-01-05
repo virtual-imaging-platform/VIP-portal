@@ -9,15 +9,15 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.models.AppVersion;
+import fr.insalyon.creatis.vip.application.models.Application;
+import fr.insalyon.creatis.vip.application.models.Resource;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.inter.GroupInterface;
 
@@ -38,7 +38,7 @@ public class GroupInterfaceImpl implements GroupInterface {
     }
 
     @Override
-    public List<String> getItems(String groupname) throws BusinessException {
+    public List<String> getItems(String groupname) throws VipException {
         List<String> items = new ArrayList<>();
         Group group = groupBusiness.get(groupname);
 
@@ -61,7 +61,7 @@ public class GroupInterfaceImpl implements GroupInterface {
     }
 
     @Override
-    public void delete(String item, String groupname) throws BusinessException {
+    public void delete(String item, String groupname) throws VipException {
         Group group = groupBusiness.get(groupname);
 
         switch (group.getType()) {
@@ -76,11 +76,11 @@ public class GroupInterfaceImpl implements GroupInterface {
     }
 
     @Override
-    public List<String> getMissingGroupsRessources(User user) throws BusinessException {
+    public List<String> getMissingGroupsRessources(User user) throws VipException {
         // show which resources are missing depending on user application groups
         Set<String> result = new HashSet<>();
         List<Application> userApps = applicationBusiness.getApplications(user);
-        List<Resource> userResources = resourceBusiness.getAvailableForUser(user);
+        List<Resource> userResources = resourceBusiness.getAvailableForExecution(user);
         Set<Resource> missingResources = new HashSet<>();
 
         for (Application app : userApps) {

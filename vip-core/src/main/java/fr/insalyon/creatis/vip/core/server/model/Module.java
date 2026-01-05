@@ -3,10 +3,6 @@ package fr.insalyon.creatis.vip.core.server.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/**
- *
- * @author Tristan Glatard tristan.glatard@creatis.insa-lyon.fr
- */
 public enum Module {
     PROCESSING("Processing"),
     DATA("Data"),

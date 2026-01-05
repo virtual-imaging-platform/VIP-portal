@@ -31,14 +31,15 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 
-import fr.insalyon.creatis.vip.application.client.bean.Tag;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
-import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
-import java.util.List;
+import fr.insalyon.creatis.vip.application.models.Tag;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 
 public interface ApplicationImporterService extends RemoteService {
 

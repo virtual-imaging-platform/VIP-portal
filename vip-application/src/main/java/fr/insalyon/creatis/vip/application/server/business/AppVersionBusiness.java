@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Resource;
-import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.models.AppVersion;
+import fr.insalyon.creatis.vip.application.models.Resource;
+import fr.insalyon.creatis.vip.application.models.Tag;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 @Service
@@ -28,7 +28,7 @@ public class AppVersionBusiness {
         this.applicationDAO = applicationDAO;
     }
 
-    public void add(AppVersion version) throws BusinessException {
+    public void add(AppVersion version) throws VipException {
         try {
             applicationDAO.addVersion(version);
 
@@ -41,11 +41,11 @@ public class AppVersionBusiness {
                 resourceBusiness.associate(resource, version);
             }
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void update(AppVersion version) throws BusinessException {
+    public void update(AppVersion version) throws VipException {
         try {
             AppVersion before = getVersion(version.getApplicationName(), version.getVersion());
             List<String> beforeResourceNames = before.getResourcesNames();
@@ -69,27 +69,27 @@ public class AppVersionBusiness {
             }
 
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void remove(String applicationName, String version) throws BusinessException {
+    public void remove(String applicationName, String version) throws VipException {
         try {
             applicationDAO.removeVersion(applicationName, version);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void updateDoiForVersion(String doi, String applicationName, String version) throws BusinessException {
+    public void updateDoiForVersion(String doi, String applicationName, String version) throws VipException {
         try {
             applicationDAO.updateDoiForVersion(doi, applicationName, version);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public List<AppVersion> getVersions(String applicationName) throws BusinessException {
+    public List<AppVersion> getVersions(String applicationName) throws VipException {
         try {
             List<AppVersion> versions = applicationDAO.getVersions(applicationName);
 
@@ -99,12 +99,12 @@ public class AppVersionBusiness {
             }
             return versions;
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public AppVersion getVersion(String applicationName, String applicationVersion)
-            throws BusinessException {
+            throws VipException {
         try {
             AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
             if (version == null) {
@@ -116,7 +116,7 @@ public class AppVersionBusiness {
 
             return version;
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 }

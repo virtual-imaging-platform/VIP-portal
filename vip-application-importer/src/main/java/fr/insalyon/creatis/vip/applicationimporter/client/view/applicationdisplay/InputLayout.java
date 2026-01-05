@@ -1,11 +1,12 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
+import java.util.Set;
+
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
-import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 
-import java.util.Set;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesInput;
+import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 
 /**
  *
