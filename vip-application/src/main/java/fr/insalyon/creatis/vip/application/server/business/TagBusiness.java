@@ -10,11 +10,15 @@ import fr.insalyon.creatis.vip.application.models.AppVersion;
 import fr.insalyon.creatis.vip.application.models.Tag;
 import fr.insalyon.creatis.vip.application.server.dao.TagDAO;
 import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPExternalSafe;
+import fr.insalyon.creatis.vip.core.server.model.PrecisePage;
 
 @Service
 @Transactional
-public class TagBusiness {
+public class TagBusiness extends CommonBusiness {
     
     private TagDAO tagDAO;
 
@@ -77,5 +81,12 @@ public class TagBusiness {
         } catch (DAOException e) {
             throw new VipException(e);
         }
+    }
+
+    @VIPExternalSafe
+    public PrecisePage<Tag> get(int offset, int quantity) throws VipException {
+        permissions.checkLevel(UserLevel.Administrator);
+
+        return pageBuilder.doPrecise(offset, quantity, getAll());
     }
 }
