@@ -36,13 +36,13 @@ public class ApplicationController {
     }
 
     @GetMapping
-    public PrecisePage<Application> listApplications(@RequestParam(defaultValue = "0") @PositiveOrZero int offset,
+    public PrecisePage<Application> list(@RequestParam(defaultValue = "0") @PositiveOrZero int offset,
             @RequestParam(defaultValue = "10") @Positive @Max(value = 50) int quantity, @RequestParam Optional<String> group) throws VipException {
         return applicationBusiness.get(offset, quantity, group.orElse(null));
     }
 
     @GetMapping(value = "{id}")
-    public Application getApplication(@PathVariable String id) throws VipException {
+    public Application get(@PathVariable String id) throws VipException {
         Application app = applicationBusiness.get(id);
 
         if (app == null) {
@@ -53,12 +53,12 @@ public class ApplicationController {
     }
 
     @DeleteMapping(value = "{id}")
-    public void deleteApplication(@PathVariable String id) throws VipException {
+    public void delete(@PathVariable String id) throws VipException {
         applicationBusiness.remove(id);
     }
 
     @PutMapping(value = "{id}")
-    public Application createOrUpdateApplication(@PathVariable String id, @RequestBody @Valid Application app)
+    public Application createOrUpdate(@PathVariable String id, @RequestBody @Valid Application app)
             throws VipException {
         if ( ! id.equals(app.getName())) {
             throw new VipException(DefaultError.BAD_INPUT_FIELD, id, "Application name do not match!");
@@ -74,7 +74,7 @@ public class ApplicationController {
     }
 
     @PostMapping()
-    public Application createApplication(@RequestBody @Valid Application app) throws VipException {
-        return createOrUpdateApplication(app.getName(), app);
+    public Application create(@RequestBody @Valid Application app) throws VipException {
+        return createOrUpdate(app.getName(), app);
     }
 }
