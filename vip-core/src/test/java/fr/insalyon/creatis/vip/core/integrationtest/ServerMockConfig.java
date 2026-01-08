@@ -37,6 +37,7 @@ public class ServerMockConfig {
     // paths stuff
     public static final String TEST_USERS_ROOT = "/test/prefix/vip/data/test_users";
     public static final String TEST_GROUP_ROOT = "/test/prefix/vip/data/test_groups";
+    public static final String TEST_CORS_URL = "https://test-cors-domain";
 
     public static void reset(Server server) {
         Mockito.reset(server);
@@ -57,7 +58,7 @@ public class ServerMockConfig {
         when(server.getKeycloakActivated()).thenReturn(false);
         // CORS_AUTHORIZED_DOMAINS is only used in vip-api, but in the SpringRestApiConfig (servlet context),
         // which uses a Server bean internally. We mock it here, currently lacking a cleaner solution for a higher level mock.
-        when(server.getCarminCorsAuthorizedDomains()).thenReturn(new String[]{});
+        when(server.getCarminCorsAuthorizedDomains()).thenReturn(new String[]{TEST_CORS_URL});
     }
 
     @Bean

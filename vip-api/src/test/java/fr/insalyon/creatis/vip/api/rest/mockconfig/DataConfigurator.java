@@ -31,7 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.rest.mockconfig;
 
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import org.mockito.Mockito;
@@ -50,7 +50,7 @@ import static org.mockito.ArgumentMatchers.eq;
  */
 public class DataConfigurator {
 
-    public static void configureFS(BaseWebSpringIT testSuite) throws BusinessException {
+    public static void configureFS(BaseRestApiSpringIT testSuite) throws BusinessException {
         // exists
         // getModifDate
         // listDir

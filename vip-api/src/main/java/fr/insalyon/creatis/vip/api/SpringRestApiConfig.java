@@ -88,9 +88,10 @@ public class SpringRestApiConfig implements WebMvcConfigurer {
         configurer.replaceMediaTypes(Collections.emptyMap());
     }
 
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
+        registry.addMapping("/rest/**")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
             .allowedOrigins(server.getCarminCorsAuthorizedDomains());
     }

@@ -7,6 +7,7 @@ import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+import fr.insalyon.creatis.vip.core.integrationtest.TestConfigurer;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -45,7 +46,7 @@ import static org.mockito.ArgumentMatchers.anyString;
  * h2 in-memory database instead
  */
 
-@SpringJUnitWebConfig(SpringCoreConfig.class)
+@SpringJUnitWebConfig(name="root", classes=SpringCoreConfig.class)
 // launch all spring environment for testing, also take test bean though automatic package scan
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = {
@@ -62,6 +63,7 @@ public abstract class BaseSpringIT {
     @Autowired protected EmailBusiness emailBusiness;
     @Autowired protected GRIDAClient gridaClient;
     @Autowired protected GroupBusiness groupBusiness;
+    @Autowired protected List<TestConfigurer> testConfigurers;
 
     protected final String emailUser1 = "test1@test.fr";
     protected final String emailUser2 = "test2@test.fr";
@@ -87,6 +89,9 @@ public abstract class BaseSpringIT {
         ServerMockConfig.reset(server);
         Mockito.reset(gridaClient);
         Mockito.doReturn(new String[]{"test@admin.test"}).when(emailBusiness).getAdministratorsEmails();
+        for (TestConfigurer testConfigurer : testConfigurers) {
+            testConfigurer.setUpBeforeEachTest();
+        }
     }
 
     protected void assertRowsNbInTable(String tableName, int expectedNb) {
