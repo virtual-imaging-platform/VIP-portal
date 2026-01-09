@@ -89,15 +89,6 @@ public class SpringRestApiConfig implements WebMvcConfigurer {
     }
 
     /*
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/rest/**")
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-            .allowedOrigins(server.getCarminCorsAuthorizedDomains());
-    }
-     */
-
-    /*
      to verify that the proxy is still valid each day
      */
     @Override
