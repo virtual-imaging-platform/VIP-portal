@@ -17,7 +17,7 @@ import fr.insalyon.creatis.vip.application.server.business.PublicExecutionBusine
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
-public class PublicExecutionIT extends BaseSpringIT {
+public class PublicExecutionIT extends BaseApplicationSpringIT {
     
     @Autowired
     private PublicExecutionBusiness business;

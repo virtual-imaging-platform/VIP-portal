@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.itest.data;
 
 import fr.insalyon.creatis.vip.api.model.PathProperties;
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Type;
@@ -62,7 +62,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by abonnet on 1/23/17.
  */
 @Disabled
-public class DataControllerIT extends BaseWebSpringIT {
+public class DataControllerIT extends BaseRestApiSpringIT {
 
     @Test
     public void shouldReturnFilePath() throws Exception {

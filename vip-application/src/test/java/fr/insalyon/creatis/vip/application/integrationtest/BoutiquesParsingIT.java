@@ -16,10 +16,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class BoutiquesParsingIT extends BaseSpringIT {
-
-    @Autowired
-    BoutiquesBusiness boutiquesBusiness;
+public class BoutiquesParsingIT extends BaseApplicationSpringIT {
 
     @Value("classpath:FreeSurfer-Recon-all_v731.json")
     Resource resourceFile;

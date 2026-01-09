@@ -29,33 +29,70 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.model;
+package fr.insalyon.creatis.vip.core.server.security.common;
 
-import jakarta.validation.constraints.NotNull;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
- * Created by abonnet on 8/21/17.
+ * Vip user proxy that is conform to spring security (must implement a specific class)
+ *
+ * Created by abonnet on 7/25/16.
  */
-public class AuthenticationCredentials {
+public class SpringPrincipalUser implements UserDetails, Principal {
 
-    private String username;
-    private String password;
+    private final User vipUser;
 
-    @NotNull
-    public String getUsername() {
-        return username;
+    public SpringPrincipalUser(User vipUser) {
+        this.vipUser = vipUser;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public User getVipUser() {
+        return vipUser;
     }
 
-    @NotNull
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>(); // not used at the moment
+    }
+
+    @Override
     public String getPassword() {
-        return password;
+        return vipUser.getPassword();
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    @Override
+    public String getUsername() {
+        return vipUser.getEmail();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // not used at the moment
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !vipUser.isAccountLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // not used at the moment
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // not used at the moment
+    }
+
+    @Override
+    public String getName() {
+        return getUsername();
     }
 }

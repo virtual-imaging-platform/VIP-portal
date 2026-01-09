@@ -7,12 +7,14 @@ import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+import fr.insalyon.creatis.vip.core.integrationtest.TestConfigurer;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +36,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 
 /**
- * Utility superclass to launch tests with the whole spring configuration, as
- * in production. Subclass only need to extend it and can benefit from dependency
- * injection.
+ * Base superclass to launch tests with the whole "root" spring application context.
+ * This does not include the children web application context (/rest and /internal)
+ * See {@link fr.insalyon.creatis.vip.core.integrationtest.BaseWebSpringIT}
  *
+ * Spring will automatically get the beans available on the class path, so class should be the base of all tests
+ * on the root application context in all module.
+ * Dedicated Test Classes could extend this to add helpers for other module, but should not change the Test/Spring config
+ * see {@link fr.insalyon.creatis.vip.application.integrationtest.BaseApplicationSpringIT} (in vip-application)
+ *
+ * To configure beans, just add beans with the "test" profile, and a TestConfigurer bean to configure them before each
+ * test (to configure and reset mocks especially).
+ * This will harvest all TestConfigurer automatically.
+ * See {@link fr.insalyon.creatis.vip.core.integrationtest.SpringTestConfig}
  *
  * The "test" profile overrides all the external dependencies
  * that would throw exception by mocked and configurable ones.
@@ -45,7 +56,7 @@ import static org.mockito.ArgumentMatchers.anyString;
  * h2 in-memory database instead
  */
 
-@SpringJUnitWebConfig(SpringCoreConfig.class)
+@SpringJUnitWebConfig(name="root", classes=SpringCoreConfig.class)
 // launch all spring environment for testing, also take test bean though automatic package scan
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = {
@@ -55,6 +66,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 public abstract class BaseSpringIT {
     
     @Autowired @Qualifier("db-datasource") protected DataSource dataSource; // this is a mockito spy wrapping the h2 memory datasource
+    @Autowired protected ApplicationContext applicationContext;
     @Autowired protected ConfigurationBusiness configurationBusiness;
     @Autowired protected ApplicationContext appContext;
     @Autowired protected DataSource lazyDataSource;
@@ -62,6 +74,8 @@ public abstract class BaseSpringIT {
     @Autowired protected EmailBusiness emailBusiness;
     @Autowired protected GRIDAClient gridaClient;
     @Autowired protected GroupBusiness groupBusiness;
+    @Autowired protected GroupDAO groupDAO;
+    @Autowired protected List<TestConfigurer> testConfigurers;
 
     protected final String emailUser1 = "test1@test.fr";
     protected final String emailUser2 = "test2@test.fr";
@@ -84,9 +98,9 @@ public abstract class BaseSpringIT {
 
     @BeforeEach
     protected void setUp() throws Exception {
-        ServerMockConfig.reset(server);
-        Mockito.reset(gridaClient);
-        Mockito.doReturn(new String[]{"test@admin.test"}).when(emailBusiness).getAdministratorsEmails();
+        for (TestConfigurer testConfigurer : testConfigurers) {
+            testConfigurer.setUpBeforeEachTest();
+        }
     }
 
     protected void assertRowsNbInTable(String tableName, int expectedNb) {

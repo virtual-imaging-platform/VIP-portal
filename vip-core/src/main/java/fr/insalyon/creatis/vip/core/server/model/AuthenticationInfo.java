@@ -29,70 +29,29 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.security.apikey;
-
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collection;
+package fr.insalyon.creatis.vip.core.server.model;
 
 /**
- * Vip user proxy that is conform to spring security (must implement a specific class)
- *
- * Created by abonnet on 7/25/16.
+ * Created by abonnet on 8/21/17.
  */
-public class SpringApiPrincipal implements UserDetails, Principal {
+public class AuthenticationInfo {
 
-    private final User vipUser;
+    private String httpHeader;
+    private String httpHeaderValue;
 
-    public SpringApiPrincipal(User vipUser) {
-        this.vipUser = vipUser;
+    public String getHttpHeader() {
+        return httpHeader;
     }
 
-    public User getVipUser() {
-        return vipUser;
+    public void setHttpHeader(String httpHeader) {
+        this.httpHeader = httpHeader;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new ArrayList<>(); // not used at the moment
+    public String getHttpHeaderValue() {
+        return httpHeaderValue;
     }
 
-    @Override
-    public String getPassword() {
-        return vipUser.getPassword();
-    }
-
-    @Override
-    public String getUsername() {
-        return vipUser.getEmail();
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true; // not used at the moment
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !vipUser.isAccountLocked();
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true; // not used at the moment
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true; // not used at the moment
-    }
-
-    @Override
-    public String getName() {
-        return getUsername();
+    public void setHttpHeaderValue(String httpHeaderValue) {
+        this.httpHeaderValue = httpHeaderValue;
     }
 }

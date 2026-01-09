@@ -33,10 +33,8 @@ package fr.insalyon.creatis.vip.core.server.security;
 
 import  fr.insalyon.creatis.vip.core.server.business.Server;
 
-import fr.insalyon.creatis.vip.core.server.security.apikey.SpringApiPrincipal;
 import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationFilter;
 import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationProvider;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 
 import fr.insalyon.creatis.vip.core.server.security.oidc.OidcConfig;
 import fr.insalyon.creatis.vip.core.server.security.oidc.OidcResolver;
@@ -47,20 +45,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Service;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * VIP API configuration for API key and OIDC authentications.
@@ -93,6 +92,22 @@ public class RestApiSecurityConfig {
         this.oidcResolver = oidcResolver;
     }
 
+    // Do not make it a bean as it is only used to configure CORS exceptions specific to /rest endpoints
+    // It is used in the apiFilterChain method just bellow
+    // It allows some CORS exceptions only for the /rest endpoints
+    public CorsConfigurationSource restCorsConfigurationSource() {
+        // applyPermitDefaultValues allows all origins, GET-HEAD-POST, and all headers
+        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
+        // We override with a white list of origins
+        configuration.setAllowedOrigins(Arrays.asList(server.getCarminCorsAuthorizedDomains()));
+        // We override with all methods (to allow PUT and DELETE)
+        configuration.setAllowedMethods(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // protect all requests of this security chain (the /rest one)
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Bean
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
@@ -119,7 +134,7 @@ public class RestApiSecurityConfig {
                 // session must be activated otherwise OIDC auth info will be lost when accessing /rest/loginOIDC
                 // .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .anonymous((anonymous) -> anonymous.disable())
-                .cors(Customizer.withDefaults())
+                .cors(corsConfigurer -> corsConfigurer.configurationSource(restCorsConfigurationSource()))
                 .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()))
                 .csrf((csrf) -> csrf.disable());
         // API key authentication always active
@@ -147,30 +162,6 @@ public class RestApiSecurityConfig {
                 vipAuthenticationEntryPoint, apikeyAuthenticationProvider);
     }
 
-    // Provide authenticated user after a successful API key or OIDC token authentication
-    @Service
-    public static class CurrentUserProvider implements Supplier<User> {
-
-        private final Logger logger = LoggerFactory.getLogger(getClass());
-
-        @Override
-        public User get() {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null) {
-                return null;
-            }
-            Object principal = authentication.getPrincipal();
-            if (principal instanceof SpringApiPrincipal) { // API key authentication
-                return ((SpringApiPrincipal) principal).getVipUser();
-            } else if (principal instanceof User) { // OIDC authentication
-                return (User) principal;
-            } else { // no resolvable user found (shouldn't happen)
-                logger.error("CurrentUserProvider: unknown principal class {}", principal.getClass());
-                return null;
-            }
-        }
-    }
-
     /*
         Do not use the default firewall (StrictHttpFirewall) because it blocks
         "//" in url and it is used in gwt rpc calls
@@ -181,5 +172,4 @@ public class RestApiSecurityConfig {
         firewall.setAllowUrlEncodedSlash(true);
         return firewall;
     }
-
 }

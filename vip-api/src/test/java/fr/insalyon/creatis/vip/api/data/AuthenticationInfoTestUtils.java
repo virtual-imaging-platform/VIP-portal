@@ -31,8 +31,9 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.model.AuthenticationInfo;
 import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
+import fr.insalyon.creatis.vip.core.server.model.AuthenticationInfo;
+
 import org.hamcrest.Matcher;
 
 import java.util.Arrays;

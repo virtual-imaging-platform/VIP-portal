@@ -29,29 +29,35 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.model;
+package fr.insalyon.creatis.vip.core.integrationtest;
+
+import fr.insalyon.creatis.vip.core.server.SpringInternalApiConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ContextHierarchy;
 
 /**
- * Created by abonnet on 8/21/17.
+ * Base Class to test the internal API with mocked http requests
+ * See {@link BaseWebSpringIT}
+ * and ({@link fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT}
+ * for more info on configuration.
+ *
+ * In particular, this will pick up automatically all beans / controllers available in the module where this will be
+ * used.
  */
-public class AuthenticationInfo {
+@ContextHierarchy(
+        @ContextConfiguration(name="internal-api", classes = SpringInternalApiConfig.class)
+)
+abstract public class BaseInternalApiSpringIT extends BaseWebSpringIT {
 
-    private String httpHeader;
-    private String httpHeaderValue;
-
-    public String getHttpHeader() {
-        return httpHeader;
+    @Override
+    protected String getServletPath() {
+        return "internal";
     }
 
-    public void setHttpHeader(String httpHeader) {
-        this.httpHeader = httpHeader;
-    }
-
-    public String getHttpHeaderValue() {
-        return httpHeaderValue;
-    }
-
-    public void setHttpHeaderValue(String httpHeaderValue) {
-        this.httpHeaderValue = httpHeaderValue;
+    @BeforeEach
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
     }
 }

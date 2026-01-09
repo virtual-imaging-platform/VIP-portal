@@ -81,7 +81,7 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
     }
 
     protected User getSessionUser() throws CoreException {
-        return vipSessionBusiness.getUserFromSession(this.getThreadLocalRequest());
+        return vipSessionBusiness.getUserFromSession(getThreadLocalRequest(), getThreadLocalResponse());
     }
 
     protected Map<Group, GROUP_ROLE> getUserGroupsFromSession() throws CoreException {

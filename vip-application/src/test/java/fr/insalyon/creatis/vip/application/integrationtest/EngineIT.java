@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class EngineIT extends BaseSpringIT {
-
-    @Autowired
-    private EngineBusiness engineBusiness;
+public class EngineIT extends BaseApplicationSpringIT {
 
     private Engine engine;
 

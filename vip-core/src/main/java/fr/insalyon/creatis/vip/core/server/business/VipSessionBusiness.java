@@ -1,29 +1,29 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPCheckRemoval;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
 
 /*
     Manages the reads/writes of vip core information in the web session
@@ -33,41 +33,23 @@ import java.util.function.Supplier;
 
 @Service
 @Transactional
+@VIPCheckRemoval
 public class VipSessionBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected Server server;
     protected ConfigurationBusiness configurationBusiness;
+    private SessionBusiness sessionBusiness;
 
     @Autowired
-    public VipSessionBusiness(Server server, ConfigurationBusiness configurationBusiness) {
+    public VipSessionBusiness(Server server, ConfigurationBusiness configurationBusiness, SessionBusiness sessionBusiness) {
         this.server = server;
         this.configurationBusiness = configurationBusiness;
+        this.sessionBusiness = sessionBusiness;
     }
 
-    public void setVIPSession(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            User user) throws BusinessException, CoreException {
-        try {
-            configurationBusiness.updateUserLastLogin(user.getEmail());
-            user = setUserInSession(user, request.getSession());
-            Cookie userCookie = new Cookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
-            userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
-            userCookie.setPath("/");
-            response.addCookie(userCookie);
-            Cookie sessionCookie = new Cookie(CoreConstants.COOKIES_SESSION, user.getSession());
-            userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
-            sessionCookie.setPath("/");
-            response.addCookie(sessionCookie);
-        } catch (UnsupportedEncodingException ex) {
-            logger.error("Error setting VIP session for {} ",user, ex);
-            throw new BusinessException(ex);
-        }
-    }
-
-    public User getUserFromSession(HttpServletRequest request) throws CoreException {
+    public User getUserFromSession(HttpServletRequest request, HttpServletResponse response) throws CoreException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute(CoreConstants.SESSION_USER);
         if (user != null) {
@@ -78,13 +60,16 @@ public class VipSessionBusiness {
         user = resetSessionFromCookie(request);
         if (user != null) {
             return user;
+        } else {
+            // still not there -> no user info available -> no user logged in
+            // we clear cookies to avoid blocking account with repeated calls
+            logger.error("No VIP user found in session {}. Attributes : {}",
+                    session.getId(), enumerationToString(session.getAttributeNames()));
+            sessionBusiness.clearLoginCookies(response);
+                    
+            throw new CoreException("User not logged in.");  
         }
-        // still not there -> no user info available -> no user logged in
-        logger.error("No VIP user found in session {}. Attributes : {}",
-                session.getId(), enumerationToString(session.getAttributeNames()));
-        throw new CoreException("User not logged in.");
     }
-
 
     public Map<Group, GROUP_ROLE> getUserGroupsFromSession(HttpServletRequest request)
             throws CoreException {
@@ -110,7 +95,8 @@ public class VipSessionBusiness {
         throw new CoreException("User has no groups defined.");
     }
 
-    protected User resetSessionFromCookie(HttpServletRequest request)
+    @VIPCheckRemoval
+    public User resetSessionFromCookie(HttpServletRequest request)
             throws CoreException {
 
         try {
