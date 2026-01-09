@@ -79,17 +79,10 @@ import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by abonnet on 7/28/16.
- * <p>
- * Base test config that allow spring integration testing for vip API
- * <p>
- * The spring test tools allow to simulate the http layer but everything else
- * is the same as production configuration
- * <p>
- * To authenticate, tests should either
- * * login via with httpbasic(user, password)
- * * use {@link WithMockUser} annotation
- * <p>
+ * Base Class to test the Rest API with mocked http requests
+ * See {@link BaseWebSpringIT}
+ * and ({@link fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT}
+ * for more info on configuration
  */
 @ContextHierarchy(
         @ContextConfiguration(name="rest-api", classes = SpringRestApiConfig.class)

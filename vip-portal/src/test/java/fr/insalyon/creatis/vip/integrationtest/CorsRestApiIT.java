@@ -45,8 +45,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 public class CorsRestApiIT extends BaseRestApiSpringIT {
 
     // GLOBAL note : preflight request does not have credentials
+    // preflight = OPTIONS + "Origin" header + "Access-Control-Request-Method" header
 
     /**
+     * Axel :
+     *
      * How CORS is handled in spring and spring security :
      * - CORS config/exceptions can be configured in the spring MVC config (with WebMvcConfigurer),
      *      this ensures CORS security finely when the request gets to the spring MVC dispatcher,
@@ -56,18 +59,31 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
      *      (so not from the SpringRestApiConfig in our case)
      *      In VIP, when the context was split from 1 big single context to 1 ROOT and 2 children context,
      *      CORS was then misconfigured because without the proper config, spring security let the GET/POST/ETC requests
-     *      go on but blocks the preflight (OPTION) ones
+     *      go on but blocks the preflight (OPTION) ones.
+     *      Preflight requests are mandatory in browsers, so this makes CORS fail
+     *
+     * The easiest solution I found is to make custom CORS configurations in the spring security filter chain,
+     * let spring security handle everything and not configure anything in spring MVC.
+     * So :
+     * - the "/rest" filter chain has the CORS config with exceptions
+     * - the other filter chains ("/internal" and "/") has strict CORS configuration without any exception
+     *
+     * see @{@link fr.insalyon.creatis.vip.core.server.security.RestApiSecurityConfig}
+     * see @{@link fr.insalyon.creatis.vip.core.server.security.GeneralSecurityConfig}
      */
 
     public String apikey;
 
+    /**
+     * insert a user with a valid and known api key
+     */
     @BeforeEach
     public void setUpTestUser() throws BusinessException, GRIDAClientException {
         createUserWithPassword(emailUser2, "coucou");
         apikey = getConfigurationBusiness().generateNewUserApikey(emailUser2);
     }
 
-    // without an Origin header, GET is ok
+    // without an Origin header (not CORS), with a valid api key, GET is ok
     @Test
     public void testGetWithoutOrigin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -78,7 +94,7 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // without an Origin header, with a wrong api key, GET is 401
+    // without an Origin header (not CORS), with a wrong api key, GET is 401
     @Test
     public void testGetWithBadApiKeyWithoutOrigin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -89,7 +105,7 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // without an Origin header, OPTION is not really CORS, so not a preflight, and is rejected
+    // without an Origin header and without credential, OPTION is not a preflight, so not CORS, and is rejected
     @Test
     public void testPreflightWithoutOrigin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -99,7 +115,7 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // with a bad origin, GET should be forbidden
+    // with a bad origin, GET should be forbidden by CORS
     @Test
     public void testCORSGetWithBadOrigin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -111,7 +127,7 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // with a bad origin, preflight OPTION should be forbidden
+    // with a bad origin, preflight OPTION should be forbidden by CORS
     @Test
     public void testCORSPreflightWithBadOrigin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -123,7 +139,7 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // with an allowed origin, GET should be OK
+    // with an allowed origin an valid api key, GET should be OK
     @Test
     public void testCORSGetWithOriginOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -136,7 +152,7 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
     }
 
     // with an allowed origin, preflight OPTION should be ok and return CORS info
-    // we do it for all methods
+    // a preflight specify the HTTP method to check, so we test each one
     public void testCORSPreflightWithOriginOk(String method) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
                         .options("/rest/pipelines")
@@ -169,15 +185,16 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
         testCORSPreflightWithOriginOk("DELETE");
     }
 
-    // If the url does not begin with /rest, there should not be an exception.
-    // It uses the non-secured /platform endpoint.
+    // If the url does not begin with /rest, there should not be an exception and CORS must not be allowed.
+    // we build another MockMvc with a servlet path different than "/rest" to test that
+    // This test uses the non-secured /platform endpoint.
     // With a secured endpoint (actually an endpoint needed a connected user), the user will be null (and will trigger
     // a NPE) as the rest spring security chain won't be used (because mapped on /rest) and so spring won't provide
     // the current user
     // Also note that we use the /internal servlet path to also ensure the CORS config of /internal endpoints in spring
     // security. Actually, the /internal controllers are not loaded in this test context, only the /rest ones.
     @Test
-    public void testCORSGetWithOriginOkButNonRestApi() throws Exception {
+    public void testCORSGetWithOriginOkButOnInternalApi() throws Exception {
         buildMockMvc("internal").perform(MockMvcRequestBuilders
                         .get("/internal/platform")
                         .header("Origin", ServerMockConfig.TEST_CORS_URL)
@@ -187,10 +204,32 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // if the url does not begin with /rest, there should not be an exception
+    // Same thing with a servlet path different than /rest or /internal
+    @Test
+    public void testCORSGetWithOriginOkButNonRestApi() throws Exception {
+        buildMockMvc("testservletpath").perform(MockMvcRequestBuilders
+                        .get("/testservletpath/platform")
+                        .header("Origin", ServerMockConfig.TEST_CORS_URL)
+                        .with(ApikeyRequestPostProcessor.apikey("testapikey", apikey)))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
+    }
+
+    // Same thing but verify it is ok without CORS
+    @Test
+    public void testGetWithOriginOkButNonRestApi() throws Exception {
+        buildMockMvc("testservletpath").perform(MockMvcRequestBuilders
+                        .get("/testservletpath/platform"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
+    }
+
+    // if the url does not begin with /rest, there should not be an exception for preflight
     // must use the non-secured /platform endpoint, see previous test why
     @Test
-    public void testCORSPreflightWithOriginOkButNonRestApi() throws Exception {
+    public void testCORSPreflightWithOriginOkButOnInternalApi() throws Exception {
         buildMockMvc("internal").perform(MockMvcRequestBuilders
                         .options("/internal/platform")
                         .header("Origin", ServerMockConfig.TEST_CORS_URL)

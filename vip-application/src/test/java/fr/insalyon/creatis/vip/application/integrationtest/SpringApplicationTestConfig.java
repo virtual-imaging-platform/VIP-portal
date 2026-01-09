@@ -25,7 +25,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 /*
-   replaces workflowsdb beans by mocks in tests
+   Replaces workflowsdb beans by mocks in tests.
+   And configure them with a TestConfigurer
  */
 @Configuration
 @Profile("test")

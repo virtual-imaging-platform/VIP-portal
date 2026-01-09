@@ -44,10 +44,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <packaging>jar</packaging>
     <name>VIP-API</name>
 
-    <properties>
-        <skip.itests>true</skip.itests>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
@@ -98,12 +94,21 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>itest</id>
-            <properties>
-                <skip.itests>false</skip.itests>
-            </properties>
-        </profile>
-    </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <!-- this adds the test code as a maven artefact to use it elsewhere -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

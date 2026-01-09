@@ -50,7 +50,16 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-
+/**
+ * This is the base class to extends the BaseSpringIT test class (with only the root application context) with
+ * the necessary spring-web tests.
+ * Spring web uses a MockMvc that mocks a single Spring MVC Dispatcher servlet, so one MockMvc can only be used on
+ * the Rest API or the internal api API, not both.
+ * There are 2 separate Base Test class for each API, extending this with a custom @ContextHierarchy and with the
+ * appropriate servlet path in getServletPath()
+ * see {@link BaseInternalApiSpringIT}
+ * and {@link fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT} (in vip-api)
+ */
 abstract public class BaseWebSpringIT extends BaseSpringIT {
 
     @Autowired

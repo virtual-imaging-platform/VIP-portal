@@ -41,21 +41,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ContextHierarchy;
 
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Created by abonnet on 7/22/16.
- *
- * These tests check the authentication with the spring test tools.
- * It requests a wrong url that should be secured and expects a 404 when OK
- * <p>
- * Use common vip spring test configuration ({@link BaseRestApiSpringIT}
+
+/*
+ Needs to merge the mock of UserDAO into the root application context
  */
-@ContextConfiguration(classes = SpringAuthenticationWithMockedUserDaoIT.TestContextConfiguration.class)
+@ContextHierarchy(
+    @ContextConfiguration(name="root", classes = SpringAuthenticationWithMockedUserDaoIT.TestContextConfiguration.class)
+)
 public class SpringAuthenticationWithMockedUserDaoIT extends BaseRestApiSpringIT {
 
     static class TestContextConfiguration {
@@ -66,6 +65,9 @@ public class SpringAuthenticationWithMockedUserDaoIT extends BaseRestApiSpringIT
         }
     }
 
+    /**
+     * Test that an unexpected runtime exception ends up with a clean AuthenticationError
+     */
     @Test
     public void authenticationWithCoreKo() throws Exception {
         Mockito.when(getUserDAO().getUserByApikey("apikeyvalue"))

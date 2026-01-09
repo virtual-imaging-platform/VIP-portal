@@ -51,7 +51,7 @@ import java.util.Arrays;
 public class CorsInternalApiIT extends BaseInternalApiSpringIT {
 
     /**
-     * See CorsRestApiIt for information on CORS config and testing in VIP
+     * See CorsRestApiIT for information on CORS config and testing in VIP
      *
      * Here, it is just to verify that CORS is always blocked on the internal API, because the exceptions must
      * only be allowed on /rest

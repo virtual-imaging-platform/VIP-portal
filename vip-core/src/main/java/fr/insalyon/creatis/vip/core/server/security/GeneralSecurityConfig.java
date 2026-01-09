@@ -43,13 +43,16 @@ public class GeneralSecurityConfig {
         this.oidcLoginConfig = oidcLoginConfig;
     }
 
-    // global CORS configuration used when cors is configured with ".cors(Customizer.withDefaults())" in the filter chain
-    // it forbid any CORS stuff
-    // it is overridden for /rest in RestApiSecurityConfig
+    // Global CORS configuration used when cors is configured with ".cors(Customizer.withDefaults())" in the filter chain
+    // The bean has to be named corsConfigurationSource to be picked up by spring security
+    // It forbids any CORS request (preflight or not)
+    // It is overridden for /rest in RestApiSecurityConfig
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration(); // default constructor allows nothing
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // Protect all requests of this security chain configured withDefaults ("/internal" and "/").
+        // the "/rest" security chain has another config with exceptions
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

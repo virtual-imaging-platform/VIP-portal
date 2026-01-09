@@ -92,13 +92,18 @@ public class RestApiSecurityConfig {
         this.oidcResolver = oidcResolver;
     }
 
-    // do not make it a bean as it is only used to configure CORS exceptions specific to /rest endpoints
-    // it is used in the apiFilterChain method just bellow
+    // Do not make it a bean as it is only used to configure CORS exceptions specific to /rest endpoints
+    // It is used in the apiFilterChain method just bellow
+    // It allows some CORS exceptions only for the /rest endpoints
     public CorsConfigurationSource restCorsConfigurationSource() {
+        // applyPermitDefaultValues allows all origins, GET-HEAD-POST, and all headers
         CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
+        // We override with a white list of origins
         configuration.setAllowedOrigins(Arrays.asList(server.getCarminCorsAuthorizedDomains()));
+        // We override with all methods (to allow PUT and DELETE)
         configuration.setAllowedMethods(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // protect all requests of this security chain (the /rest one)
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

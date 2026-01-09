@@ -1,12 +1,17 @@
 package fr.insalyon.creatis.vip.core.integrationtest;
 
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.mockito.Mockito;
 import org.mockito.quality.Strictness;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
@@ -59,6 +64,18 @@ public class ServerMockConfig {
         // CORS_AUTHORIZED_DOMAINS is only used in vip-api, but in the SpringRestApiConfig (servlet context),
         // which uses a Server bean internally. We mock it here, currently lacking a cleaner solution for a higher level mock.
         when(server.getCarminCorsAuthorizedDomains()).thenReturn(new String[]{TEST_CORS_URL});
+    }
+
+    @Component
+    public static class CoreTestConfigurer implements TestConfigurer {
+
+        @Autowired
+        Server server;
+
+        @Override
+        public void setUpBeforeEachTest() throws DAOException {
+            ServerMockConfig.reset(server);
+        }
     }
 
     @Bean
