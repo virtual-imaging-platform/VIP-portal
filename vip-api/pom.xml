@@ -44,12 +44,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <packaging>jar</packaging>
     <name>VIP-API</name>
 
-    <properties>
-        <skip.itests>true</skip.itests>
-        <test.version.hamcrest>2.2</test.version.hamcrest>
-        <test.version.mockito>3.3.3</test.version.mockito>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
@@ -82,24 +76,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <!-- Test dependencies -->
 
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <version>${springsecurity.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>2.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
-            <version>${test.version.hamcrest}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
             <version>${project.version}</version>
@@ -113,16 +89,26 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
         <!-- End test dependencies -->
 
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>itest</id>
-            <properties>
-                <skip.itests>false</skip.itests>
-            </properties>
-        </profile>
-    </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <!-- this adds the test code as a maven artefact to use it elsewhere -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

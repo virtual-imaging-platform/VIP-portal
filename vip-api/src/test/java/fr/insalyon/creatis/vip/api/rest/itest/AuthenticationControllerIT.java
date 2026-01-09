@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.itest;
 
 import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Created by abonnet on 8/21/17.
  */
-public class AuthenticationControllerIT extends BaseWebSpringIT {
+public class AuthenticationControllerIT extends BaseRestApiSpringIT {
 
     @Test
     public void badPasswordAuthentication() throws Exception {

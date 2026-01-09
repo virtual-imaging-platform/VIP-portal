@@ -27,12 +27,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
-public class ResourceIT extends BaseSpringIT {
-    
-    @Autowired private ResourceBusiness resourceBusiness;
-    @Autowired private ApplicationBusiness appBusiness;
-    @Autowired private EngineBusiness engineBusiness;
-    @Autowired private AppVersionBusiness appVersionBusiness;
+public class ResourceIT extends BaseApplicationSpringIT {
 
     private Resource resource;
 

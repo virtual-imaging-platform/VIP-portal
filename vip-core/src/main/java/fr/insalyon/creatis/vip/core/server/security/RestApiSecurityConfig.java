@@ -54,6 +54,12 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * VIP API configuration for API key and OIDC authentications.
@@ -86,6 +92,22 @@ public class RestApiSecurityConfig {
         this.oidcResolver = oidcResolver;
     }
 
+    // Do not make it a bean as it is only used to configure CORS exceptions specific to /rest endpoints
+    // It is used in the apiFilterChain method just bellow
+    // It allows some CORS exceptions only for the /rest endpoints
+    public CorsConfigurationSource restCorsConfigurationSource() {
+        // applyPermitDefaultValues allows all origins, GET-HEAD-POST, and all headers
+        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
+        // We override with a white list of origins
+        configuration.setAllowedOrigins(Arrays.asList(server.getCarminCorsAuthorizedDomains()));
+        // We override with all methods (to allow PUT and DELETE)
+        configuration.setAllowedMethods(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // protect all requests of this security chain (the /rest one)
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Bean
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
@@ -112,7 +134,7 @@ public class RestApiSecurityConfig {
                 // session must be activated otherwise OIDC auth info will be lost when accessing /rest/loginOIDC
                 // .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .anonymous((anonymous) -> anonymous.disable())
-                .cors(Customizer.withDefaults())
+                .cors(corsConfigurer -> corsConfigurer.configurationSource(restCorsConfigurationSource()))
                 .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()))
                 .csrf((csrf) -> csrf.disable());
         // API key authentication always active

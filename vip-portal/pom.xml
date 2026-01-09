@@ -251,6 +251,15 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-api</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- End test dependencies -->
     </dependencies>
 
     <build>
