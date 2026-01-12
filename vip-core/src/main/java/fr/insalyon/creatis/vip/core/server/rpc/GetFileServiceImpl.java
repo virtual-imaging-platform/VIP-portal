@@ -75,9 +75,13 @@ public class GetFileServiceImpl extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException {
         try {
-            User user = userDAO.getUserBySession(
-                    req.getParameter(CoreConstants.COOKIES_SESSION));
+            User user = userDAO.getUserBySession(req.getParameter(CoreConstants.COOKIES_SESSION));
 
+            if (user == null) {
+                // this is only to avoid NPE but in practice
+                // should not happen very often
+                return;
+            }
             String filepath = req.getParameter("filepath");
 
             if (filepath != null && !filepath.isEmpty()) {
