@@ -180,7 +180,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(status().is4xxClientError()); // waiting for good API Exception
+                    .andExpect(jsonPath("$.errorCode").value(1001));
 
         // update app wrong matching ids
         mockMvc.perform(put("/internal/applications/not_good_name")
