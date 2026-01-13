@@ -160,7 +160,15 @@ public class ApplicationControllerIT extends BaseSpringIT {
 
     @Test
     public void update() throws Exception {
+        // set group public
+        group.setPublicGroup(true);
+        groupBusiness.update(nameGroup1, group);
+
         Application app = new Application("super_app", "les applications sont vraiment belles");
+        app.setGroups(List.of(group));
+
+        configurationBusiness.addUserToGroup(emailUser2, nameGroup1);
+        developperUser = configurationBusiness.getUserWithGroups(emailUser2);
 
         // create app
         mockMvc.perform(post("/internal/applications")
@@ -168,7 +176,16 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(app)))
                     .andExpect(status().isOk());
 
-        app.setCitation("les applications sont vraimen moches");
+        app.setCitation("les applications sont vraiment moches");
+
+        // developer try to edit application in public group
+        mockMvc.perform(put("/internal/applications/" + app.getName())
+            .with(getUserSecurityMock(developperUser))
+            .with(SecurityMockMvcRequestPostProcessors.csrf())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(app)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(status().is4xxClientError()); // waiting for good API Exception
 
         // update app wrong matching ids
         mockMvc.perform(put("/internal/applications/not_good_name")
@@ -176,7 +193,6 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errorCode").value(8009));
 
@@ -186,7 +202,6 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                .andDo(print())
                     .andExpect(status().isOk());
     }
 

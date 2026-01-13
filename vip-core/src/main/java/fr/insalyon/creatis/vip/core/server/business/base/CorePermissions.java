@@ -70,7 +70,7 @@ public class CorePermissions {
     }
 
     public <T> void checkUnchanged(T a, T b) throws BusinessException {
-        if (a != b) {
+        if (!a.equals(b)) {
             throw new BusinessException(CoreConstants.NOT_RIGHT); 
         }
     }

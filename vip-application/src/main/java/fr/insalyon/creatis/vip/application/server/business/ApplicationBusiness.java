@@ -131,6 +131,8 @@ public class ApplicationBusiness extends CommonBusiness {
         if (userSupplier.get().getLevel().equals(UserLevel.Developer)) {
             // developer can only associate group at CREATION
             permissions.checkUnchanged(app.getGroups(), existingApp.getGroups());
+            // edition only on application from privates groups
+            permissions.checkOnlyUserPrivateGroups(existingApp.getGroups());
         }
         try {
             Application before = getApplication(app.getName());
