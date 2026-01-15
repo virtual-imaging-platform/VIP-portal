@@ -68,7 +68,7 @@ abstract public class BaseWebSpringIT extends BaseSpringIT {
     @Autowired
     protected ResourceLoader resourceLoader;
     @Autowired
-    protected UserDAO testUserDAO;
+    protected UserDAO userDAO;
     @Autowired
     protected ConfigurationBusiness configurationBusiness;
     @Autowired
@@ -113,7 +113,7 @@ abstract public class BaseWebSpringIT extends BaseSpringIT {
     }
 
     public UserDAO getUserDAO() {
-        return testUserDAO;
+        return userDAO;
     }
 
     public ConfigurationBusiness getConfigurationBusiness() {

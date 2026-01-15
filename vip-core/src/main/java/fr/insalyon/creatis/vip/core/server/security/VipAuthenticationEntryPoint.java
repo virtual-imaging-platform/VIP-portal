@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.core.server.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 import org.slf4j.Logger;
@@ -59,10 +60,12 @@ public class VipAuthenticationEntryPoint implements AuthenticationEntryPoint, Au
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ObjectMapper objectMapper;
+    private final Server server;
 
     @Autowired
-    public VipAuthenticationEntryPoint(ObjectMapper objectMapper) {
+    public VipAuthenticationEntryPoint(ObjectMapper objectMapper, Server server) {
         this.objectMapper = objectMapper;
+        this.server = server;
     }
 
     @Override
@@ -74,7 +77,7 @@ public class VipAuthenticationEntryPoint implements AuthenticationEntryPoint, Au
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         // OIDC resource server handler may already have set this header
         if ( ! response.containsHeader("WWW-Authenticate")) {
-            response.addHeader("WWW-Authenticate", "API-key");
+            response.addHeader("WWW-Authenticate", "header; header-name=" + server.getApikeyHeaderName());
         }
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         ErrorCodeAndMessage error = new ErrorCodeAndMessage();
