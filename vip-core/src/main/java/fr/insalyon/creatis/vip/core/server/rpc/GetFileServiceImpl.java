@@ -80,7 +80,7 @@ public class GetFileServiceImpl extends HttpServlet {
             if (user == null) {
                 // this is only to avoid NPE but in practice
                 // should not happen very often
-                return;
+                throw new ServletException("User not found in the session!");
             }
             String filepath = req.getParameter("filepath");
 
