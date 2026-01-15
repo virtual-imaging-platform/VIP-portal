@@ -26,17 +26,6 @@ async function get_fetch_authenticate(form_email, form_password){
 
 }
 
-function setCookie(value_user, value_session, exdays) {
-    cname = "vip-cookie-user"
-    csession = "vip-cookie-session"
-    const d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    let expires = "expires="+d.toUTCString();
-    document.cookie = cname + "=" + value_user + ";" + expires + ";path=/";
-    document.cookie = csession + "=" + value_session + ";" + expires + ";path=/";
-    window.location.href="home.html";
-}
-
 async function createUser(){
     let isValid = true;
 
@@ -78,8 +67,7 @@ async function createUser(){
     if (isValid) {
         try {
                 await get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country);
-                const data = await get_fetch_authenticate(new_email, new_password);
-                setCookie(new_email, data.httpHeaderValue, 7);
+                await get_fetch_authenticate(new_email, new_password);
             } catch (error) {
                 console.log(error);
                 document.getElementById('fetch-failed').style.display = 'block';
