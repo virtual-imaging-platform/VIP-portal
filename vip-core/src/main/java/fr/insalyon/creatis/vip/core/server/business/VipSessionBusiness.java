@@ -123,9 +123,13 @@ public class VipSessionBusiness {
     }
 
     private Map<String, String> getCookies(HttpServletRequest request) {
-        HashMap<String,String> cookiesMap = new HashMap<>();
-        for (Cookie cookie : request.getCookies()) {
-            cookiesMap.put(cookie.getName(), decodeCookieValue(cookie.getValue()));
+        HashMap<String, String> cookiesMap = new HashMap<>();
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                cookiesMap.put(cookie.getName(), decodeCookieValue(cookie.getValue()));
+            }
         }
         return cookiesMap;
     }
