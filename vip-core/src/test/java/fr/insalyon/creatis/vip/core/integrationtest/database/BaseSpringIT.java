@@ -1,5 +1,13 @@
 package fr.insalyon.creatis.vip.core.integrationtest.database;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -28,9 +36,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -77,6 +83,8 @@ public abstract class BaseSpringIT {
     @Autowired protected GroupDAO groupDAO;
     @Autowired protected List<TestConfigurer> testConfigurers;
 
+    protected ObjectMapper mapper;
+
     protected final String emailUser1 = "test1@test.fr";
     protected final String emailUser2 = "test2@test.fr";
     protected final String emailUser3 = "test3@test.fr";
@@ -98,6 +106,9 @@ public abstract class BaseSpringIT {
 
     @BeforeEach
     protected void setUp() throws Exception {
+        // by default spring mvc json path validation uses JsonPath that use a json-smart parser
+        // we change that to Jackson, and we make jackson strict to refuse things like : {"foo":42}bar
+        setUpStrictJacksonMapper();
         for (TestConfigurer testConfigurer : testConfigurers) {
             testConfigurer.setUpBeforeEachTest();
         }
@@ -162,6 +173,28 @@ public abstract class BaseSpringIT {
 
     protected Date getNextSecondDate() {
         return new Date(new Date().getTime() + (1000));
+    }
+
+    protected void setUpStrictJacksonMapper() throws Exception {
+        // by default JsonPath uses json-smart, change to jackson with strict mode
+        mapper = new ObjectMapper();
+        mapper.enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
+        Configuration.setDefaults(new Configuration.Defaults() {
+            @Override
+            public JsonProvider jsonProvider() {
+                return new JacksonJsonProvider(mapper);
+            }
+
+            @Override
+            public Set<Option> options() {
+                return EnumSet.noneOf(Option.class);
+            }
+
+            @Override
+            public MappingProvider mappingProvider() {
+                return new JacksonMappingProvider();
+            }
+        });
     }
 
 
