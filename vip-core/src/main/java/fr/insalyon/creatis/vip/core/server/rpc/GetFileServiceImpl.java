@@ -75,14 +75,15 @@ public class GetFileServiceImpl extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException {
         try {
-            User user = userDAO.getUserBySession(req.getParameter(CoreConstants.COOKIES_SESSION));
+
+            User user = (User) req.getSession().getAttribute(CoreConstants.SESSION_USER);
+            String filepath = req.getParameter("filepath");
 
             if (user == null) {
-                // this is only to avoid NPE but in practice
-                // should not happen very often
-                throw new ServletException("User not found in the session!");
+                logger.warn("Download from an unlogged user (filepath : {}", filepath);
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not logged in");
+                return;
             }
-            String filepath = req.getParameter("filepath");
 
             if (filepath != null && !filepath.isEmpty()) {
 
