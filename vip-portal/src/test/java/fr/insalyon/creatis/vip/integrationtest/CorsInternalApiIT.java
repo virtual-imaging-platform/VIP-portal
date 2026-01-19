@@ -53,8 +53,8 @@ public class CorsInternalApiIT extends BaseInternalApiSpringIT {
     /**
      * See CorsRestApiIT for information on CORS config and testing in VIP
      *
-     * Here, it is just to verify that CORS is always blocked on the internal API, because the exceptions must
-     * only be allowed on /rest
+     * Here, it is just to verify that CORS is configured with the default stuff (block preflight, rest is ok),
+     * because the exceptions must only be allowed on /rest
      */
 
     public String sessionCode;
@@ -97,7 +97,7 @@ public class CorsInternalApiIT extends BaseInternalApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // with a bad origin, GET should be forbidden
+    // with a bad origin, GET is ok (net a preflight)
     @Test
     public void testCORSGetWithBadOrigin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -105,7 +105,7 @@ public class CorsInternalApiIT extends BaseInternalApiSpringIT {
                         .header("Origin", "https://bad-url.com")
                         .cookie(new Cookie(CoreConstants.COOKIES_SESSION, sessionCode)))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
@@ -121,7 +121,7 @@ public class CorsInternalApiIT extends BaseInternalApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // with an allowed origin for /rest, GET should be KO for /internal
+    // with an allowed origin for /rest, GET should be also OK for /internal (not a preflight)
     @Test
     public void testCORSGetWithOriginOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -129,7 +129,7 @@ public class CorsInternalApiIT extends BaseInternalApiSpringIT {
                         .header("Origin", ServerMockConfig.TEST_CORS_URL)
                         .cookie(new Cookie(CoreConstants.COOKIES_SESSION, sessionCode)))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 

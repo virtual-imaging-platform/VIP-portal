@@ -39,6 +39,7 @@ public class InternalSecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(antMatcher(HttpMethod.POST, "/internal/session")).permitAll()
                         .requestMatchers(antMatcher("/internal/**")).authenticated())
+                // default CORS : no configuration, so block preflight and let the rest
                 .cors(Customizer.withDefaults())
                 .csrf((csrf) -> csrf
                         // CSRF token managed by SpringSecurity but MANUALLY setted in the controller
