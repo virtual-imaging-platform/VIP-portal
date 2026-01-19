@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -20,6 +22,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class SessionBusiness {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     final private ConfigurationBusiness configurationBusiness;
     final private Supplier<User> userProvider;
@@ -75,12 +79,13 @@ public class SessionBusiness {
 
     private Cookie createCookie(String name, String value, int maxAge, boolean httpOnly) {
         Cookie cookie = new Cookie(name, value);
-        boolean isSecure = server.isDevMode();
+        boolean isSecure = ! server.isDevMode();
 
         cookie.setPath("/");
         cookie.setHttpOnly(httpOnly);
         cookie.setSecure(isSecure);
         cookie.setMaxAge(maxAge);
+        logger.debug("Creating {} cookie, secured : {}, httpOnly : {}", name, isSecure, httpOnly);
         return cookie;
     }
 }
