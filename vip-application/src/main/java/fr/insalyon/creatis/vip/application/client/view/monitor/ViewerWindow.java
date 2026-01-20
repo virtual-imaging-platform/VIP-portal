@@ -173,9 +173,7 @@ public class ViewerWindow extends Window {
                 com.google.gwt.user.client.Window.open(
                         GWT.getModuleBaseURL()
                         + "/getfileservice?filepath=" + "/" + simulationID
-                        + "/" + folder + "/" + fileName + extension
-                        + "&" + CoreConstants.COOKIES_SESSION
-                        + "=" + Cookies.getCookie(CoreConstants.COOKIES_SESSION),
+                        + "/" + folder + "/" + fileName + extension,
                         "", "");
             }
         });

@@ -65,8 +65,10 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
      * The easiest solution I found is to make custom CORS configurations in the spring security filter chain,
      * let spring security handle everything and not configure anything in spring MVC.
      * So :
-     * - the "/rest" filter chain has the CORS config with exceptions
-     * - the other filter chains ("/internal" and "/") has strict CORS configuration without any exception
+     * - The "/rest" filter chain has the CORS config with exceptions
+     * - The other filter chains ("/internal" and "/") has the default security (Blocks preflight but let the rest)
+     *   This should not be strict because in the case where the web server is behind a reverse proxy, spring will
+     *   interpret
      *
      * see @{@link fr.insalyon.creatis.vip.core.server.security.RestApiSecurityConfig}
      * see @{@link fr.insalyon.creatis.vip.core.server.security.GeneralSecurityConfig}
@@ -185,7 +187,10 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
         testCORSPreflightWithOriginOk("DELETE");
     }
 
-    // If the url does not begin with /rest, there should not be an exception and CORS must not be allowed.
+    // If the url does not begin with /rest, there should not be an exception, but with the default behavior only
+    // preflight are blocked.
+    // Here the request should go through CORS checks, but fails on spring security because /internal/*** is secured
+    // by cookies
     // we build another MockMvc with a servlet path different than "/rest" to test that
     // This test uses the non-secured /platform endpoint.
     // With a secured endpoint (actually an endpoint needed a connected user), the user will be null (and will trigger
@@ -200,11 +205,12 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
                         .header("Origin", ServerMockConfig.TEST_CORS_URL)
                         .with(ApikeyRequestPostProcessor.apikey("testapikey", apikey)))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
     // Same thing with a servlet path different than /rest or /internal
+    // not a preflight, so OK
     @Test
     public void testCORSGetWithOriginOkButNonRestApi() throws Exception {
         buildMockMvc("testservletpath").perform(MockMvcRequestBuilders
@@ -212,7 +218,7 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
                         .header("Origin", ServerMockConfig.TEST_CORS_URL)
                         .with(ApikeyRequestPostProcessor.apikey("testapikey", apikey)))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
