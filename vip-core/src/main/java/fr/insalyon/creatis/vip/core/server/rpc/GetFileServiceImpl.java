@@ -51,6 +51,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  *
@@ -87,8 +89,17 @@ public class GetFileServiceImpl extends HttpServlet {
 
             if (filepath != null && !filepath.isEmpty()) {
 
-                File file = new File(server.getWorkflowsPath()
-                        + filepath);
+                // normalize and verify there is no risk of accessing a file outside the workflows directory
+                Path workflowsPath = Paths.get(server.getWorkflowsPath()).normalize().toAbsolutePath();
+                Path requestedPath = workflowsPath.resolve(filepath).normalize().toAbsolutePath();
+
+                if ( ! requestedPath.startsWith(workflowsPath)) {
+                    logger.warn("(" + user.getEmail() + ") Attempt to access file outside workflows path: '" + filepath + "'.");
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid file path");
+                    return;
+                }
+
+                File file = requestedPath.toFile();
 
                 boolean isDir = false;
                 if (file.isDirectory()) {
