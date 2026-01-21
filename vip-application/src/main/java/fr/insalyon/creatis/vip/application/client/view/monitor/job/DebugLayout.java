@@ -249,9 +249,7 @@ public class DebugLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 com.google.gwt.user.client.Window.open(
                         GWT.getModuleBaseURL()
-                        + "/getfileservice?filepath=" + loadedFile
-                        + "&" + CoreConstants.COOKIES_SESSION
-                        + "=" + Cookies.getCookie(CoreConstants.COOKIES_SESSION),
+                        + "/getfileservice?filepath=" + loadedFile,
                         "", "");
             }
         });
