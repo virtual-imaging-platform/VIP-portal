@@ -91,7 +91,7 @@ public class GetFileServiceImpl extends HttpServlet {
 
                 // normalize and verify there is no risk of accessing a file outside the workflows directory
                 Path workflowsPath = Paths.get(server.getWorkflowsPath()).normalize().toAbsolutePath();
-                Path requestedPath = workflowsPath.resolve(filepath).normalize().toAbsolutePath();
+                Path requestedPath = Paths.get(server.getWorkflowsPath(), filepath).normalize().toAbsolutePath(); // do not use resolve as filepath could be absolute
 
                 if ( ! requestedPath.startsWith(workflowsPath)) {
                     logger.warn("(" + user.getEmail() + ") Attempt to access file outside workflows path: '" + filepath + "'.");
