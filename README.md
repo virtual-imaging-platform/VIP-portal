@@ -27,6 +27,13 @@ See on https://hub.docker.com/r/viplatform/vip-portal for specific VIP versions 
 
 You can also use the vip-ansible project to install VIP in a virtual machine (contact team members).
 
+# VIP-portal building and testing
+
+Once you have VIP running in a docker container or a VM, you can update it this way:
+- Build a new version of vip-portal with `mvn clean package`
+- This will produce a .war file in `vip-portal/target`
+- You can then scp this .war file in the `tomcat/webapps` directory of the container or the VM.
+
 # Production installation instructions
 
 Contact us at [vip-support@creatis.insa-lyon.fr](vip-support@creatis.insa-lyon.fr).
