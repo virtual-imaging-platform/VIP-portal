@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.publication.server.business;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import fr.insalyon.creatis.vip.publication.server.dao.PublicationDAO;
@@ -85,6 +86,7 @@ public class PublicationBusiness {
     public void addPublication(Publication pub)
             throws BusinessException {
         try {
+            assertDataIsOK(pub);
             publicationDAO.add(pub);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -94,11 +96,27 @@ public class PublicationBusiness {
     public void updatePublication(Publication pub)
             throws BusinessException {
         try {
+            assertDataIsOK(pub);
             publicationDAO.update(pub);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
+
+    private void assertDataIsOK(Publication publication) throws BusinessException {
+        if (publication.getTitle() == null || publication.getTitle().isEmpty()) {
+            throw new BusinessException("Wrong publication : no title !");
+        }
+        if (publication.getAuthors() == null || publication.getAuthors().isEmpty()) {
+            throw new BusinessException("Wrong publication : no author !");
+        }
+        CoreUtil.assertOnlyLatin1Characters(publication.getTitle());
+        CoreUtil.assertOnlyLatin1Characters(publication.getDoi());
+        if (publication.getDoi() != null) {
+            CoreUtil.assertOnlyLatin1Characters(publication.getAuthors());
+        }
+    }
+
     public Publication getPublication(Long id)
             throws BusinessException {
         try {
