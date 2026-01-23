@@ -72,7 +72,7 @@ public class ApplicationsLayout extends VLayout {
                 public void onClick(ClickEvent event) {
                     ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                             getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                    appsTab.setApplication(null, null, null, null);
+                    appsTab.setApplication(null, null, null, null, null);
                 }
             });
             toolstrip.addMember(addButton);
@@ -95,7 +95,7 @@ public class ApplicationsLayout extends VLayout {
         ListGridField nameField = new ListGridField("name", "Application Name");
         ListGridField groupsField = new ListGridField("groupsLabel", "Groups");
         ListGridField resourceField = new ListGridField("resources", "Resources");
-
+        ListGridField noteField = new ListGridField("note", "Note");
         grid = new ListGrid() {
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
@@ -152,7 +152,8 @@ public class ApplicationsLayout extends VLayout {
             grid.setFields(
                 nameField,
                 groupsField,
-                resourceField);
+                resourceField,
+                noteField);
         }
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
@@ -252,6 +253,8 @@ public class ApplicationsLayout extends VLayout {
             record.getAttribute("name"), 
             record.getAttribute("owner"), 
             record.getAttribute("citation"), 
-            groups);
+            record.getAttribute("note"),
+            groups
+        );
     }
 }

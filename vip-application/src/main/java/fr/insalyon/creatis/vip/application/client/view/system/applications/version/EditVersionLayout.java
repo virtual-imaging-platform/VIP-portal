@@ -58,6 +58,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     private IButton newSettingsButton;
     private CheckboxItem isVisibleField;
     private TextItem sourceField;
+    private TextItem noteField;
     private ListGrid tagsGrid;
     private SelectItem resourcesList;
     private IButton saveButton;
@@ -108,8 +109,8 @@ public class EditVersionLayout extends AbstractFormLayout {
         sourceField = FieldUtil.getTextItem(450, null);
         sourceField.setRequired(false);
 
-        sourceField = FieldUtil.getTextItem(450, null);
-        sourceField.setRequired(false);
+        noteField = FieldUtil.getTextItem(450, null);
+        noteField.setRequired(false);
 
         tagsGrid = new ListGrid();
         tagsGrid.setWidth(450);
@@ -138,7 +139,7 @@ public class EditVersionLayout extends AbstractFormLayout {
                 if (versionField.validate()) {
                     AppVersion toSave = new AppVersion(applicationName, versionField.getValueAsString().trim(),
                             descriptorField.getValueAsString(), settingsToMap(), isVisibleField.getValueAsBoolean(),
-                            sourceField.getValueAsString());
+                            sourceField.getValueAsString(), noteField.getValueAsString().trim());
 
                     toSave.setResources(resourcesToList(Arrays.asList(resourcesList.getValues())));
                     toSave.setTags(tagsToList(toSave.getApplicationName(), toSave.getVersion()));
@@ -209,6 +210,8 @@ public class EditVersionLayout extends AbstractFormLayout {
         addInline(sourceLabel, sourceBtn);
         addMember(FieldUtil.getForm(sourceField));
 
+        addField("Note", noteField);
+
         addField("Resources authorized", resourcesList);
         addMember(WidgetUtil.getLabel("<b>" + "Tags Settings" + "</b>", 15));
         addMember(tagsGrid);
@@ -274,7 +277,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setVersion(null, null, true, null, null, null);
+                setVersion(null, null, true, null, null, null, null);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadVersions(applicationName);
@@ -283,7 +286,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     }
 
     public void setApplication(String applicationName) {
-        setVersion(null, null, true, null, null, null);
+        setVersion(null, null, true, null, null, null, null);
         this.applicationName = applicationName;
         this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
         this.versionField.setDisabled(false);
@@ -292,7 +295,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     }
 
     public void setVersion(String version, String descriptor, boolean isVisible, String source,
-            Map<String, String> settings, String[] resources) {
+        String note, Map<String, String> settings, String[] resources) {
         if (version != null) {
             this.versionField.setValue(version);
             this.versionField.setDisabled(true);
@@ -300,6 +303,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.descriptorField.setDisabled(true);
             this.isVisibleField.setValue(isVisible);
             this.sourceField.setValue(source);
+            this.noteField.setValue(note);
             this.resourcesList.setValues(resources);
             this.removeButton.setDisabled(false);
             this.newVersion = false;
@@ -312,6 +316,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.descriptorField.setDisabled(true);
             this.isVisibleField.setValue(true);
             this.sourceField.setValue("");
+            this.noteField.setValue("");
             this.removeButton.setDisabled(true);
             this.newVersion = true;
         }
