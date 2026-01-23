@@ -185,9 +185,9 @@ public class EditPublicationLayout extends AbstractFormLayout {
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newPublication) {
-            PublicationService.Util.getInstance().addPublication(pub, getCallback("add"));
+            PublicationService.Util.getInstance().addPublication(pub, getCallback("Add"));
         } else {
-            PublicationService.Util.getInstance().updatePublication(pub, getCallback("update"));
+            PublicationService.Util.getInstance().updatePublication(pub, getCallback("Update"));
         }
     }
 
@@ -197,6 +197,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to " + text + " publication:<br />" + caught.getMessage());
+                WidgetUtil.resetIButton(saveButton, text, ("Add".equals(text)) ? CoreConstants.ICON_ADD : CoreConstants.ICON_EDIT);
             }
 
             @Override
