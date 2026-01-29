@@ -27,6 +27,7 @@ import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -58,7 +59,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     private IButton newSettingsButton;
     private CheckboxItem isVisibleField;
     private TextItem sourceField;
-    private TextItem noteField;
+    private TextAreaItem noteField;
     private ListGrid tagsGrid;
     private SelectItem resourcesList;
     private IButton saveButton;
@@ -109,8 +110,11 @@ public class EditVersionLayout extends AbstractFormLayout {
         sourceField = FieldUtil.getTextItem(450, null);
         sourceField.setRequired(false);
 
-        noteField = FieldUtil.getTextItem(450, null);
+        noteField = new TextAreaItem();
         noteField.setRequired(false);
+        noteField.setShowTitle(false);
+        noteField.setWidth(450);
+        noteField.setHeight(70);
 
         tagsGrid = new ListGrid();
         tagsGrid.setWidth(450);
@@ -209,9 +213,7 @@ public class EditVersionLayout extends AbstractFormLayout {
         });
         addInline(sourceLabel, sourceBtn);
         addMember(FieldUtil.getForm(sourceField));
-
-        addField("Note", noteField);
-
+        addFieldResponsiveHeight("Note", noteField);
         addField("Resources authorized", resourcesList);
         addMember(WidgetUtil.getLabel("<b>" + "Tags Settings" + "</b>", 15));
         addMember(tagsGrid);

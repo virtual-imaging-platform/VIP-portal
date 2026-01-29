@@ -15,6 +15,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
@@ -41,7 +42,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
 
     private boolean newApplication = true;
     private TextItem nameField;
-    private TextItem noteField;
+    private TextAreaItem noteField;
     private RichTextEditor richTextEditor;
     private SelectItem groupsList;
     private IButton saveButton;
@@ -61,8 +62,11 @@ public class EditApplicationLayout extends AbstractFormLayout {
 
         nameField = FieldUtil.getTextItem(450, null);
 
-        noteField = FieldUtil.getTextItem(450, null);
+        noteField = new TextAreaItem();
         noteField.setRequired(false);
+        noteField.setShowTitle(false);
+        noteField.setWidth(450);
+        noteField.setHeight(70);
 
         usersPickList = new SelectItem();
         usersPickList.setShowTitle(false);
@@ -129,7 +133,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
         addField("Name", nameField);
         addField("Owner", usersPickList);
         addField("Groups", groupsList);
-        addField("Note", noteField);
+        addFieldResponsiveHeight("Note", noteField);
         addMember(WidgetUtil.getLabel("<b>Citation</b>", 15));
         addMember(richTextEditor);
         addMember(removeButton);

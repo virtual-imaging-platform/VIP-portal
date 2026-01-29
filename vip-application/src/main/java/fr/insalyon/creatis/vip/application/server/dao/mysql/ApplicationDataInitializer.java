@@ -94,7 +94,7 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                     "name VARCHAR(255), "
                 +   "citation TEXT, "
                 +   "owner VARCHAR(255), "
-                +   "note VARCHAR(255), "
+                +   "note TEXT, "
                 +   "PRIMARY KEY (name), "
                 +   "FOREIGN KEY (owner) REFERENCES VIPUsers(email) "
                 +   "ON DELETE SET NULL ON UPDATE CASCADE");
@@ -116,7 +116,7 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                 +   "settings " + tableInitializer.getJsonType() + ", "
                 +   "visible BOOLEAN, "
                 +   "source TEXT, "
-                +   "note VARCHAR(255), "
+                +   "note TEXT, "
                 +   "PRIMARY KEY (application, version), "
                 +   "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
                 +   "ON DELETE CASCADE ON UPDATE CASCADE");

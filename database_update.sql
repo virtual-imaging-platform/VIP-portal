@@ -46,5 +46,5 @@ USE workflowsdb;
 ALTER TABLE Workflows ADD tags VARCHAR(255);
 
 -- v4.6
-ALTER TABLE VIPApplications ADD note VARCHAR(255);
-ALTER TABLE VIPAppVersions ADD note VARCHAR(255);
+ALTER TABLE VIPApplications ADD note TEXT;
+ALTER TABLE VIPAppVersions ADD note TEXT;
