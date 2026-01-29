@@ -88,38 +88,42 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
         commonNameField.setDetailFormatter(new DetailFormatter() {
 
-            private int LINE_MAX_CHAR = 18;
+            private static final int LINE_MAX_CHAR = 18;
+            private static final int MAX_LINES = 3;
+            private static final String SEPARATOR_REGEX = "[ \\-_+]";
 
             public String format(Object value, Record record, DetailViewerField field) {
-
-                String[] words = value.toString().split(" ");
+                String[] words = value.toString().split("(?=" + SEPARATOR_REGEX + "[a-zA-Z0-9])", -1);
                 StringBuilder finalName = new StringBuilder();
                 StringBuilder currentLine = new StringBuilder();
                 int lineNumber = 0;
                 int wordIndex = 0;
-                while (lineNumber < 3 && wordIndex < words.length) {
-                    String s = words[wordIndex];
-                    if (currentLine.length() + s.length() > (LINE_MAX_CHAR - 1)) {
-                        if (currentLine.length() > 0) {
-                            if (lineNumber > 0) {
-                                finalName.append("<br/>");
-                            }
-                            finalName.append(buildLine(currentLine));
-                            lineNumber++;
-                        }
-                        currentLine = new StringBuilder(s);
-                    } else {
-                        currentLine.append(" ");
+                while (lineNumber < MAX_LINES && wordIndex < words.length) {
+                    String s = words[wordIndex++];
+                    if (wordIndex < words.length && words[wordIndex].matches(SEPARATOR_REGEX)) {
+                        s += words[wordIndex++];
+                    }
+
+                    if (currentLine.length() + s.length() <= LINE_MAX_CHAR - 1) {
                         currentLine.append(s);
+                        continue;
                     }
-                    wordIndex++;
-                }
-                if (lineNumber < 3) {
-                    if (lineNumber > 0) {
-                        finalName.append("<br/>");
+
+                    if (currentLine.length() > 0) {
+                        finalName.append(lineNumber > 0 ? "<br/>" : "")
+                                .append(buildLine(currentLine));
+                        lineNumber++;
                     }
-                    finalName.append(buildLine(currentLine));
+
+                    currentLine.setLength(0);
+                    currentLine.append(s);
                 }
+
+                if (lineNumber < MAX_LINES) {
+                    finalName.append(lineNumber > 0 ? "<br/>" : "")
+                            .append(buildLine(currentLine));
+                }
+
                 return finalName.toString();
             }
 

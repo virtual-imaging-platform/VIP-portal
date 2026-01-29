@@ -229,7 +229,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
                         configurationBusiness.addUserToGroup("nonExistent user", nameGroup1)
         );
         // INSERT + nonExistent foreign key / part of primary key groupName => user email
-        assertTrue(StringUtils.contains(exception.getMessage(), "JdbcSQLException: Referential integrity constraint violation"));
+        assertTrue(StringUtils.contains(exception.getMessage(), "Referential integrity constraint violation"));
     }
 
     @Test
@@ -241,7 +241,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
                 );
 
         // INSERT + nonExistent foreign key / part of primary key groupName => violation
-        assertTrue(StringUtils.contains(exception.getMessage(), "JdbcSQLException: Referential integrity constraint violation"));
+        assertTrue(StringUtils.contains(exception.getMessage(), "Referential integrity constraint violation"));
 
     }
 

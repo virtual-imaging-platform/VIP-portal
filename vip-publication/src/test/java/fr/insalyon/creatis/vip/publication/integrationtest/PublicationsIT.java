@@ -1,15 +1,26 @@
-package integrationtest;
+package fr.insalyon.creatis.vip.publication.integrationtest;
 
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
+import fr.insalyon.creatis.vip.publication.server.dao.PublicationDAO;
 import org.apache.commons.lang.StringUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.validation.constraints.AssertTrue;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLDataException;
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
 
 public class PublicationsIT extends BaseSpringIT {
     @Autowired
@@ -60,11 +71,15 @@ public class PublicationsIT extends BaseSpringIT {
         Publication publication3 = new Publication(idPublicationCreated, "Publication title", "21/06/2023", "01010100", "author1, author2", "type", "typeName", null);
         publicationBusiness.addPublication(publication3);
 
-        // Without parameter
-        Publication publication4 = new Publication();
-        publicationBusiness.addPublication(publication4);
+        Assertions.assertEquals(4, publicationBusiness.getPublications().size(), "Incorrect publications number");
+    }
 
-        Assertions.assertEquals(5, publicationBusiness.getPublications().size(), "Incorrect publications number");
+    @Test
+    public void testAddPublicationWithoutTitle() throws BusinessException {
+        // Without parameter
+        Publication publication = new Publication();
+
+        Assertions.assertThrows(BusinessException.class, () -> publicationBusiness.addPublication(publication));
     }
 
     @Test
@@ -85,7 +100,7 @@ public class PublicationsIT extends BaseSpringIT {
         );
 
         // INSERT + nonExistent foreign key vipAuthor => violation
-        assertTrue(StringUtils.contains(exception.getMessage(), "JdbcSQLException: Referential integrity constraint violation"));
+        assertTrue(StringUtils.contains(exception.getMessage(), "Referential integrity constraint violation"));
     }
 
 
@@ -152,7 +167,7 @@ public class PublicationsIT extends BaseSpringIT {
         );
 
         // UPDATE + nonExistent foreign key vipAuthor => violation
-        assertTrue(StringUtils.contains(exception.getMessage(), "JdbcSQLException: Referential integrity constraint violation"));
+        assertTrue(StringUtils.contains(exception.getMessage(), "Referential integrity constraint violation"));
         // Verify the update didn't take place
         assertEquals(adminEmail, publicationBusiness.getPublication(idPublicationCreated).getVipAuthor(), "Incorrect vipAuthor publication updated");
     }
@@ -201,6 +216,25 @@ public class PublicationsIT extends BaseSpringIT {
 
         // Verify there is still 1 publication
         Assertions.assertEquals(1, publicationBusiness.getPublications().size(), "Incorrect number of publications");
+    }
+
+    /* ********************************************************************************************************************************************** */
+    /* ************************************************************** special characters test ******************************************************* */
+    /* ********************************************************************************************************************************************** */
+
+    @Test
+    public void testNonAsciiCharacter() {
+
+        Publication publication3 = new Publication(idPublicationCreated, "Publication title with special character :" +
+                " CT‑scan or \u2011 (non breaking hyphen / U+2011)"
+                + " un coeur : I \u2764 Java!",
+                "21/06/2023", "01010100", "author1, author2", "type", "typeName", null);
+
+        BusinessException businessException = assertThrows(BusinessException.class,
+                () -> publicationBusiness.addPublication(publication3));
+
+        System.out.println(businessException.getMessage());
+        Assertions.assertTrue(businessException.getMessage().startsWith("Non-valid characters : [‑‑❤]"));
     }
 
 }
