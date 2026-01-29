@@ -63,7 +63,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <springsecurity.version>6.3.4</springsecurity.version>
         <springoauth.version>6.3.4</springoauth.version>
         <jackson.version>2.18.0</jackson.version>
-        <h2database.version>1.4.196</h2database.version>
+        <h2database.version>2.4.240</h2database.version>
     </properties>
 
     <description>VIP</description>
