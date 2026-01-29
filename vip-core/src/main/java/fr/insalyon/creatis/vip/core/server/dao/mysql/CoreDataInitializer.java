@@ -71,15 +71,15 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                         + "last_login TIMESTAMP, "
                         + "level VARCHAR(50), "
                         + "country_code VARCHAR(2), "
-                        + "max_simulations int(11), "
+                        + "max_simulations INT, "
                         + "termsUse TIMESTAMP, "
                         + "lastUpdatePublications TIMESTAMP,"
-                        + "failed_authentications int(11),"
+                        + "failed_authentications INT,"
                         + "account_locked BOOLEAN,"
                         + "apikey VARCHAR(255),"
                         + "PRIMARY KEY(email),"
-                        + "UNIQUE KEY(first_name,last_name),"
-                        + "UNIQUE KEY(apikey)")) {
+                        + "UNIQUE (first_name,last_name),"
+                        + "UNIQUE (apikey)")) {
 
             String folder = server.getAdminFirstName().toLowerCase() + "_"
                     + server.getAdminLastName().toLowerCase();
@@ -125,7 +125,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
 
     private void initializeTermsOfUseTable() {
         if (tableInitializer.createTable("VIPTermsOfUse",
-                "id INT(11) NOT NULL AUTO_INCREMENT, "
+                "id INT NOT NULL AUTO_INCREMENT, "
                         + "date TIMESTAMP NULL, "
                         + "PRIMARY KEY (id)")) {
             try {

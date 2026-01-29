@@ -70,7 +70,7 @@ public class PublicationDataInitializer extends JdbcDaoSupport {
 
         tableInitializer.createTable(
                 "VIPPublications",
-                "id INT(11) NOT NULL AUTO_INCREMENT, "
+                "id INT NOT NULL AUTO_INCREMENT, "
                         + "title text, "
                         + "date VARCHAR(45), "
                         + "doi VARCHAR(255), "
