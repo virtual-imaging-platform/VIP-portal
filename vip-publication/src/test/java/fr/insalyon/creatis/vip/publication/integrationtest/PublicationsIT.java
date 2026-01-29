@@ -100,7 +100,7 @@ public class PublicationsIT extends BaseSpringIT {
         );
 
         // INSERT + nonExistent foreign key vipAuthor => violation
-        assertTrue(StringUtils.contains(exception.getMessage(), "JdbcSQLException: Referential integrity constraint violation"));
+        assertTrue(StringUtils.contains(exception.getMessage(), "Referential integrity constraint violation"));
     }
 
 
@@ -167,7 +167,7 @@ public class PublicationsIT extends BaseSpringIT {
         );
 
         // UPDATE + nonExistent foreign key vipAuthor => violation
-        assertTrue(StringUtils.contains(exception.getMessage(), "JdbcSQLException: Referential integrity constraint violation"));
+        assertTrue(StringUtils.contains(exception.getMessage(), "Referential integrity constraint violation"));
         // Verify the update didn't take place
         assertEquals(adminEmail, publicationBusiness.getPublication(idPublicationCreated).getVipAuthor(), "Incorrect vipAuthor publication updated");
     }
