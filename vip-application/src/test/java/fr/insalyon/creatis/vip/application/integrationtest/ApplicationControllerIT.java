@@ -139,18 +139,9 @@ public class ApplicationControllerIT extends BaseSpringIT {
         configurationBusiness.addUserToGroup(emailUser2, nameGroup1);
         developperUser = configurationBusiness.getUserWithGroups(emailUser2);
 
-        // developer in the private group can do that
+        // developer/admin in the private group can do that
         mockMvc.perform(delete("/internal/applications/" + app.getName())
             .with(getUserSecurityMock(developperUser))
-            .with(SecurityMockMvcRequestPostProcessors.csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(mapper.writeValueAsString(app.getName())))
-                .andDo(print())
-                    .andExpect(status().isOk()); // waiting for good API Exception
-    
-        // good one and admin!
-        mockMvc.perform(delete("/internal/applications/" + app.getName())
-            .with(getUserSecurityMock(adminUser))
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app.getName())))

@@ -107,7 +107,7 @@ public abstract class BaseSpringIT {
         User u = createUser(email, UUID.randomUUID().toString().substring(0, 4));
 
         configurationBusiness.updateUser(u.getEmail(), level, u.getCountryCode(), u.getMaxRunningSimulations(), false);
-        return configurationBusiness.getUserWithGroups(email);
+        return configurationBusiness.getUser(email);
     }
 
     protected User createUser(String testEmail) throws GRIDAClientException, BusinessException {

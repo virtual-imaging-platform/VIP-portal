@@ -62,7 +62,13 @@ public class ApplicationController {
     @DeleteMapping(value = "{id}")
     public void deleteApplication(@PathVariable String id) throws ApiException {
         try {
-            applicationBusiness.remove(id);
+            Application app = applicationBusiness.get(id);
+
+            if (app == null) {
+                throw new ApiException(ApiException.ApiError.APPLICATION_NOT_FOUND, id);
+            } else {
+                applicationBusiness.remove(id);
+            }
         } catch (BusinessException e) {
             throw new ApiException(e);
         }

@@ -68,7 +68,7 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
     }
 
     protected void putApplicationInGroup(String appName, String groupname) throws BusinessException {
-        getApplicationBusiness().associate(new Application(appName, null), new Group(groupname));
+        getApplicationBusiness().associate(new Application(appName, null), groupname);
     }
 
     protected AppVersion createAVersion(String appName, String versionName, boolean visible) throws BusinessException {

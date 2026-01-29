@@ -9,10 +9,10 @@ import fr.insalyon.creatis.vip.core.server.model.PrecisePage;
 @Service
 public class PageBuilder {
     
-    public <T> PrecisePage<T> doPrecise(int offset, int limit, List<T> data) {
+    public <T> PrecisePage<T> doPrecise(int offset, int quantity, List<T> data) {
         PrecisePage<T> page = new PrecisePage<>();
         int dataSize = data.size();
-        int endIndex = Math.min(offset + limit, dataSize);
+        int endIndex = Math.min(offset + quantity, dataSize);
 
         // if the offest exceed the data size, then an empty List<T>
         // will be returned 
