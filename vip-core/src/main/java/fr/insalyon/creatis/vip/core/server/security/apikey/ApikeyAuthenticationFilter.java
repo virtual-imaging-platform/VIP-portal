@@ -106,17 +106,23 @@ public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
         catch (AuthenticationException failed) {
             SecurityContextHolder.clearContext();
 
+            // if credentials are wrong, stop the chain and return an auth error
             logger.debug("Authentication request failed", failed);
             this.authenticationEntryPoint.commence(request, response, failed);
+            // must return, because authenticationEntryPoint generates a response, and nothing must be written afterwards
+            return;
         }
         catch (Exception failed) {
             SecurityContextHolder.clearContext();
 
+            // if there is a runtime exception, we catch it to have a nice json error
             logger.error("Unexpected error while authenticating ", failed);
             this.authenticationEntryPoint.commence(
                     request,
                     response,
                     new AuthenticationServiceException("Internal Authentication error"));
+            // must return, because authenticationEntryPoint generates a response, and nothing must be written afterwards
+            return;
         }
 
         filterChain.doFilter(request, response);

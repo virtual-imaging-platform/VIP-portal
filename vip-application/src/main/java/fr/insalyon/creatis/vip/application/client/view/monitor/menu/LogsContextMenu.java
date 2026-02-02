@@ -54,9 +54,8 @@ public class LogsContextMenu extends Menu {
             public void onClick(MenuItemClickEvent event) {
                 Window.open(
                         GWT.getModuleBaseURL()
-                        + "/getfileservice?filepath=" + baseDir
-                        + "/" + dataName + "&" + CoreConstants.COOKIES_SESSION
-                        + "=" + Cookies.getCookie(CoreConstants.COOKIES_SESSION), "", "");
+                        + "/getfileservice?filepath=" + baseDir + "/" + dataName,
+                        "", "");
             }
         });
 

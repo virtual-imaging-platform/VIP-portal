@@ -20,11 +20,8 @@ import fr.insalyon.creatis.vip.application.server.business.TagBusiness;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
-public class TagIT extends BaseSpringIT {
+public class TagIT extends BaseApplicationSpringIT {
 
-    @Autowired private TagBusiness tagBusiness;
-    @Autowired private ApplicationBusiness appBusiness;
-    @Autowired private AppVersionBusiness appVersionBusiness;
 
     private Tag tag;
     private Application app;

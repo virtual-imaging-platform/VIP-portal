@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.security;
 
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.security.oidc.OidcLoginConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,12 @@ import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationC
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Spring security configuration.
@@ -26,12 +33,13 @@ import org.springframework.security.web.firewall.DefaultHttpFirewall;
 @Configuration
 @EnableWebSecurity
 public class GeneralSecurityConfig {
-    private final Environment env;
+
+    private final Server server;
     private final OidcLoginConfig oidcLoginConfig;
 
     @Autowired
-    public GeneralSecurityConfig(Environment env, OidcLoginConfig oidcLoginConfig) {
-        this.env = env;
+    public GeneralSecurityConfig(Server server, OidcLoginConfig oidcLoginConfig) {
+        this.server = server;
         this.oidcLoginConfig = oidcLoginConfig;
     }
 
@@ -39,6 +47,7 @@ public class GeneralSecurityConfig {
     @Order(3)
     public SecurityFilterChain generalFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll())
+                // default CORS : no configuration, so block preflight and let the rest
                 .cors(Customizer.withDefaults())
                 .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()))
                 .csrf((csrf) -> csrf.disable());

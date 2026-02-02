@@ -666,10 +666,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                 ps.close();
                 return user;
             }
-
-            logger.error("There is no user registered with the session: {}", session);
-            throw new DAOException("There is no user registered with the session: " + session);
-
+            return null;
         } catch (SQLException ex) {
             logger.error("Error getting user from session: {}", session, ex);
             throw new DAOException(ex);

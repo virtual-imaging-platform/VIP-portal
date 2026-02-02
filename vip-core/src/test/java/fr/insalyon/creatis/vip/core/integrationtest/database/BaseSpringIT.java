@@ -1,5 +1,13 @@
 package fr.insalyon.creatis.vip.core.integrationtest.database;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -8,6 +16,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+import fr.insalyon.creatis.vip.core.integrationtest.TestConfigurer;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -17,6 +26,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
 import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationProvider;
 
+import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,19 +43,26 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 
 /**
- * Utility superclass to launch tests with the whole spring configuration, as
- * in production. Subclass only need to extend it and can benefit from dependency
- * injection.
+ * Base superclass to launch tests with the whole "root" spring application context.
+ * This does not include the children web application context (/rest and /internal)
+ * See {@link fr.insalyon.creatis.vip.core.integrationtest.BaseWebSpringIT}
  *
+ * Spring will automatically get the beans available on the class path, so class should be the base of all tests
+ * on the root application context in all module.
+ * Dedicated Test Classes could extend this to add helpers for other module, but should not change the Test/Spring config
+ * see {@link fr.insalyon.creatis.vip.application.integrationtest.BaseApplicationSpringIT} (in vip-application)
+ *
+ * To configure beans, just add beans with the "test" profile, and a TestConfigurer bean to configure them before each
+ * test (to configure and reset mocks especially).
+ * This will harvest all TestConfigurer automatically.
+ * See {@link fr.insalyon.creatis.vip.core.integrationtest.SpringTestConfig}
  *
  * The "test" profile overrides all the external dependencies
  * that would throw exception by mocked and configurable ones.
@@ -53,7 +70,7 @@ import static org.mockito.ArgumentMatchers.anyString;
  * h2 in-memory database instead
  */
 
-@SpringJUnitWebConfig(SpringCoreConfig.class)
+@SpringJUnitWebConfig(name="root", classes=SpringCoreConfig.class)
 // launch all spring environment for testing, also take test bean though automatic package scan
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = {
@@ -63,6 +80,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 public abstract class BaseSpringIT {
     
     @Autowired @Qualifier("db-datasource") protected DataSource dataSource; // this is a mockito spy wrapping the h2 memory datasource
+    @Autowired protected ApplicationContext applicationContext;
     @Autowired protected ConfigurationBusiness configurationBusiness;
     @Autowired protected ApplicationContext appContext;
     @Autowired protected DataSource lazyDataSource;
@@ -70,6 +88,10 @@ public abstract class BaseSpringIT {
     @Autowired protected EmailBusiness emailBusiness;
     @Autowired protected GRIDAClient gridaClient;
     @Autowired protected GroupBusiness groupBusiness;
+    @Autowired protected GroupDAO groupDAO;
+    @Autowired protected List<TestConfigurer> testConfigurers;
+
+    protected ObjectMapper mapper;
 
     protected final String emailUser1 = "test1@test.fr";
     protected final String emailUser2 = "test2@test.fr";
@@ -92,9 +114,12 @@ public abstract class BaseSpringIT {
 
     @BeforeEach
     protected void setUp() throws Exception {
-        ServerMockConfig.reset(server);
-        Mockito.reset(gridaClient);
-        Mockito.doReturn(new String[]{"test@admin.test"}).when(emailBusiness).getAdministratorsEmails();
+        // by default spring mvc json path validation uses JsonPath that use a json-smart parser
+        // we change that to Jackson, and we make jackson strict to refuse things like : {"foo":42}bar
+        setUpStrictJacksonMapper();
+        for (TestConfigurer testConfigurer : testConfigurers) {
+            testConfigurer.setUpBeforeEachTest();
+        }
     }
 
     protected void assertRowsNbInTable(String tableName, int expectedNb) {
@@ -180,4 +205,28 @@ public abstract class BaseSpringIT {
     protected Date getNextSecondDate() {
         return new Date(new Date().getTime() + (1000));
     }
+
+    protected void setUpStrictJacksonMapper() throws Exception {
+        // by default JsonPath uses json-smart, change to jackson with strict mode
+        mapper = new ObjectMapper();
+        mapper.enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
+        Configuration.setDefaults(new Configuration.Defaults() {
+            @Override
+            public JsonProvider jsonProvider() {
+                return new JacksonJsonProvider(mapper);
+            }
+
+            @Override
+            public Set<Option> options() {
+                return EnumSet.noneOf(Option.class);
+            }
+
+            @Override
+            public MappingProvider mappingProvider() {
+                return new JacksonMappingProvider();
+            }
+        });
+    }
+
+
 }

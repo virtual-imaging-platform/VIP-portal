@@ -143,7 +143,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
         logger.info("({}) Downloading '{}'.",user.getEmail(), file.getAbsolutePath());
 
         resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
-        resp.setContentLength((int) file.length());
+        resp.setContentLengthLong(file.length());
         resp.setHeader("Content-Disposition", "attachment; filename=\""
                 + file.getName() + "\"");
 

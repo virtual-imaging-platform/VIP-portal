@@ -52,14 +52,17 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(result);
                     } catch (AuthenticationException e) {
                         SecurityContextHolder.clearContext();
-
                         logger.debug("Session authentication failed for session: {}", cookie.getValue(), e);
-                        authenticationEntryPoint.commence(request, response, e);
+                        // this must not stop the chain as a user with a wrong cookie must still be able to create a
+                        // new one. So let's ignore and go on
                     } catch (Exception e) {
                         SecurityContextHolder.clearContext();
 
+                        // if there is a runtime exception, we catch it to have a nice json error
                         logger.error("Unexpected error while authenticating ", e);
                         authenticationEntryPoint.commence(request, response, new AuthenticationServiceException("Internal Authentication Error"));
+                        // must return, because authenticationEntryPoint generates a response, and nothing must be written afterwards
+                        return;
                     }
                 }
             }

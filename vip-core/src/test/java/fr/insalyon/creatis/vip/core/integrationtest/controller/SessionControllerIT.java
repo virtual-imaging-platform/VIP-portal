@@ -1,57 +1,27 @@
 package fr.insalyon.creatis.vip.core.integrationtest.controller;
 
-import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
-import fr.insalyon.creatis.vip.core.server.SpringInternalApiConfig;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.integrationtest.BaseInternalApiSpringIT;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.web.servlet.MvcResult;
 
-@ContextConfiguration(classes = { SpringInternalApiConfig.class })
-public class SessionControllerIT extends BaseSpringIT {
+import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-    @Autowired
-    private WebApplicationContext wac;
+public class SessionControllerIT extends BaseInternalApiSpringIT {
 
-    @Autowired
-    private UserDAO userDAO;
-
-    private MockMvc mockMvc;
     private ObjectMapper mapper;
 
     @BeforeEach
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(wac)
-                .defaultRequest(MockMvcRequestBuilders.get("/").servletPath("/internal"))
-                .apply(SecurityMockMvcConfigurers.springSecurity())
-                .build();
+    protected void setUpMapper() throws Exception {
         mapper = new ObjectMapper();
     }
 
@@ -87,7 +57,7 @@ public class SessionControllerIT extends BaseSpringIT {
         mockMvc.perform(post("/internal/session")
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(credentials)))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isUnauthorized())
             .andExpect(cookie().doesNotExist(CoreConstants.COOKIES_USER))
             .andExpect(cookie().doesNotExist(CoreConstants.COOKIES_SESSION));
 
@@ -187,4 +157,5 @@ public class SessionControllerIT extends BaseSpringIT {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.email").value(emailUser2));
     }
+
 }

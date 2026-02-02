@@ -22,17 +22,7 @@ import java.util.*;
  To test InputFileParser, but more importantly to test the prototype injections
  in spring
  */
-public class ParserIT extends BaseSpringIT {
-
-    @Autowired
-    private WorkflowBusiness workflowBusiness;
-
-    @Autowired
-    private GroupDAO groupDAO;
-
-    @Autowired
-    private ApplicationContext applicationContext;
-
+public class ParserIT extends BaseApplicationSpringIT {
 
     @Test
     public void testInputM2Parsing() throws BusinessException, DAOException, IOException {

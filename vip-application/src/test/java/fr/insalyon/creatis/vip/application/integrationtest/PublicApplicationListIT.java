@@ -18,10 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.List;
 
-public class PublicApplicationListIT extends BaseSpringIT {
-
-    @Autowired private ApplicationBusiness applicationBusiness;
-    @Autowired private AppVersionBusiness appVersionBusiness;
+public class PublicApplicationListIT extends BaseApplicationSpringIT {
 
     @Test
     public void shouldNotIncludePrivateGroupsAndClasses() throws BusinessException, ApplicationException, GRIDAClientException {
@@ -34,10 +31,10 @@ public class PublicApplicationListIT extends BaseSpringIT {
 
         groupBusiness.add(publicGroup);
         groupBusiness.add(privateGroup);
-        applicationBusiness.add(app);
+        appBusiness.add(app);
         appVersionBusiness.add(appVersion);
 
-        List<Application> publicApplications = applicationBusiness.getPublicApplications();
+        List<Application> publicApplications = appBusiness.getPublicApplications();
         assertEquals(1, publicApplications.size());
 
         Application resultApp = publicApplications.get(0);
