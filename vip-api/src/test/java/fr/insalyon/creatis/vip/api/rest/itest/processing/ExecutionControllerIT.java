@@ -459,7 +459,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
             ResourceType.LOCAL, 
             "", 
             Arrays.asList(engine.getName()),
-            Arrays.asList(new Group("testResources", true, GroupType.APPLICATION)));
+            Set.of(new Group("testResources", true, GroupType.APPLICATION)));
 
         engineBusiness.add(engine);
         resourceBusiness.add(resource);

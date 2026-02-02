@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
     @Test
     public void add() throws Exception {
         Application app = new Application("super_app", "les applications sont vraiment belles");
-        app.setGroups(List.of(group));
+        app.setGroups(Set.of(group));
 
         // not the rights
         mockMvc.perform(post("/internal/applications")
@@ -116,7 +116,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
     @Test
     public void remove() throws Exception {
         Application app = new Application("super_app", "les applications sont vraiment belles");
-        app.setGroups(List.of(group));
+        app.setGroups(Set.of(group));
 
         // create app first
         mockMvc.perform(post("/internal/applications")
@@ -156,7 +156,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
         groupBusiness.update(nameGroup1, group);
 
         Application app = new Application("super_app", "les applications sont vraiment belles");
-        app.setGroups(List.of(group));
+        app.setGroups(Set.of(group));
 
         configurationBusiness.addUserToGroup(emailUser2, nameGroup1);
         developperUser = configurationBusiness.getUserWithGroups(emailUser2);
@@ -225,7 +225,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
         Application app2 = new Application("app2", "wow super app2");
         Application app3 = new Application("app3", "wow super app3");
 
-        app3.setGroups(List.of(group, group2));
+        app3.setGroups(Set.of(group, group2));
         configurationBusiness.addUserToGroup(emailUser2, nameGroup1);
         developperUser = configurationBusiness.getUserWithGroups(emailUser2);
 

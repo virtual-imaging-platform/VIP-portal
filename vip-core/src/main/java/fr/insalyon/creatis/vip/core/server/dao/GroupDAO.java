@@ -4,6 +4,7 @@ import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -23,5 +24,5 @@ public interface GroupDAO {
 
     public List<Group> getByApplication(String applicationName) throws DAOException;
 
-    public List<Group> getByRessource(String ressourceName) throws DAOException;
+    public Set<Group> getByRessource(String ressourceName) throws DAOException;
 }

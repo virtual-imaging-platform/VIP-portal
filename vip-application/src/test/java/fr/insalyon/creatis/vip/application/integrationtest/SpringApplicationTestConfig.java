@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 /*
    Replaces workflowsdb beans by mocks in tests.
@@ -52,7 +52,7 @@ public class SpringApplicationTestConfig {
         }
 
         public void createAnApplication(String appName, String groupname) throws BusinessException {
-            Application app = new Application(appName, "test citation", new ArrayList<>());
+            Application app = new Application(appName, "test citation", new HashSet<>());
 
             applicationBusiness.add(app);
 

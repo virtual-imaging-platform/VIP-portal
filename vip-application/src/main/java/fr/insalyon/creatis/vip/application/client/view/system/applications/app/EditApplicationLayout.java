@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
@@ -32,6 +33,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -82,8 +84,8 @@ public class EditApplicationLayout extends AbstractFormLayout {
             public void onClick(ClickEvent event) {
                 if (nameField.validate()) {
                     List<String> groupsNames = Arrays.asList(groupsList.getValues());
-                    List<Group> groups = groupsNames.stream()
-                        .map((name) -> new Group(groupsMap.get(name), false, GroupType.RESOURCE)).collect(Collectors.toList());
+                    Set<Group> groups = groupsNames.stream()
+                        .map((name) -> new Group(groupsMap.get(name), false, GroupType.RESOURCE)).collect(Collectors.toSet());
 
                     if (newApplication) {
                         save(new Application(
@@ -238,7 +240,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
                 List<Group> data = result.stream()
                     .filter((g) -> g.getType() == GroupType.APPLICATION)
                     .collect(Collectors.toList());
-                List<String> formatGroups = SystemUtils.formatGroups(data);
+                List<String> formatGroups = SystemUtils.formatGroups(new HashSet<>(data));
 
                 groupsMap.putAll(IntStream.range(0, Math.min(formatGroups.size(), data.size()))
                     .boxed()

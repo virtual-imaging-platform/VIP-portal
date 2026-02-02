@@ -1,9 +1,10 @@
 package fr.insalyon.creatis.vip.core.server.business.base;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class CorePermissions {
         throw new BusinessException(CoreConstants.NOT_RIGHT);
     }
 
-    public void checkOnlyUserPrivateGroups(List<Group> groupsToCheck) throws BusinessException {
+    public void checkOnlyUserPrivateGroups(Set<Group> groupsToCheck) throws BusinessException {
         User user = uSupplier.get();
         Set<Group> userGroups = user.getGroups();
 
@@ -50,15 +51,15 @@ public class CorePermissions {
         }
     }
 
-    public List<Group> filterOnlyUserGroups(List<Group> toFilter) {
+    public Set<Group> filterOnlyUserGroups(List<Group> toFilter) {
         User user = uSupplier.get();
-        List<Group> result = new ArrayList<>();
+        Set<Group> result = new HashSet<>();
         Set<Group> userGroups = user.getGroups();
 
         if (user.isSystemAdministrator()) {
             result.addAll(toFilter);
         } else {
-            result = toFilter.stream().filter((g) -> userGroups.contains(g)).toList();
+            result = toFilter.stream().filter((g) -> userGroups.contains(g)).collect(Collectors.toSet());
         }
         return result;
     }

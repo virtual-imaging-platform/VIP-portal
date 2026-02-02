@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
@@ -17,14 +17,9 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
-import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
 public class ResourceIT extends BaseApplicationSpringIT {
@@ -41,7 +36,7 @@ public class ResourceIT extends BaseApplicationSpringIT {
             ResourceType.BATCH, 
             "conf.file",
             new ArrayList<>(),
-            new ArrayList<>());
+            new HashSet<>());
     
         createGroup("test_resource", GroupType.RESOURCE);
         resourceBusiness.add(resource);
@@ -117,7 +112,7 @@ public class ResourceIT extends BaseApplicationSpringIT {
         Group group = groupBusiness.get("resourcetest");
         User user = configurationBusiness.getUser("super@test.insa");
 
-        resource.setGroups(Arrays.asList(group));
+        resource.setGroups(Set.of(group));
         resourceBusiness.update(resource);
         assertEquals(0, resourceBusiness.getAvailableForUser(user).size());
 

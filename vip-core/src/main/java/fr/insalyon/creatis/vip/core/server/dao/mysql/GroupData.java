@@ -47,7 +47,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Rafael Ferreira da Silva
@@ -179,8 +181,8 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
     }
 
     @Override
-    public List<Group> getByRessource(String resourceName) throws DAOException {
-        List<Group> groups = new ArrayList<Group>();
+    public Set<Group> getByRessource(String resourceName) throws DAOException {
+        Set<Group> groups = new HashSet<>();
         String query =  "SELECT * FROM VIPGroups g "
         +               "JOIN VIPGroupsResources ga ON ga.groupname = g.name "
         +               "WHERE ga.resourcename = ?";

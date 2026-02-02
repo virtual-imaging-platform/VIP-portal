@@ -135,7 +135,7 @@ public class ApplicationBusiness extends CommonBusiness {
             permissions.checkOnlyUserPrivateGroups(existingApp.getGroups());
         }
         try {
-            List<String> beforeGroupsNames = existingApp.getGroupsNames();
+            Set<String> beforeGroupsNames = existingApp.getGroupsNames();
 
             applicationDAO.update(app);
             for (String group : app.getGroupsNames()) {

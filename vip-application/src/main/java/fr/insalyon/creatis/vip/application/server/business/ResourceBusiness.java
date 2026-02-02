@@ -55,7 +55,7 @@ public class ResourceBusiness {
         try {
             Resource before = getByName(resource.getName());
             List<String> beforeEnginesNames = before.getEngines();
-            List<String> beforeGroupsNames = before.getGroupsNames();
+            Set<String> beforeGroupsNames = before.getGroupsNames();
 
             resourceDAO.update(resource);
             for (String engine : resource.getEngines()) {
