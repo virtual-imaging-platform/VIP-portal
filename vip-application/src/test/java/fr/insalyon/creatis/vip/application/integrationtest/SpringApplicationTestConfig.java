@@ -62,7 +62,7 @@ public class SpringApplicationTestConfig {
         }
 
         public void putApplicationInGroup(String appName, String groupname) throws BusinessException {
-            applicationBusiness.associate(new Application(appName, null), new Group(groupname));
+            applicationBusiness.associate(new Application(appName, null), groupname);
         }
 
         public AppVersion createAVersion(String appName, String versionName, boolean visible) throws BusinessException {
