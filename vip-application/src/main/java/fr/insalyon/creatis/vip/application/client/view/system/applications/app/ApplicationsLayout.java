@@ -96,7 +96,6 @@ public class ApplicationsLayout extends VLayout {
         ListGridField groupsField = new ListGridField("groupsLabel", "Groups");
         ListGridField resourceField = new ListGridField("resources", "Resources");
         ListGridField noteField = new ListGridField("note", "Note");
-        noteField.setEscapeHTML(true);
         grid = new ListGrid() {
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
@@ -146,8 +145,6 @@ public class ApplicationsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-        grid.setWrapCells(true);
-        grid.setFixedRecordHeights(false);
         if (onlyPublicApps){
             grid.setFields(nameField);
         } else {

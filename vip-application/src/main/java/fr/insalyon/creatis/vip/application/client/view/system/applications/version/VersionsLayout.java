@@ -132,8 +132,6 @@ public class VersionsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-        grid.setWrapCells(true);
-        grid.setFixedRecordHeights(false);
 
         ListGridField isVisibleField = new ListGridField("visible", "Visible");
         isVisibleField.setType(ListGridFieldType.BOOLEAN);
@@ -142,7 +140,7 @@ public class VersionsLayout extends VLayout {
                 isVisibleField,
                 new ListGridField("version", "Version"),
                 new ListGridField("resources", "Resources"),
-                new ListGridField("note", "Note").setEscapeHTML(true));
+                new ListGridField("note", "Note"));
         grid.setSortField("version");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
