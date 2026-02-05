@@ -45,6 +45,6 @@ ALTER TABLE VIPExternalPlatforms ADD refresh_token_url VARCHAR(255);
 USE workflowsdb;
 ALTER TABLE Workflows ADD tags VARCHAR(255);
 
--- v4.6
+-- v4.7
 ALTER TABLE VIPApplications ADD note TEXT;
 ALTER TABLE VIPAppVersions ADD note TEXT;
