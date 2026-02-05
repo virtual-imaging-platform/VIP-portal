@@ -12,34 +12,18 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
-import fr.insalyon.creatis.vip.core.server.SpringInternalApiConfig;
+import fr.insalyon.creatis.vip.core.integrationtest.BaseInternalApiSpringIT;
 
-@ContextConfiguration(classes = { SpringInternalApiConfig.class })
-public class ApplicationControllerIT extends BaseSpringIT {
+public class ApplicationControllerIT extends BaseInternalApiSpringIT {
     
-    @Autowired
-    private WebApplicationContext wac;
-
-    private MockMvc mockMvc;
-    private ObjectMapper mapper;
     private User adminUser;
     private User developperUser;
     private User basicUser;
@@ -50,12 +34,6 @@ public class ApplicationControllerIT extends BaseSpringIT {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(wac)
-                .defaultRequest(MockMvcRequestBuilders.get("/").servletPath("/internal"))
-                .apply(SecurityMockMvcConfigurers.springSecurity())
-                .build();
-        mapper = new ObjectMapper();
 
         adminUser = createUser(emailUser1, UserLevel.Administrator);
         developperUser = createUser(emailUser2, UserLevel.Developer);
