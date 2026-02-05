@@ -36,8 +36,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * Base Class to test the internal API with mocked http requests
  * See {@link BaseWebSpringIT}
@@ -51,8 +49,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
         @ContextConfiguration(name="internal-api", classes = SpringInternalApiConfig.class)
 )
 abstract public class BaseInternalApiSpringIT extends BaseWebSpringIT {
-
-    protected final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     protected String getServletPath() {
