@@ -1,14 +1,14 @@
 package fr.insalyon.creatis.vip.api.rest.mockconfig;
 
-import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
-import org.mockito.Mockito;
-
-import java.util.Arrays;
-import java.util.Collections;
-
-import static fr.insalyon.creatis.vip.api.data.PathTestUtils.*;
+import static fr.insalyon.creatis.vip.api.data.PathTestUtils.getDataModitTS;
+import static fr.insalyon.creatis.vip.api.data.PathTestUtils.testDir1;
+import static fr.insalyon.creatis.vip.api.data.PathTestUtils.testFile1;
+import static fr.insalyon.creatis.vip.api.data.PathTestUtils.testFile2;
+import static fr.insalyon.creatis.vip.api.data.PathTestUtils.testFile3;
+import static fr.insalyon.creatis.vip.api.data.PathTestUtils.testFile4;
+import static fr.insalyon.creatis.vip.api.data.PathTestUtils.testFile5;
+import static fr.insalyon.creatis.vip.api.data.PathTestUtils.user1Dir;
+import static fr.insalyon.creatis.vip.api.data.PathTestUtils.user2Dir;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser2;
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.ROOT;
@@ -19,7 +19,7 @@ import java.util.Collections;
 
 import org.mockito.Mockito;
 
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 

@@ -1,16 +1,14 @@
 package fr.insalyon.creatis.vip.publication.server.business;
 
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.publication.client.bean.Publication;
-import fr.insalyon.creatis.vip.publication.server.dao.PublicationDAO;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import fr.insalyon.creatis.vip.publication.server.dao.PublicationDAO;
@@ -71,12 +69,12 @@ public class PublicationBusiness {
         }
     }
 
-    private void assertDataIsOK(Publication publication) throws BusinessException {
+    private void assertDataIsOK(Publication publication) throws VipException {
         if (publication.getTitle() == null || publication.getTitle().isEmpty()) {
-            throw new BusinessException("Wrong publication : no title !");
+            throw new VipException("Wrong publication : no title !");
         }
         if (publication.getAuthors() == null || publication.getAuthors().isEmpty()) {
-            throw new BusinessException("Wrong publication : no author !");
+            throw new VipException("Wrong publication : no author !");
         }
         CoreUtil.assertOnlyLatin1Characters(publication.getTitle());
         CoreUtil.assertOnlyLatin1Characters(publication.getDoi());

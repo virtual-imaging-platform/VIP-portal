@@ -1,31 +1,17 @@
 package fr.insalyon.creatis.vip.core.integrationtest.database;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
-import com.jayway.jsonpath.spi.json.JsonProvider;
-import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import fr.insalyon.creatis.grida.client.GRIDAClient;
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
-import fr.insalyon.creatis.vip.core.integrationtest.TestConfigurer;
-import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
-import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
-import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationProvider;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 
-import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.sql.DataSource;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +27,32 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-import java.util.*;
-import java.util.UUID;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.MappingProvider;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.integrationtest.TestConfigurer;
+import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
+import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
+import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationProvider;
 
 /**
  * Base superclass to launch tests with the whole "root" spring application context.

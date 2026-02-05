@@ -1,8 +1,5 @@
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.fileParam;
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.flagParam;
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.getFullPipeline;
@@ -28,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import fr.insalyon.creatis.vip.api.exception.ApiError;
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 
 public class PipelineControllerIT extends BaseRestApiSpringIT {

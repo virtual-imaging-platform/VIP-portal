@@ -1,10 +1,5 @@
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.core.server.model.Module;
-import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
-import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_DATA_MAX_SIZE;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_DEFAULT_LIST_LIMIT;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_PLATFORM_DESCRIPTION;
@@ -34,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import fr.insalyon.creatis.vip.api.exception.ApiError;
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.server.model.Module;
 import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;

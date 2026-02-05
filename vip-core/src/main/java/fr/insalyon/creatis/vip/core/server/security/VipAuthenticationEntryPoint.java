@@ -1,9 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -21,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insalyon.creatis.vip.core.client.DefaultError;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

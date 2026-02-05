@@ -31,16 +31,17 @@
  */
 package fr.insalyon.creatis.vip.integrationtest;
 
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
-import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
-import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
+import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 
 public class CorsRestApiIT extends BaseRestApiSpringIT {
 
@@ -80,7 +81,7 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
      * insert a user with a valid and known api key
      */
     @BeforeEach
-    public void setUpTestUser() throws BusinessException, GRIDAClientException {
+    public void setUpTestUser() throws VipException, GRIDAClientException {
         createUserWithPassword(emailUser2, "coucou");
         apikey = getConfigurationBusiness().generateNewUserApikey(emailUser2);
     }

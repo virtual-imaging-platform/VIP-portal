@@ -1,13 +1,5 @@
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
-import fr.insalyon.creatis.vip.api.tools.spring.BearerTokenRequestPostProcessor;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -19,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
 import fr.insalyon.creatis.vip.api.tools.spring.BearerTokenRequestPostProcessor;
 import fr.insalyon.creatis.vip.core.client.DefaultError;

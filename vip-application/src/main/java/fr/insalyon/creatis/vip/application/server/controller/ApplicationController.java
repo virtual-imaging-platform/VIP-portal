@@ -57,7 +57,7 @@ public class ApplicationController {
             Application app = applicationBusiness.get(id);
 
             if (app == null) {
-                throw new ApiException(ApiException.ApiError.APPLICATION_NOT_FOUND, id);
+                throw new VipException(DefaultError.NOT_FOUND, id);
             } else {
             applicationBusiness.remove(id);
             }

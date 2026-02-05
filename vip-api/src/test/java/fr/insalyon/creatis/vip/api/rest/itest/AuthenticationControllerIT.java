@@ -1,10 +1,5 @@
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-
 import static fr.insalyon.creatis.vip.api.data.AuthenticationInfoTestUtils.jsonCorrespondsToAuthenticationInfo;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_APIKEY_HEADER;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -16,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 
 public class AuthenticationControllerIT extends BaseRestApiSpringIT {

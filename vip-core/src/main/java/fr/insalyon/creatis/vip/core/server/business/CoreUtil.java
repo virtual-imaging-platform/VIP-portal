@@ -2,6 +2,8 @@ package fr.insalyon.creatis.vip.core.server.business;
 
 import java.text.Normalizer;
 
+import fr.insalyon.creatis.vip.core.client.VipException;
+
 public class CoreUtil {
 
     /*
@@ -15,10 +17,10 @@ public class CoreUtil {
         return getCleanString(s, replacement, false, true);
     }
 
-    public static void assertOnlyLatin1Characters(String s) throws BusinessException {
+    public static void assertOnlyLatin1Characters(String s) throws VipException {
         String nonLatin1Char = filterNonLatin1Characters(s);
         if ( ! nonLatin1Char.isEmpty()) {
-            throw new BusinessException("Non-valid characters : [" + nonLatin1Char + "] (in string \"" + s + "\" )");
+            throw new VipException("Non-valid characters : [" + nonLatin1Char + "] (in string \"" + s + "\" )");
         }
     }
 

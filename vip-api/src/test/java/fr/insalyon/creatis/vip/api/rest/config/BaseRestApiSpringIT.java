@@ -1,65 +1,43 @@
 package fr.insalyon.creatis.vip.api.rest.config;
 
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_DATA_MAX_SIZE;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_DEFAULT_LIST_LIMIT;
-import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_PLATFORM_DESCRIPTION;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_PLATFORM_EMAIL;
-import fr.insalyon.creatis.vip.application.integrationtest.SpringApplicationTestConfig;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_PLATFORM_NAME;
-import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_SUPPORTED_API_VERSION;
-import fr.insalyon.creatis.vip.core.integrationtest.BaseWebSpringIT;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_SUPPORTED_MODULES;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_SUPPORTED_PROTOCOLS;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_UNSUPPORTED_METHOD;
-import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-
-import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
-import static org.mockito.Mockito.when;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.api.SpringRestApiConfig;
 import fr.insalyon.creatis.vip.api.rest.mockconfig.DataConfigurator;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.integrationtest.BaseApplicationSpringIT;
+import fr.insalyon.creatis.vip.application.integrationtest.SpringApplicationTestConfig;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowExecutionBusiness;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.integrationtest.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
@@ -161,15 +139,15 @@ abstract public class BaseRestApiSpringIT extends BaseWebSpringIT {
 
     // vip-application test utils
 
-    protected void createAnApplication(String appName, String groupname) throws BusinessException {
+    protected void createAnApplication(String appName, String groupname) throws VipException {
         applicationTestConfigurer.createAnApplication(appName, groupname);
     }
 
-    public void putApplicationInGroup(String appName, String groupname) throws BusinessException {
+    public void putApplicationInGroup(String appName, String groupname) throws VipException {
         applicationTestConfigurer.putApplicationInGroup(appName, groupname);
     }
 
-    public AppVersion createAVersion(String appName, String versionName, boolean visible) throws BusinessException {
+    public AppVersion createAVersion(String appName, String versionName, boolean visible) throws VipException {
         return applicationTestConfigurer.createAVersion(appName, versionName, visible);
     }
 }

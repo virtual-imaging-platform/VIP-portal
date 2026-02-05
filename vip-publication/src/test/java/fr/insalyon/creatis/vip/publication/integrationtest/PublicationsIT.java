@@ -16,22 +16,6 @@ import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
-import fr.insalyon.creatis.vip.publication.server.dao.PublicationDAO;
-import org.apache.commons.lang.StringUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.validation.constraints.AssertTrue;
-import java.nio.charset.StandardCharsets;
-import java.sql.SQLDataException;
-import java.sql.SQLException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
 
 public class PublicationsIT extends BaseSpringIT {
     @Autowired
@@ -86,11 +70,11 @@ public class PublicationsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testAddPublicationWithoutTitle() throws BusinessException {
+    public void testAddPublicationWithoutTitle() throws VipException {
         // Without parameter
         Publication publication = new Publication();
 
-        Assertions.assertThrows(BusinessException.class, () -> publicationBusiness.addPublication(publication));
+        Assertions.assertThrows(VipException.class, () -> publicationBusiness.addPublication(publication));
     }
 
     @Test
@@ -241,7 +225,7 @@ public class PublicationsIT extends BaseSpringIT {
                 + " un coeur : I \u2764 Java!",
                 "21/06/2023", "01010100", "author1, author2", "type", "typeName", null);
 
-        BusinessException businessException = assertThrows(BusinessException.class,
+        VipException businessException = assertThrows(VipException.class,
                 () -> publicationBusiness.addPublication(publication3));
 
         System.out.println(businessException.getMessage());

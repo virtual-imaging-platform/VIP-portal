@@ -57,6 +57,7 @@ public class SessionControllerIT extends BaseInternalApiSpringIT {
         mockMvc.perform(post("/internal/session")
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(credentials)))
+            .andDo(print())
             .andExpect(status().isUnauthorized())
             .andExpect(cookie().doesNotExist(CoreConstants.COOKIES_USER))
             .andExpect(cookie().doesNotExist(CoreConstants.COOKIES_SESSION));

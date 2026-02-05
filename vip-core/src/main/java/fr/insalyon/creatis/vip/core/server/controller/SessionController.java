@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -63,7 +64,7 @@ public class SessionController {
             return session;
         } catch (UnsupportedEncodingException e) {
             if (e.getMessage().startsWith("Authentication failed")) {
-                throw new ApiException(ApiException.ApiError.BAD_CREDENTIALS);
+                throw new VipException(DefaultError.BAD_CREDENTIALS);
             }
             throw new VipException("Failed to create user session!", e);
         }
