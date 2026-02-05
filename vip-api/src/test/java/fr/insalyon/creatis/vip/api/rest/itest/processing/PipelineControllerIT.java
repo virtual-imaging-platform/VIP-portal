@@ -79,12 +79,11 @@ public class PipelineControllerIT extends BaseRestApiSpringIT {
 
     @Test
     public void userGetAPipelineWithBoutiques() throws Exception {
-
         String appName = "testBoutiquesApp", groupName = "testGroup", versionName = "v42";
         AppVersion appVersion = configureBoutiquesTestApp(appName, groupName, versionName);
         String pipelineId = appName + "/" + versionName;
 
-        createUserInGroup(baseUser1.getEmail(), groupName);
+        baseUser1 = createUserInGroup(baseUser1.getEmail(), groupName);
 
         mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
                 .andDo(print())
@@ -98,12 +97,11 @@ public class PipelineControllerIT extends BaseRestApiSpringIT {
 
     @Test
     public void userGetBoutiquesDescriptor() throws Exception {
-
         String appName = "testBoutiquesApp", groupName = "testGroup", versionName = "v42";
         configureBoutiquesTestApp(appName, groupName, versionName);
         String pipelineId = appName + "/" + versionName;
 
-        createUserInGroup(baseUser1.getEmail(), groupName);
+        baseUser1 = createUserInGroup(baseUser1.getEmail(), groupName);
 
         mockMvc.perform(get("/rest/pipelines/" + pipelineId).param("format", "boutiques").with(baseUser1()))
                 .andDo(print())
@@ -118,6 +116,7 @@ public class PipelineControllerIT extends BaseRestApiSpringIT {
 
     @Test
     public void shouldReturnPipelines() throws Exception {
+        setAdminContext();
         createGroup("group1");
         createGroup("group2");
         createGroup("group3");
@@ -142,10 +141,10 @@ public class PipelineControllerIT extends BaseRestApiSpringIT {
         AppVersion appBC = createAVersion("appBC", "v1", true);
         AppVersion appC = createAVersion("appC", "v1", true);
 
-        createUserInGroup(baseUser1.getEmail(), "test1", "group1");
-        createUserInGroup(baseUser2.getEmail(), "test2", "group2");
-        createUserInGroup(baseUser3.getEmail(), "test3", "group3");
-        createUserInGroups(baseUser4.getEmail(), "test4", "group1", "group2");
+        baseUser1 = createUserInGroup(baseUser1.getEmail(), "test1", "group1");
+        baseUser2 = createUserInGroup(baseUser2.getEmail(), "test2", "group2");
+        baseUser3 = createUserInGroup(baseUser3.getEmail(), "test3", "group3");
+        baseUser4 = createUserInGroups(baseUser4.getEmail(), "test4", "group1", "group2");
 
         // temp trailing slash for shanoir, see fr.insalyon.creatis.vip.api.SpringRestApiConfig::configurePathMatch
         mockMvc.perform(get("/rest/pipelines/").with(baseUser1()))

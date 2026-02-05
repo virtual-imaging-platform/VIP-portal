@@ -159,6 +159,7 @@ abstract public class BaseRestApiSpringIT extends BaseWebSpringIT {
     }
 
     protected AppVersion configureTestApp(String appName, String groupName, String versionName) throws BusinessException, GRIDAClientException, IOException {
+        setAdminContext();
         AppVersion appVersion = applicationTestConfigurer.configureAnApplication(appName, versionName, groupName);
         applicationTestConfigurer.configureVersion(appVersion, FileUtil.read(getBoutiquesTestFile()));
 

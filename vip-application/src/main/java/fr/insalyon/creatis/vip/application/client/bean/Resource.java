@@ -1,8 +1,10 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -15,9 +17,9 @@ public class Resource implements IsSerializable {
     private ResourceType type;
     private String configuration;
     private List<String> engines;
-    private List<Group> groups;
+    private Set<Group> groups;
 
-    public Resource(String name, boolean status, ResourceType type, String configuration, List<String> engines, List<Group> groups) {
+    public Resource(String name, boolean status, ResourceType type, String configuration, List<String> engines, Set<Group> groups) {
         this.name = name;
         this.status = status;
         this.type = type;
@@ -26,12 +28,12 @@ public class Resource implements IsSerializable {
         this.groups = groups;
     }
 
-    public Resource(String name, boolean status, String type, String configuration, List<String> engines, List<Group> groups) {
+    public Resource(String name, boolean status, String type, String configuration, List<String> engines, Set<Group> groups) {
         this(name, status, ResourceType.fromString(type), configuration, engines, groups);
     }
 
     public Resource(String name) {
-        this(name, false, ResourceType.getDefault(), "", new ArrayList<>(), new ArrayList<>());
+        this(name, false, ResourceType.getDefault(), "", new ArrayList<>(), new HashSet<>());
     }
 
     public Resource() {}
@@ -76,15 +78,15 @@ public class Resource implements IsSerializable {
         this.engines = engines;
     }
 
-    public List<Group> getGroups() {
+    public Set<Group> getGroups() {
         return groups;
     }
 
-    public List<String> getGroupsNames() {
-        return groups.stream().map(Group::getName).collect(Collectors.toList());
+    public Set<String> getGroupsNames() {
+        return groups.stream().map(Group::getName).collect(Collectors.toSet());
     }
 
-    public void setGroups(List<Group> groups) {
+    public void setGroups(Set<Group> groups) {
         this.groups = groups;
     }
 

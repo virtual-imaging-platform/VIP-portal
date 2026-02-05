@@ -1,18 +1,15 @@
 package fr.insalyon.creatis.vip.core.integrationtest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.integrationtest.BaseInternalApiSpringIT;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
-import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -26,10 +23,6 @@ public class SessionControllerIT extends BaseInternalApiSpringIT {
     @BeforeEach
     protected void setUpMapper() throws Exception {
         mapper = new ObjectMapper();
-    }
-
-    private RequestPostProcessor getUserSecurityMock(User user) {
-        return SecurityMockMvcRequestPostProcessors.user(new SpringPrincipalUser(user));
     }
 
     @Test

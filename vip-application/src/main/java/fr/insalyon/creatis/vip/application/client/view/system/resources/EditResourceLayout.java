@@ -2,8 +2,10 @@ package fr.insalyon.creatis.vip.application.client.view.system.resources;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -88,8 +90,8 @@ public class EditResourceLayout extends AbstractFormLayout {
                     @Override
                     public void onClick(ClickEvent event) {
                         List<String> groupsNames = Arrays.asList(groupsList.getValues());
-                        List<Group> groups = groupsNames.stream()
-                            .map((name) -> new Group(groupsMap.get(name), false, GroupType.RESOURCE)).collect(Collectors.toList());
+                        Set<Group> groups = groupsNames.stream()
+                            .map((name) -> new Group(groupsMap.get(name), false, GroupType.RESOURCE)).collect(Collectors.toSet());
                         if (nameField.validate() && configurationField.validate()) {
                             save(new Resource(
                                 nameField.getValueAsString().trim(),
@@ -231,7 +233,7 @@ public class EditResourceLayout extends AbstractFormLayout {
                 List<Group> data = result.stream()
                     .filter((g) -> g.getType() == GroupType.RESOURCE)
                     .collect(Collectors.toList());
-                List<String> formatGroups = SystemUtils.formatGroups(data);
+                List<String> formatGroups = SystemUtils.formatGroups(new HashSet<>(data));
 
                 groupsMap.putAll(IntStream.range(0, Math.min(formatGroups.size(), data.size()))
                     .boxed()

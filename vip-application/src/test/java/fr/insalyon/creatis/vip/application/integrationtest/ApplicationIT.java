@@ -4,21 +4,17 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
-import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -28,6 +24,7 @@ public class ApplicationIT extends BaseApplicationSpringIT {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
+        setAdminContext();
 
         // group test and user test creation
         group1 = new Group("group1", true, GroupType.getDefault());
@@ -183,7 +180,7 @@ public class ApplicationIT extends BaseApplicationSpringIT {
         Group group = new Group("test", false, GroupType.APPLICATION);
 
         groupBusiness.add(group);
-        app.setGroups(Arrays.asList(group));
+        app.setGroups(Set.of(group));
         appBusiness.update(app);
 
         assertEquals(1, appBusiness.getApplications(group).size());
@@ -195,11 +192,11 @@ public class ApplicationIT extends BaseApplicationSpringIT {
         Group group = new Group("test", false, GroupType.APPLICATION);
 
         groupBusiness.add(group);
-        app.setGroups(Arrays.asList(group));
+        app.setGroups(Set.of(group));
         appBusiness.update(app);
 
         assertEquals(1, appBusiness.getApplications(group).size());
-        app.setGroups(new ArrayList<>());
+        app.setGroups(new HashSet<>());
         appBusiness.update(app);
 
         assertEquals(0, appBusiness.getApplications(group).size());

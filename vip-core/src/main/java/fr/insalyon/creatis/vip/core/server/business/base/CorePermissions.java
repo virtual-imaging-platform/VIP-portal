@@ -1,0 +1,78 @@
+package fr.insalyon.creatis.vip.core.server.business.base;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+
+@Service
+public class CorePermissions {
+
+    private Supplier<User> uSupplier;
+
+    @Autowired
+    public CorePermissions(Supplier<User> uSupplier) {
+        this.uSupplier = uSupplier;
+    }
+
+    public void checkLevel(UserLevel... authorizedLevels) throws BusinessException {
+        User user = uSupplier.get();
+
+        for (UserLevel level: authorizedLevels) {
+            if (level.equals(user.getLevel())) {
+                return;
+            }
+        }
+        throw new BusinessException(CoreConstants.NOT_RIGHT);
+    }
+
+    public void checkOnlyUserPrivateGroups(Set<Group> groupsToCheck) throws BusinessException {
+        User user = uSupplier.get();
+        Set<Group> userGroups = user.getGroups();
+
+        if (groupsToCheck == null) {
+            return;
+        }
+        for (Group group : groupsToCheck) {
+            // check ONLY user groups and ONLY privates groups
+            if ( ! userGroups.contains(group) || group.isPublicGroup()) {
+                throw new BusinessException(CoreConstants.NOT_RIGHT);
+            }
+        }
+    }
+
+    public Set<Group> filterOnlyUserGroups(List<Group> toFilter) {
+        User user = uSupplier.get();
+        Set<Group> result = new HashSet<>();
+        Set<Group> userGroups = user.getGroups();
+
+        if (user.isSystemAdministrator()) {
+            result.addAll(toFilter);
+        } else {
+            result = toFilter.stream().filter((g) -> userGroups.contains(g)).collect(Collectors.toSet());
+        }
+        return result;
+    }
+
+    public <T> void checkItemInList(T item, List<T> list) throws BusinessException {
+        if ( ! list.contains(item)) {
+            throw new BusinessException(CoreConstants.NOT_RIGHT);
+        }
+    }
+
+    public <T> void checkUnchanged(T a, T b) throws BusinessException {
+        if (!a.equals(b)) {
+            throw new BusinessException(CoreConstants.NOT_RIGHT); 
+        }
+    }
+}

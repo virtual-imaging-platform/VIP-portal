@@ -66,7 +66,7 @@ public class GroupInterfaceImpl implements GroupInterface {
 
         switch (group.getType()) {
             case APPLICATION:
-                applicationBusiness.dissociate(new Application(item, ""), group);
+                applicationBusiness.dissociate(new Application(item, ""), groupname);
                 break;
 
             case RESOURCE:

@@ -36,6 +36,7 @@ import fr.insalyon.creatis.grida.common.bean.GridPathInfo;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.*;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.api.data.UserTestUtils;
 import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.ExecutionStatus;
 import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
@@ -93,6 +94,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
 
         w1 = new Workflow(simulation1.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine", null);
         w2 = new Workflow(simulation2.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine", null);
+        UserTestUtils.reset();
     }
 
     @Test
@@ -385,7 +387,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
         configureBoutiquesTestApp(appName, groupName, versionName);
 
         createGroup("testResources", GroupType.RESOURCE);
-        createUserInGroups(baseUser1.getEmail(), "", groupName, "testResources");
+        baseUser1 = createUserInGroups(baseUser1.getEmail(), "", groupName, "testResources");
 
         ArgumentCaptor<String> inputsCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> workflowContentCaptor = ArgumentCaptor.forClass(String.class);
@@ -457,7 +459,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
             ResourceType.LOCAL, 
             "", 
             Arrays.asList(engine.getName()),
-            Arrays.asList(new Group("testResources", true, GroupType.APPLICATION)));
+            Set.of(new Group("testResources", true, GroupType.APPLICATION)));
 
         engineBusiness.add(engine);
         resourceBusiness.add(resource);

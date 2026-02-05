@@ -1,12 +1,13 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import fr.insalyon.creatis.vip.core.client.bean.Group;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Application implements IsSerializable {
 
@@ -14,7 +15,7 @@ public class Application implements IsSerializable {
     private String citation;
     private String owner;
     private String fullName;
-    private List<Group> groups;
+    private Set<Group> groups;
 
     public Application() {}
 
@@ -22,19 +23,19 @@ public class Application implements IsSerializable {
         this(name, null, null, citation);
     }
 
-    public Application(String name, String citation, List<Group> groups) {
+    public Application(String name, String citation, Set<Group> groups) {
         this(name, null, null, citation, groups);
     }
 
     public Application(String name, String owner, String fullName, String citation) {
-        this(name, owner, fullName, citation, new ArrayList<>());
+        this(name, owner, fullName, citation, new HashSet<>());
     }
 
     public Application(String name, String owner, String citation) {
-        this(name, owner, null, citation, new ArrayList<>());
+        this(name, owner, null, citation, new HashSet<>());
     }
 
-    public Application(String name, String owner, String fullName, String citation, List<Group> groups) {
+    public Application(String name, String owner, String fullName, String citation, Set<Group> groups) {
         this.name = name;
         this.citation = citation;
         this.owner = owner;
@@ -62,19 +63,41 @@ public class Application implements IsSerializable {
         this.owner = owner;
     }
 
+    public void setCitation(String citation) {
+        this.citation = citation;
+    }
+
     public String getFullName() {
         return fullName;
     }
 
-    public List<Group> getGroups() {
+    public Set<Group> getGroups() {
         return groups;
     }
 
-    public List<String> getGroupsNames() {
-        return groups.stream().map(Group::getName).collect(Collectors.toList());
+    public Set<String> getGroupsNames() {
+        return groups.stream().map(Group::getName).collect(Collectors.toSet());
     }
 
-    public void setGroups(List<Group> groups) {
+    public void setGroups(Set<Group> groups) {
         this.groups = groups;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Application other = (Application) obj;
+        return Objects.equals(name, other.name) &&
+               Objects.equals(citation, other.citation) &&
+               Objects.equals(owner, other.owner) &&
+               Objects.equals(fullName, other.fullName) &&
+               Objects.equals(groups, other.groups);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, citation, owner, fullName, groups);
     }
 }

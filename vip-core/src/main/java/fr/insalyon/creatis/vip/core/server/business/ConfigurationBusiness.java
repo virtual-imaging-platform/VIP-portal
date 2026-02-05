@@ -962,4 +962,11 @@ public class ConfigurationBusiness {
             logger.error("Cannot sent mail to admin. Ignoring", e);
         }
     }
+
+    public Set<Group> getOrLoadUserGroups(User user) throws BusinessException {
+        if (user.getGroups() == null || user.getGroups().isEmpty()) {
+            user.setGroups(getUserGroups(user.getEmail()));
+        }
+        return user.getGroups();
+    }
 }

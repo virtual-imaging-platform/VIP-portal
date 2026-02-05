@@ -31,80 +31,158 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
+import fr.insalyon.creatis.vip.core.server.business.PageBuilder;
+import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPExternalSafe;
+import fr.insalyon.creatis.vip.core.server.model.PrecisePage;
 
 @Service
 @Transactional
-public class ApplicationBusiness {
+public class ApplicationBusiness extends CommonBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ApplicationDAO applicationDAO;
     private GroupBusiness groupBusiness;
-    private ConfigurationBusiness configurationBusiness;
     private AppVersionBusiness appVersionBusiness;
+    private PageBuilder pageBuilder;
 
     @Autowired
-    public ApplicationBusiness(ApplicationDAO applicationDAO, GroupBusiness groupBusiness, ConfigurationBusiness configurationBusiness, AppVersionBusiness appVersionBusiness) {
+    public ApplicationBusiness(ApplicationDAO applicationDAO, GroupBusiness groupBusiness,
+            AppVersionBusiness appVersionBusiness, PageBuilder pageBuilder) {
         this.applicationDAO = applicationDAO;
         this.groupBusiness = groupBusiness;
-        this.configurationBusiness = configurationBusiness;
         this.appVersionBusiness = appVersionBusiness;
+        this.pageBuilder = pageBuilder;
     }
 
-    public void add(Application application) throws BusinessException {
-        try {
-            applicationDAO.add(application);
+    @VIPExternalSafe
+    public void add(Application app) throws BusinessException {
+        permissions.checkLevel(UserLevel.Administrator, UserLevel.Developer);
 
-            for (String groupName : application.getGroupsNames()) {
-                associate(application, new Group(groupName));
+        if (getUserLevel().equals(UserLevel.Developer)) {
+            // developers can only assign from private groups they belong to
+            // at application creation
+            permissions.checkOnlyUserPrivateGroups(app.getGroups());
+        }
+        try {
+            applicationDAO.add(app);
+
+            for (String groupName : app.getGroupsNames()) {
+                associate(app, groupName);
             }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
+    @VIPExternalSafe
     public void remove(String name) throws BusinessException {
+        Application app = getApplication(name); // not safe, do not return to user!
+
+        if (app == null) {
+            return;
+        }
+        permissions.checkLevel(UserLevel.Administrator, UserLevel.Developer);
+
+        if (getUserLevel().equals(UserLevel.Developer)) {
+            // this is related to developers
+            // they can only remove application from private groups they belong to
+            permissions.checkItemInList(app, getUserContextApplications());
+            permissions.checkOnlyUserPrivateGroups(app.getGroups());
+        }
         try {
+            logger.trace("Removing application: {}", name);
             applicationDAO.remove(name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void update(Application application) throws BusinessException {
-        try {
-            Application before = getApplication(application.getName());
-            List<String> beforeGroupsNames = before.getGroupsNames();
+    @VIPExternalSafe
+    public void update(Application app) throws BusinessException {
+        Application existingApp = getApplication(app.getName()); // not safe, do not return to user!
 
-            applicationDAO.update(application);
-            for (String group : application.getGroupsNames()) {
-                if ( ! beforeGroupsNames.removeIf((s) -> s.equals(group))) {
-                    associate(application, new Group(group));
+        permissions.checkLevel(UserLevel.Administrator, UserLevel.Developer);
+
+        if (getUserLevel().equals(UserLevel.Developer)) {
+            // developer can only associate group at CREATION
+            permissions.checkUnchanged(app.getGroups(), existingApp.getGroups());
+            // edition only on application from privates groups
+            permissions.checkOnlyUserPrivateGroups(existingApp.getGroups());
+        }
+        try {
+            Set<String> beforeGroupsNames = existingApp.getGroupsNames();
+
+            applicationDAO.update(app);
+            for (String group : app.getGroupsNames()) {
+                if (!beforeGroupsNames.removeIf((s) -> s.equals(group))) {
+                    associate(app, group);
                 }
             }
             for (String group : beforeGroupsNames) {
-                dissociate(application, new Group(group));
+                dissociate(app, group);
             }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
+        }
+    }
+
+    @VIPExternalSafe
+    public Application get(String name) throws BusinessException {
+        List<Application> apps = getUserContextApplications();
+
+        return apps.stream().filter((app) -> name.equals(app.getName()))
+            .findFirst().orElse(null);
+    }
+
+    @VIPExternalSafe
+    public PrecisePage<Application> get(int offset, int quantity, String group) throws BusinessException {
+        List<Application> apps;
+
+        // permissions
+        apps = getUserContextApplications();
+
+        // filter
+        if (group != null) {
+            apps = apps.stream().filter((app) -> app.getGroupsNames().contains(group)).toList();
+        }
+
+        // pagination
+        return pageBuilder.doPrecise(offset, quantity, apps);
+    }
+
+    @VIPExternalSafe
+    public List<Application> getUserContextApplications() throws BusinessException {
+        User user = getUser();
+
+        if (user.isSystemAdministrator()) {
+            return getApplications();
+        } else {
+            return getApplications(user);
         }
     }
 
@@ -124,8 +202,13 @@ public class ApplicationBusiness {
         }
     }
 
+    @VIPExternalSafe
     public List<Application> getApplications(User user) throws BusinessException {
-        List<Group> userGroups = configurationBusiness.getUserGroups(user.getEmail()).keySet()
+        // this perform permissions filtering based on user group's membership
+        // if you perform this function as an Admin you will only get
+        // applications of groups you belong to.
+        // notes: use getApplications() to retrieve everything in DB
+        List<Group> userGroups = configurationBusiness.getOrLoadUserGroups(user)
             .stream()
             .filter((g) -> g.getType().equals(GroupType.APPLICATION))
             .collect(Collectors.toList());
@@ -151,7 +234,6 @@ public class ApplicationBusiness {
     }
 
     public List<Application> getApplicationsWithOwner(String email) throws BusinessException {
-
         try {
             return mapGroups(applicationDAO.getApplicationsWithOwner(email));
         } catch (DAOException ex) {
@@ -180,23 +262,7 @@ public class ApplicationBusiness {
                 .stream().sorted(Comparator.comparing(Application::getName)).collect(Collectors.toList());
     }
 
-    public List<Group> getPublicGroupsForApplication(String applicationName) throws BusinessException {
-        Application application = getApplication(applicationName);
-
-        if (application == null) {
-            logger.error("No application exists with name {}", applicationName);
-            throw new BusinessException("Wrong application name");
-        }
-
-        List<Group> appGroups = groupBusiness.getByApplication(applicationName);
-
-        return appGroups.stream()
-            .filter((g) -> g.isPublicGroup())
-            .collect(Collectors.toList());
-    }
-
     public List<String> getApplicationNames() throws BusinessException {
-
         List<String> applicationNames = new ArrayList<String>();
         for (Application application : getApplications()) {
             applicationNames.add(application.getName());
@@ -212,9 +278,9 @@ public class ApplicationBusiness {
         }
     }
 
-    public void associate(Application app, Group group) throws BusinessException {
+    public void associate(Application app, String groupName) throws BusinessException {
         app = getApplication(app.getName());
-        group = groupBusiness.get(group.getName());
+        Group group = groupBusiness.get(groupName);
 
         try {
             applicationDAO.associate(app, group);
@@ -223,7 +289,9 @@ public class ApplicationBusiness {
         }
     }
 
-    public void dissociate(Application app, Group group) throws BusinessException {
+    public void dissociate(Application app, String groupName) throws BusinessException {
+        Group group = groupBusiness.get(groupName);
+
         try {
             applicationDAO.dissociate(app, group);
         } catch (DAOException e) {
@@ -231,11 +299,17 @@ public class ApplicationBusiness {
         }
     }
 
+    // this function need to only map groups that user can see
+    // otherwise it will lead to permission leak issues
     private Application mapGroups(Application app) throws BusinessException {
+        List<Group> appGroups;
+
         if (app == null) {
             return null;
         } else {
-            app.setGroups(groupBusiness.getByApplication(app.getName()));
+            appGroups = groupBusiness.getByApplication(app.getName());
+
+            app.setGroups(permissions.filterOnlyUserGroups(appGroups));
             return app;
         }
     }

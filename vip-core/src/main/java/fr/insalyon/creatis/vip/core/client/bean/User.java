@@ -105,6 +105,7 @@ public class User implements IsSerializable {
         this.lastUpdatePublications=lastUpdatePublications;
         this.failedAuthentications = failedAuthentications;
         this.accountLocked = locked;
+        this.groups = new HashMap<>();
     }
 
     public boolean isConfirmed() {
@@ -244,7 +245,11 @@ public class User implements IsSerializable {
     }
 
     public Set<Group> getGroups() {
-        return groups.keySet();
+        if (groups == null) {
+            return null;
+        } else {
+            return groups.keySet();
+        }
     }
 
     private void filterGroups() {
