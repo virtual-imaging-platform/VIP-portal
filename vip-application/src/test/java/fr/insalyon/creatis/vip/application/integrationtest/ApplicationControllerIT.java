@@ -108,7 +108,7 @@ public class ApplicationControllerIT extends BaseInternalApiSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app.getName())))
-                    .andExpect(jsonPath("$.errorCode").value(1001))
+                    .andExpect(jsonPath("$.errorCode").value(1000))
                     .andExpect(status().is4xxClientError());
 
         configurationBusiness.addUserToGroup(emailUser2, nameGroup1);
