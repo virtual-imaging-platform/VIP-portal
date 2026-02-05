@@ -52,7 +52,7 @@ public class SpringApplicationTestConfig {
         }
 
         public void createAnApplication(String appName, String groupname) throws BusinessException {
-            Application app = new Application(appName, "test citation", new HashSet<>());
+            Application app = new Application(appName, "test citation", "test note", new HashSet<>());
 
             applicationBusiness.add(app);
 

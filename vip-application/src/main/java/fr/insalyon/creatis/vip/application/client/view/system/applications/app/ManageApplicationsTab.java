@@ -67,13 +67,13 @@ public class ManageApplicationsTab extends AbstractManageTab {
         manageVersionLayout.setApplication(applicationName);
     }
 
-    public void setApplication(String name, String owner, String citation, Map<String, String> groups) {
-        editLayout.setApplication(name, owner, citation, groups);
+    public void setApplication(String name, String owner, String citation, String note, Map<String, String> groups) {
+        editLayout.setApplication(name, owner, citation, note, groups);
     }
 
     public void setVersion(String version, String descriptor, String doi, Map<String, String> settings, 
-            boolean isVisible, String source, String[] resources) {
-        editVersionLayout.setVersion(version, descriptor, isVisible, source, settings, resources);
+            boolean isVisible, String source, String note, String[] resources) {
+        editVersionLayout.setVersion(version, descriptor, isVisible, source, note, settings, resources);
         manageVersionLayout.setVersion(version, descriptor, doi);
     }
 

@@ -16,31 +16,33 @@ public class Application implements IsSerializable {
     private String owner;
     private String fullName;
     private Set<Group> groups;
+    private String note;
 
     public Application() {}
 
     public Application(String name, String citation) {
-        this(name, null, null, citation);
+        this(name, null, null, citation, null);
     }
 
-    public Application(String name, String citation, Set<Group> groups) {
-        this(name, null, null, citation, groups);
+    public Application(String name, String citation, String note, Set<Group> groups) {
+        this(name, null, null, citation, note, groups);
     }
 
-    public Application(String name, String owner, String fullName, String citation) {
-        this(name, owner, fullName, citation, new HashSet<>());
+    public Application(String name, String owner, String fullName, String citation, String note) {
+        this(name, owner, fullName, citation, note, new HashSet<>());
     }
 
-    public Application(String name, String owner, String citation) {
-        this(name, owner, null, citation, new HashSet<>());
+    public Application(String name, String owner, String citation, String note) {
+        this(name, owner, null, citation, note, new HashSet<>());
     }
 
-    public Application(String name, String owner, String fullName, String citation, Set<Group> groups) {
+    public Application(String name, String owner, String fullName, String citation, String note, Set<Group> groups) {
         this.name = name;
         this.citation = citation;
         this.owner = owner;
         this.fullName = fullName;
         this.groups = groups;
+        this.note = note;
     }
 
     public String getName() {
@@ -81,6 +83,10 @@ public class Application implements IsSerializable {
 
     public void setGroups(Set<Group> groups) {
         this.groups = groups;
+    }
+
+    public String getNote() {
+        return note;
     }
 
     @Override

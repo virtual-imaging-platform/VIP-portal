@@ -66,7 +66,7 @@ public class VersionsLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setVersion(null, null, null, null, true, null, null);
+                appsTab.setVersion(null, null, null, null, true, null, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -139,7 +139,8 @@ public class VersionsLayout extends VLayout {
         grid.setFields(
                 isVisibleField,
                 new ListGridField("version", "Version"),
-                new ListGridField("resources", "Resources"));
+                new ListGridField("resources", "Resources"),
+                new ListGridField("note", "Note"));
         grid.setSortField("version");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -169,7 +170,7 @@ public class VersionsLayout extends VLayout {
                     dataList.add(new VersionRecord(
                         version.getVersion(), version.getDescriptor(),
                         version.getDoi(), version.isVisible(), version.getSource(),
-                        version.getSettings(), version.getResourcesNames()));
+                        version.getNote(), version.getSettings(), version.getResourcesNames()));
                 }
                 grid.setData(dataList.toArray(new VersionRecord[]{}));
             }
@@ -196,6 +197,7 @@ public class VersionsLayout extends VLayout {
             record.getAttributeAsMap("settings"),
             record.getAttributeAsBoolean("visible"),
             record.getAttribute("source"),
+            record.getAttribute("note"),
             record.getAttributeAsStringArray("resources"));
     }
 

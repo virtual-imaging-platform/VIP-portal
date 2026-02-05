@@ -43,7 +43,7 @@ public class ApplicationIT extends BaseApplicationSpringIT {
         engines.add("test engine");
         engineBusiness.add(engine);
 
-        Application application = new Application("Application1", "test1@test.fr", "test1", "citation1");
+        Application application = new Application("Application1", "test1@test.fr", "citation1", "test1");
         appBusiness.add(application);
 
         AppVersion appVersion = new AppVersion("Application1", "version 0.0", "{}", true);

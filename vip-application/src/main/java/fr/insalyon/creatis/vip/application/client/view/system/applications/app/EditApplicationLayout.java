@@ -15,6 +15,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
@@ -41,6 +42,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
 
     private boolean newApplication = true;
     private TextItem nameField;
+    private TextAreaItem noteField;
     private RichTextEditor richTextEditor;
     private SelectItem groupsList;
     private IButton saveButton;
@@ -59,6 +61,12 @@ public class EditApplicationLayout extends AbstractFormLayout {
     private void configure() {
 
         nameField = FieldUtil.getTextItem(450, null);
+
+        noteField = new TextAreaItem();
+        noteField.setRequired(false);
+        noteField.setShowTitle(false);
+        noteField.setWidth(450);
+        noteField.setHeight(70);
 
         usersPickList = new SelectItem();
         usersPickList.setShowTitle(false);
@@ -91,6 +99,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
                         save(new Application(
                             nameField.getValueAsString().trim(),
                             richTextEditor.getValue(),
+                            noteField.getValueAsString().trim(),
                             groups));
                     } else {
                         save(new Application(
@@ -98,6 +107,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
                             usersPickList.getValueAsString(), 
                             null,
                             richTextEditor.getValue(),
+                            noteField.getValueAsString().trim(),
                             groups));
                     }
                 }
@@ -123,6 +133,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
         addField("Name", nameField);
         addField("Owner", usersPickList);
         addField("Groups", groupsList);
+        addFieldResponsiveHeight("Note", noteField);
         addMember(WidgetUtil.getLabel("<b>Citation</b>", 15));
         addMember(richTextEditor);
         addMember(removeButton);
@@ -134,7 +145,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
         }
     }
 
-    public void setApplication(String name, String owner, String citation, Map<String, String> groups) {
+    public void setApplication(String name, String owner, String citation, String note, Map<String, String> groups) {
         if (name != null) {
             usersPickList.setCanEdit(true);
             fetchUsers(owner);
@@ -142,6 +153,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
             nameField.setDisabled(true);
             groupsList.setValues(groups.keySet().stream().toArray(String[]::new));
             richTextEditor.setValue(citation);
+            noteField.setValue(note);
             newApplication = false;
             removeButton.setDisabled(false);
             groupsMap = groups;
@@ -151,6 +163,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
             nameField.setValue("");
             nameField.setDisabled(false);
             richTextEditor.setValue("");
+            noteField.setValue("");
             newApplication = true;
             removeButton.setDisabled(true);
             groupsMap = new HashMap<>();
@@ -188,7 +201,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
 
-                setApplication(null, null, null, null);
+                setApplication(null, null, null, null, null);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadApplications();
                 

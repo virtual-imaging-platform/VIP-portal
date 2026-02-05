@@ -75,12 +75,13 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void add(Application application) throws DAOException {
-        String query = "INSERT INTO VIPApplications(name, citation, owner) VALUES (?,?,?)";
+        String query = "INSERT INTO VIPApplications(name, citation, owner, note) VALUES (?,?,?,?)";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, application.getName());
             ps.setString(2, application.getCitation());
             ps.setString(3, application.getOwner());
+            ps.setString(4, application.getNote());
             ps.execute();
 
         } catch (SQLException ex) {
@@ -96,12 +97,13 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void update(Application application) throws DAOException {
-        String query = "UPDATE VIPApplications SET citation=?, owner=? WHERE name=?";
+        String query = "UPDATE VIPApplications SET citation=?, owner=?, note=? WHERE name=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, application.getCitation());
             ps.setString(2, application.getOwner());
-            ps.setString(3, application.getName());
+            ps.setString(3, application.getNote());
+            ps.setString(4, application.getName());
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -178,6 +180,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
                     rs.getString("name"), 
                     rs.getString("owner"), 
                     user.getFirstName() + " " + user.getLastName(), 
+                    rs.getString("note"),
                     rs.getString("citation")));
             }
             return applications;
@@ -275,8 +278,8 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void addVersion(AppVersion version) throws DAOException {
-        String query =  "INSERT INTO VIPAppVersions(application, version, descriptor, visible, settings, source) "
-        +               "VALUES (?, ?, ?, ?, ?, ?)";
+        String query =  "INSERT INTO VIPAppVersions(application, version, descriptor, visible, settings, source, note) "
+        +               "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, version.getApplicationName());
@@ -285,6 +288,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setBoolean(4, version.isVisible());
             ps.setString(5, mapToSettingsJson(version.getSettings()));
             ps.setString(6, version.getSource());
+            ps.setString(7, version.getNote());
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -301,7 +305,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void updateVersion(AppVersion version) throws DAOException {
-        String query =  "UPDATE VIPAppVersions SET descriptor=?, visible=?, settings=?, source=? "
+        String query =  "UPDATE VIPAppVersions SET descriptor=?, visible=?, settings=?, source=?, note=? "
         +               "WHERE application=? AND version=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
@@ -309,8 +313,9 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setBoolean(2, version.isVisible());
             ps.setString(3, mapToSettingsJson(version.getSettings()));
             ps.setString(4, version.getSource());
-            ps.setString(5, version.getApplicationName());
-            ps.setString(6, version.getVersion());
+            ps.setString(5, version.getNote());
+            ps.setString(6, version.getApplicationName());
+            ps.setString(7, version.getVersion());
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -412,7 +417,9 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         return new Application(
             rs.getString("name"),
             rs.getString("owner"),
-            rs.getString("citation"));
+            rs.getString("citation"),
+            rs.getString("note")
+        );
     }
 
     private AppVersion appVersionFromResultset(ResultSet rs) throws SQLException, DAOException {
@@ -423,7 +430,8 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             rs.getString("doi"),
             settingsJsonToMap(rs.getString("settings")),
             rs.getBoolean("visible"),
-            rs.getString("source")
+            rs.getString("source"),
+            rs.getString("note")
         );
     }
 

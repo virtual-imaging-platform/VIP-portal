@@ -22,7 +22,7 @@ public class PublicApplicationListIT extends BaseApplicationSpringIT {
         Group publicGroup = new Group("public group", true, GroupType.getDefault());
         Group privateGroup = new Group("private group", false, GroupType.getDefault());
 
-        Application app = new Application("testApp", "", Set.of(publicGroup));
+        Application app = new Application("testApp", "", "", Set.of(publicGroup));
         AppVersion appVersion = new AppVersion(app.getName(), "", "{}", true);
 
         groupBusiness.add(publicGroup);

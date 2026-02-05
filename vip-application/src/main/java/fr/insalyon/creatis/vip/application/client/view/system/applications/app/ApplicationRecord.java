@@ -16,6 +16,7 @@ public class ApplicationRecord extends ListGridRecord {
         setAttribute("citation", app.getCitation());
         setAttribute("groupsLabel", SystemUtils.formatGroups(app.getGroups()));
         setAttribute("groups", app.getGroupsNames());
+        setAttribute("note", app.getNote());
     }
 
     public ApplicationRecord(Application app, List<String> resources) {
