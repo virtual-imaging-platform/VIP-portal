@@ -19,11 +19,11 @@ public class ApiBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Server server;
-    private final ConfigurationBusiness configuration;
+    private final ConfigurationBusiness configurationBusiness;
 
-    public ApiBusiness(final Server server, final ConfigurationBusiness configuration) {
+    public ApiBusiness(final Server server, final ConfigurationBusiness configurationBusiness) {
         this.server = server;
-        this.configuration = configuration;
+        this.configurationBusiness = configurationBusiness;
     }
 
     public AuthenticationInfo authenticate(AuthenticationCredentials authCreds) throws VipException {
@@ -55,7 +55,7 @@ public class ApiBusiness {
     private User signin(String username, String password) throws VipException {
         try {
             // we do not care about the session, we're not in browser action
-            User user = configuration
+            User user = configurationBusiness
                     .signin(username, password);
             logger.info("Credentials OK for " + username);
             return user;
@@ -72,10 +72,10 @@ public class ApiBusiness {
 
         if (generateNewApiKey) {
             logger.info("generating a new apikey for " + email);
-            return configuration.generateNewUserApikey(email);
+            return configurationBusiness.generateNewUserApikey(email);
         } else {
             logger.debug("keeping the current api key for " + email);
-            return configuration.getUserApikey(email);
+            return configurationBusiness.getUserApikey(email);
         }
     }
 }
