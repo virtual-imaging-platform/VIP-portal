@@ -399,9 +399,6 @@ public class DataApiBusiness {
             }
             fos.flush();
             return isFileEmpty;
-        } catch (FileNotFoundException e) {
-            logger.error("Error creating new file {}", path ,e);
-            throw new VipException("Upload error", e);
         } catch (IOException e) {
             logger.error("IO Error storing file {}", path, e);
             throw new VipException("Upload error", e);
