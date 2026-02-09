@@ -161,19 +161,28 @@ public class WorkflowBusiness {
             try {
                 workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, parameters, resource.getConfiguration());
             } catch (VipException e) {
+                // no code mean not intended exception = engine deactivation
+                if (e.getVipErrorCode().isEmpty()) {
+                    logger.error("Unexpected exception caught on launch workflow, engine {} will be disabled", engine.getName(), e);
+
+                    engine.setStatus("disabled");
+                    engineBusiness.update(engine);
+
+                    logger.info("Sending warning email to admins !");
+                    emailBusiness.sendEmailToAdmins(
+                        "Urgent: VIP engine disabled", 
+                        "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.", 
+                        true, user.getEmail());
+                } else {
+                    logger.warn("Error occuring during workflow submission!");
+
+                    emailBusiness.sendEmailToAdmins(
+                        "Warn: Workflow submission failed!", 
+                        "An error occured while submitting a workflow: " + e.getMessage() + "\nStacktrace: " + e.getStackTrace(), 
+                        true, user.getEmail());
+                }
+
                 throw e;
-            } catch (Exception e) {
-                logger.error("Unexpected exception caught on launch workflow, engine {} will be disabled", engine.getName(), e);
-
-                engine.setStatus("disabled");
-                engineBusiness.update(engine);
-
-                logger.info("Sending warning email to admins !");
-                emailBusiness.sendEmailToAdmins(
-                    "Urgent: VIP engine disabled", 
-                    "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.", 
-                    true, user.getEmail());
-                throw new VipException("Failed to launch workflow! Engine " + engine.getName() + " has been disabled");
             }
             logger.info("Launched workflow " + workflow.toString());
 

@@ -13,7 +13,7 @@ public abstract class WorkflowEngineInstantiator {
     }
 
     public abstract String launch(String addressWS, String workflowContent, String inputs, String settings, String executorConfig, String proxyFileName)
-            throws VipException, Exception;
+            throws VipException;
 
     public abstract void kill(String addressWS, String workflowID)
             throws VipException;

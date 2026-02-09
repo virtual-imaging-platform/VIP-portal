@@ -37,7 +37,7 @@ public class WorkflowExecutionBusiness {
     }
 
     public Workflow launch(String engineEndpoint, AppVersion appVersion, User user, String simulationName,
-            Map<String, List<String>> parameters, String executorConfig) throws VipException, Exception {
+            Map<String, List<String>> parameters, String executorConfig) throws VipException {
 
         try {
             String workflowContent = appVersion.getDescriptor();

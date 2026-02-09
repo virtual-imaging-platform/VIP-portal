@@ -19,8 +19,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.insalyon.creatis.vip.application.client.view.ApplicationError;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.ProxyUtil;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 
@@ -68,7 +70,7 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
      */
     @Override
     public String launch(String addressWS, String workflow, String inputs, String settings, String executorConfig, String proxyFileName)
-            throws VipException, Exception {
+            throws VipException {
         loadTrustStore(server);
 
         String strProxy = null;
@@ -88,7 +90,14 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
 
         try {
             ObjectMapper mapper = new ObjectMapper();
-            String jsonBody = mapper.writeValueAsString(restWorkflow);
+            String jsonBody;
+
+            try {
+                jsonBody = mapper.writeValueAsString(restWorkflow);
+            } catch (JsonProcessingException e) {
+                logger.error("Error serializing RestWorkflow to JSON", e);
+                throw new VipException("Error serializing RestWorkflow to JSON", e);
+            }
 
             RestClient restClient = buildRestClient(addressWS);
             return restClient.post()
@@ -100,21 +109,18 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
         } catch (HttpServerErrorException | HttpClientErrorException e) {
             switch (e.getStatusCode().value()) {
                 case 503:
-                    logger.warn("Engine satured!: {}", e.getMessage());
-                    throw new VipException(e.getResponseBodyAsString());
+                    logger.warn("Engine satured!: {}", e.getMessage(), e);
+                    throw new VipException(ApplicationError.ENGINE_SATURATED, e);
                 case 400:
-                    logger.warn("Application likely misconfigured: {}", e.getMessage());
-                    throw new VipException(e.getResponseBodyAsString());
+                    logger.warn("Application likely misconfigured: {}", e.getMessage(), e);
+                    throw new VipException(DefaultError.GENERIC_ERROR, e);
                 default:
                     logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
-                    throw new Exception("Internal server error while fetching workflow status", e);
+                    throw new VipException("Internal server error while fetching workflow status", e);
             }
         } catch (RestClientException e) {
             logger.error("REST client error while fetching workflow status", e);
             throw new VipException("REST client error while fetching workflow status", e);
-        } catch (JsonProcessingException e) {
-            logger.error("Error serializing RestWorkflow to JSON", e);
-            throw new VipException("Error serializing RestWorkflow to JSON", e);
         }
     }
 
