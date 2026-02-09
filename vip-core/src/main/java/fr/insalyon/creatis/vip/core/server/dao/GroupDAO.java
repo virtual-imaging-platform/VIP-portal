@@ -6,10 +6,6 @@ import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import java.util.List;
 import java.util.Set;
 
-/**
- *
- * @author Rafael Silva
- */
 public interface GroupDAO {
 
     public void add(Group group) throws DAOException;

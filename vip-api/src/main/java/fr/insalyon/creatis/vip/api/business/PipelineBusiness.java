@@ -1,40 +1,19 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.api.business;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.boutiques.model.Input;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.api.model.ParameterType;
 import fr.insalyon.creatis.vip.api.model.Pipeline;
 import fr.insalyon.creatis.vip.api.model.PipelineParameter;
@@ -43,28 +22,12 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import static fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError.*;
-
-/**
- *
- * @author Tristan Glatard
- */
 @Service
 public class PipelineBusiness {
 
@@ -94,20 +57,20 @@ public class PipelineBusiness {
         return applicationName + "/" + applicationVersion;
     }
 
-    public String getApplicationVersion(String pipelineIdentifier) throws ApiException {
+    public String getApplicationVersion(String pipelineIdentifier) throws VipException {
         checkIfValidPipelineIdentifier(pipelineIdentifier);
         return pipelineIdentifier.substring(pipelineIdentifier.lastIndexOf("/") + 1);
     }
 
-    public String getApplicationName(String pipelineIdentifier) throws ApiException {
+    public String getApplicationName(String pipelineIdentifier) throws VipException {
         checkIfValidPipelineIdentifier(pipelineIdentifier);
         return pipelineIdentifier.substring(0, pipelineIdentifier.lastIndexOf("/"));
     }
 
-    private void checkIfValidPipelineIdentifier(String identifier) throws ApiException {
+    private void checkIfValidPipelineIdentifier(String identifier) throws VipException {
         if (!identifier.contains("/")) {
             logger.error("Invalid pipeline identifier {} : missing /", identifier);
-            throw new ApiException(ApiError.INVALID_PIPELINE_IDENTIFIER, identifier);
+            throw new VipException(ApiError.INVALID_PIPELINE_IDENTIFIER, identifier);
         }
     }
 
@@ -117,14 +80,14 @@ public class PipelineBusiness {
     /**
      * Returns pipeline + parameters without the results-directory param
      */
-    public Pipeline getPipelineWithoutResultsDirectory(String pipelineId) throws ApiException {
+    public Pipeline getPipelineWithoutResultsDirectory(String pipelineId) throws VipException {
         return getPipelineFromBoutiquesDescriptor(pipelineId);
     }
 
     /**
      * Returns pipeline + parameters with the results-directory param
      */
-    public Pipeline getPipelineWithResultsDirectory(String pipelineId) throws ApiException {
+    public Pipeline getPipelineWithResultsDirectory(String pipelineId) throws VipException {
         // boutiques must not contain it, we always add it
         Pipeline p = getPipelineFromBoutiquesDescriptor(pipelineId);
         p.getParameters().add(new PipelineParameter(
@@ -133,17 +96,13 @@ public class PipelineBusiness {
         return p;
     }
 
-    public BoutiquesDescriptor getBoutiquesDescriptor(String pipelineId) throws ApiException {
+    public BoutiquesDescriptor getBoutiquesDescriptor(String pipelineId) throws VipException {
         AppVersion appVersion = getAppVersionFromPipelineId(pipelineId);
 
-        try {
-            return boutiquesBusiness.parseBoutiquesString(appVersion.getDescriptor());
-        } catch (BusinessException e) {
-            throw new ApiException(e);
-        }
+        return boutiquesBusiness.parseBoutiquesString(appVersion.getDescriptor());
     }
 
-    private List<Pipeline> appsToPipelines(List<Application> applications) throws BusinessException {
+    private List<Pipeline> appsToPipelines(List<Application> applications) throws VipException {
         List<Pipeline> pipelines = new ArrayList<>();
         for (Application a : applications) {
             List<AppVersion> versions = appVersionBusiness.getVersions(a.getName());
@@ -163,28 +122,20 @@ public class PipelineBusiness {
     /**
      * List all the pipeline the user can access
      */
-    public List<Pipeline> listPipelines(String studyIdentifier) throws ApiException {
-        try {
-            if (studyIdentifier != null) {
-                logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
-            }
-
-            List<Application> applications = applicationBusiness.getApplications(currentUserProvider.get());
-            return appsToPipelines(applications);
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+    public List<Pipeline> listPipelines(String studyIdentifier) throws VipException {
+        if (studyIdentifier != null) {
+            logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
         }
+
+        List<Application> applications = applicationBusiness.getApplications(currentUserProvider.get());
+        return appsToPipelines(applications);
     }
 
     // Specific stuff that return in 'Application' class format and not 'Pipeline'
     // used for the VIP landing page
-    public List<Pipeline> listPublicPipelines() throws ApiException {
-        try {
-            List<Application> applications = applicationBusiness.getPublicApplications();
-            return appsToPipelines(applications);
-        } catch (BusinessException e) {
-            throw new ApiException(e);
-        }
+    public List<Pipeline> listPublicPipelines() throws VipException {
+        List<Application> applications = applicationBusiness.getPublicApplications();
+        return appsToPipelines(applications);
     }
 
     // ********************* Basic stuff **************************************
@@ -193,7 +144,7 @@ public class PipelineBusiness {
      *  Get the pipeline parameters from the boutiques file
      *  Warning : this does not include the results-directory parameter
      */
-    private Pipeline getPipelineFromBoutiquesDescriptor(String pipelineId) throws ApiException {
+    private Pipeline getPipelineFromBoutiquesDescriptor(String pipelineId) throws VipException {
         // download the boutiques file and parse it
         BoutiquesDescriptor boutiques = getBoutiquesDescriptor(pipelineId);
         Pipeline p = new Pipeline(pipelineId, boutiques.getName(), boutiques.getToolVersion());
@@ -218,55 +169,47 @@ public class PipelineBusiness {
     }
 
     // return basic pipeline without parameters
-    private Pipeline getPipelineWithoutParameters(String pipelineId) throws ApiException {
+    private Pipeline getPipelineWithoutParameters(String pipelineId) throws VipException {
         AppVersion appVersion = getAppVersionFromPipelineId(pipelineId);
 
         return new Pipeline(pipelineId, appVersion.getApplicationName(), appVersion.getVersion());
     }
 
-    private AppVersion getAppVersionFromPipelineId(String pipelineId) throws ApiException {
-        try {
-            String applicationName = getApplicationName(pipelineId);
-            String applicationVersion = getApplicationVersion(pipelineId);
-            AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
-            if (appVersion == null) {
-                logger.error("Cannot find pipeline {}/{}", applicationName, applicationVersion);
-                throw new ApiException(PIPELINE_NOT_FOUND, pipelineId);
-            }
-            checkAppVersionAccess(appVersion);
-            return appVersion;
-        } catch (BusinessException e) {
-            throw new ApiException(e);
+    private AppVersion getAppVersionFromPipelineId(String pipelineId) throws VipException {
+        String applicationName = getApplicationName(pipelineId);
+        String applicationVersion = getApplicationVersion(pipelineId);
+        AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
+        if (appVersion == null) {
+            logger.error("Cannot find pipeline {}/{}", applicationName, applicationVersion);
+            throw new VipException(ApiError.PIPELINE_NOT_FOUND, pipelineId);
         }
+        checkAppVersionAccess(appVersion);
+        return appVersion;
     }
 
     // ********************* VERIFICATION STUFF *******************************
 
     // should be called it all cases
-    private void checkAppVersionAccess(AppVersion appVersion) throws ApiException {
+    private void checkAppVersionAccess(AppVersion appVersion) throws VipException {
         String appName = appVersion.getApplicationName();
         String version = appVersion.getVersion();
 
         // check it is visible or in white list
         if ( ! isApplicationVersionUsableInApi(appVersion)) {
             logger.error("Application {}/{} not visible or in api whitelist", appName, version);
-            throw new ApiException(PIPELINE_NOT_FOUND, getPipelineIdentifier(appName, version));
+            throw new VipException(ApiError.PIPELINE_NOT_FOUND, getPipelineIdentifier(appName, version));
         }
 
         // check the user can use it 
-        try {
-            List<Application> apps = applicationBusiness.getApplications(currentUserProvider.get());
+        List<Application> apps = applicationBusiness.getApplications(currentUserProvider.get());
 
-            for (Application app : apps) {
-                if (app.getName().equals(appName)) {
-                    return;
-                }
+        for (Application app : apps) {
+            if (app.getName().equals(appName)) {
+                return;
             }
-            logger.error("User {} not allowed to access application {}", currentUserProvider.get(), appName);
-            throw new ApiException(NOT_ALLOWED_TO_USE_PIPELINE, getPipelineIdentifier(appName, version));
-        } catch (BusinessException e) {
-            throw new ApiException(e);
         }
+        logger.error("User {} not allowed to access application {}", currentUserProvider.get(), appName);
+        throw new VipException(ApiError.NOT_ALLOWED_TO_USE_PIPELINE, getPipelineIdentifier(appName, version));
     }
 
     private boolean isApplicationVersionUsableInApi(AppVersion appVersion) {

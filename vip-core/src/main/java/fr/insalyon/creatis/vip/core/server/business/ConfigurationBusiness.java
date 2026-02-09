@@ -1,40 +1,33 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.core.server.business;
+
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -43,27 +36,13 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
-import fr.insalyon.creatis.vip.core.server.dao.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.TermsUseDAO;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.stream.Collectors;
 
-/**
- * @author Rafael Ferreira da Silva, Nouha Boujelben
- */
 @Service
 @Transactional
 public class ConfigurationBusiness {
@@ -104,7 +83,7 @@ public class ConfigurationBusiness {
 
     }
 
-    public void configure() throws BusinessException {
+    public void configure() throws VipException {
         if (server.getMyProxyEnabled()) {
             try {
                 logger.debug("Configuring VIP server proxy.");
@@ -112,7 +91,7 @@ public class ConfigurationBusiness {
     
             } catch (Exception ex) {
                 logger.error("Error configuring myproxy : {}", ex.getMessage());
-                throw new BusinessException(ex);
+                throw new VipException(ex);
             }
         } else {
             logger.info("Proxy not needed and not validated !");
@@ -120,7 +99,7 @@ public class ConfigurationBusiness {
     }
 
     public boolean validateSession(String email, String session)
-            throws BusinessException {
+            throws VipException {
         try {
             if (email != null && session != null) {
                 if (userDAO.verifySession(email, session) && !userDAO.isLocked(email)) {
@@ -134,40 +113,40 @@ public class ConfigurationBusiness {
             }
             return false;
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public User getUser(String email) throws BusinessException {
+    public User getUser(String email) throws VipException {
         try {
             return userDAO.getUser(email);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public User getUserWithGroups(String email) throws BusinessException {
+    public User getUserWithGroups(String email) throws VipException {
         try {
             User user = userDAO.getUser(email);
             user.setGroups(usersGroupsDAO.getUserGroups(email));
             return user;
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void signup(User user, String comments, Group group) throws BusinessException {
+    public void signup(User user, String comments, Group group) throws VipException {
         signup(user, comments, false, false, group);
     }
 
     public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, Group group)
-            throws BusinessException {
+            throws VipException {
         this.signup(user, comments, automaticCreation, mapPrivateGroups,
                 group == null ? new ArrayList<>() : Arrays.asList(group));
     }
 
     public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, List<Group> groups)
-            throws BusinessException {
+            throws VipException {
 
         verifyEmail(user.getEmail());
 
@@ -192,7 +171,7 @@ public class ConfigurationBusiness {
             }
             if (user.getCountryCode().toString().equals(udc)) {
                 logger.error("Undesired country for " + user.getEmail());
-                throw new BusinessException("Error");
+                throw new VipException("Error");
             }
         }
 
@@ -303,20 +282,20 @@ public class ConfigurationBusiness {
             }
         } catch (GRIDAClientException | UnsupportedEncodingException | NoSuchAlgorithmException ex) {
             logger.error("Error signing up user {}", user.getEmail(), ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    private void verifyEmail(String email) throws BusinessException {
+    private void verifyEmail(String email) throws VipException {
         // verify email format
         try {
             InternetAddress emailAddr = new InternetAddress(email);
             emailAddr.validate();
         } catch (AddressException ex) {
             logger.error("The email {} is invalid", email);
-            throw new BusinessException("The email " + email + " is invalid");
+            throw new VipException("The email " + email + " is invalid");
         }
 
         // Build log message
@@ -342,27 +321,27 @@ public class ConfigurationBusiness {
             String[] useremail = email.split("@");
             if (useremail.length != 2) {
                 logger.info("User Mail address is incorrect : " + email);
-                throw new BusinessException("Error");
+                throw new VipException("Error");
             }
             // Only check against the domain part of the user's email address
             if (useremail[1].endsWith(udm)) {
                 logger.error("Undesired Mail Domain for " + email);
-                throw new BusinessException("Error");
+                throw new VipException("Error");
             }
         }
     }
 
-    public User signin(String email, String password) throws BusinessException {
+    public User signin(String email, String password) throws VipException {
         return signin(email, password, true);
     }
 
     public User signinWithoutResetingSession(String email, String password)
-            throws BusinessException {
+            throws VipException {
         return signin(email, password, false);
     }
 
     private User signin(String email, String password, boolean resetSession)
-            throws BusinessException {
+            throws VipException {
 
         try {
             password = MD5.get(password);
@@ -383,13 +362,13 @@ public class ConfigurationBusiness {
                     userDAO.lock(email);
                 }
                 logger.error("Authentication failed to '" + email + "' (email or password incorrect, or user is locked).");
-                throw new BusinessException("Authentication failed (email or password incorrect, or user is locked).");
+                throw new VipException("Authentication failed (email or password incorrect, or user is locked).");
             }
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             logger.error("Error signing in user {}", email, ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -421,20 +400,20 @@ public class ConfigurationBusiness {
                 cc, getCurrentTimeStamp());
     }
 
-    public void signout(String email) throws BusinessException {
+    public void signout(String email) throws VipException {
         try {
             String session = UUID.randomUUID().toString();
             userDAO.updateSession(email, session);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public User activate(String email, String code) throws BusinessException {
+    public User activate(String email, String code) throws VipException {
         try {
             if (userDAO.isLocked(email)) {
                 logger.error("Activation failed to '" + email + "' (user is locked).");
-                throw new BusinessException("User is locked.");
+                throw new VipException("User is locked.");
             }
             if (userDAO.activate(email, code)) {
 
@@ -455,33 +434,33 @@ public class ConfigurationBusiness {
                     userDAO.lock(email);
                 }
                 logger.error("Activation failed to '" + email + "' (wrong code: " + code + ").");
-                throw new BusinessException("Activation failed.");
+                throw new VipException("Activation failed.");
             }
 
         } catch (GRIDAClientException ex) {
             logger.error("Error activating {}", email, ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void activateUser(String email) throws BusinessException {
+    public void activateUser(String email) throws VipException {
         try {
             User user = userDAO.getUser(email);
             activate(email, user.getCode());
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void sendActivationCode(String email) throws BusinessException {
+    public void sendActivationCode(String email) throws VipException {
         try {
             User user = userDAO.getUser(email);
 
             if (userDAO.isLocked(email)) {
                 logger.error("Cannot send activation code to {} : account locked", email);
-                throw new BusinessException("User is locked.");
+                throw new VipException("User is locked.");
             }
 
             String emailContent = "<html>"
@@ -500,17 +479,17 @@ public class ConfigurationBusiness {
                     new String[]{user.getEmail()}, true, user.getEmail());
 
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void sendResetCode(String email) throws BusinessException {
+    public void sendResetCode(String email) throws VipException {
         try {
             User user = userDAO.getUser(email);
 
             if (userDAO.isLocked(email)) {
                 logger.error("Cannot send reset code to {} : account locked", email);
-                throw new BusinessException("User is locked.");
+                throw new VipException("User is locked.");
             }
 
             String code = UUID.randomUUID().toString();
@@ -532,12 +511,12 @@ public class ConfigurationBusiness {
                     new String[]{user.getEmail()}, true, user.getEmail());
 
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public void requestNewEmail(User user, String newEmail)
-            throws BusinessException {
+            throws VipException {
 
         try {
             String code = UUID.randomUUID().toString();
@@ -564,12 +543,12 @@ public class ConfigurationBusiness {
                     new String[]{newEmail}, true, newEmail);
 
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public void removeUser(String email, boolean sendNotificationEmail)
-            throws BusinessException {
+            throws VipException {
 
         try {
             User user = getUser(email);
@@ -605,41 +584,41 @@ public class ConfigurationBusiness {
             }
         } catch (GRIDAClientException ex) {
             logger.error("Error removing user {}", email, ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public List<User> getUsers() throws BusinessException {
+    public List<User> getUsers() throws VipException {
         try {
             return userDAO.getUsers();
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public List<String> getAllUserNames() throws BusinessException {
+    public List<String> getAllUserNames() throws VipException {
         return getUsers().stream().map(User::getFullName).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email)
-            throws BusinessException {
+            throws VipException {
         try {
             return usersGroupsDAO.getUserGroups(email);
 
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public List<Boolean> getUserPropertiesGroups(String email)
-            throws BusinessException {
+            throws VipException {
         try {
             return usersGroupsDAO.getUserPropertiesGroups(email);
 
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -650,34 +629,34 @@ public class ConfigurationBusiness {
 
     public void setUserGroups(
             String email, Map<String, CoreConstants.GROUP_ROLE> groups)
-            throws BusinessException {
+            throws VipException {
         try {
             usersGroupsDAO.setUserGroups(email, groups);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public User getUserData(String email) throws BusinessException {
+    public User getUserData(String email) throws VipException {
         try {
             return userDAO.getUser(email);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public User updateUser(User user) throws BusinessException {
+    public User updateUser(User user) throws VipException {
         try {
             userDAO.update(user);
             return user;
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public void updateUserPassword(
             String email, String currentPassword, String newPassword)
-            throws BusinessException {
+            throws VipException {
 
         try {
             currentPassword = MD5.get(currentPassword);
@@ -685,50 +664,50 @@ public class ConfigurationBusiness {
             userDAO.updatePassword(email, currentPassword, newPassword);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             logger.error("Error updating password for {}", email, ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public void updateUserEmail(String oldEmail, String newEmail)
-            throws BusinessException {
+            throws VipException {
         verifyEmail(newEmail);
         try {
             userDAO.updateEmail(oldEmail, newEmail);
         } catch (DAOException e) {
             String errorMessage = "Error changing email from " + newEmail + " to " + newEmail;
             sendErrorEmailToAdmins(errorMessage, e, oldEmail);
-            throw new BusinessException("Error changing email address", e);
+            throw new VipException("Error changing email address", e);
         }
 
     }
 
-    public void resetNextEmail(String currentEmail) throws BusinessException {
+    public void resetNextEmail(String currentEmail) throws VipException {
         try {
             userDAO.updateNextEmail(currentEmail, null);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public void updateTermsOfUse(String email) throws BusinessException {
+    public void updateTermsOfUse(String email) throws VipException {
         try {
             userDAO.updateTermsOfUse(email, getCurrentTimeStamp());
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void updateLastUpdatePublication(String email) throws BusinessException {
+    public void updateLastUpdatePublication(String email) throws VipException {
         try {
             userDAO.updateLastUpdatePublication(email, getCurrentTimeStamp());
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void sendContactMail(User user, String category, String subject, String comment) throws BusinessException {
+    public void sendContactMail(User user, String category, String subject, String comment) throws VipException {
         String emailContent = "<html>"
             + "<head></head>"
             + "<body>"
@@ -748,55 +727,55 @@ public class ConfigurationBusiness {
             true, user.getEmail());
     }
 
-    public void updateUserLastLogin(String email) throws BusinessException {
+    public void updateUserLastLogin(String email) throws VipException {
         try {
             userDAO.updateLastLogin(email, new Date());
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void addUserToGroup(String email, String groupName) throws BusinessException {
+    public void addUserToGroup(String email, String groupName) throws VipException {
         try {
             usersGroupsDAO.add(email, groupName, GROUP_ROLE.User);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public void updateUser(
             String email, UserLevel level, CountryCode countryCode,
             int maxRunningSimulations, boolean locked)
-            throws BusinessException {
+            throws VipException {
         try {
             userDAO.update(
                     email, level, countryCode, maxRunningSimulations, locked);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public List<User> getUsersFromGroup(String groupName) throws BusinessException {
+    public List<User> getUsersFromGroup(String groupName) throws VipException {
         try {
             return usersGroupsDAO.getUsersFromGroup(groupName);
 
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public void removeUserFromGroup(String email, String groupName)
-            throws BusinessException {
+            throws VipException {
         try {
             usersGroupsDAO.removeUserFromGroup(email, groupName);
 
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public void resetPassword(String email, String code, String password)
-            throws BusinessException {
+            throws VipException {
 
         try {
             User user = userDAO.getUser(email);
@@ -805,13 +784,13 @@ public class ConfigurationBusiness {
                 userDAO.resetPassword(email, MD5.get(password));
             } else {
                 logger.error("Wrong reset code for {} : {}", email, code);
-                throw new BusinessException("Wrong reset code.");
+                throw new VipException("Wrong reset code.");
             }
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             logger.error("Error resetting password for {}", email, ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -829,7 +808,7 @@ public class ConfigurationBusiness {
 
 
     public User getOrCreateUser(String email, String institution, String groupName)
-            throws BusinessException {
+            throws VipException {
 
         verifyEmail(email);
 
@@ -854,7 +833,7 @@ public class ConfigurationBusiness {
             try {
                 signup(user, "Generated automatically", true, true,
                         groupBusiness.get(groupName));
-            } catch (BusinessException ex2) {
+            } catch (VipException ex2) {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
@@ -867,33 +846,33 @@ public class ConfigurationBusiness {
             try {
                 user = getUserWithSession(email);
             } catch (DAOException ex1) {
-                throw new BusinessException(ex1);
+                throw new VipException(ex1);
             }
 
         }
         return user;
     }
 
-    public void addTermsUse() throws BusinessException {
+    public void addTermsUse() throws VipException {
         try {
             TermsOfUse termsOfUse = new TermsOfUse(getCurrentTimeStamp());
             termsUseDAO.add(termsOfUse);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public Timestamp getLastUpdateTermsOfUse() throws BusinessException {
+    public Timestamp getLastUpdateTermsOfUse() throws VipException {
         try {
             return termsUseDAO.getLastUpdateTermsOfUse();
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     // api key management
 
-    public boolean testLastUpdatePublication(String email) throws BusinessException {
+    public boolean testLastUpdatePublication(String email) throws VipException {
         try {
             if (userDAO.getLastPublicationUpdate(email) == null) {
                 return true;
@@ -905,34 +884,34 @@ public class ConfigurationBusiness {
                 return ts.before(getCurrentTimeStamp());
             }
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public String getUserApikey(String email) throws BusinessException {
+    public String getUserApikey(String email) throws VipException {
         try {
             return userDAO.getUserApikey(email);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public void deleteUserApikey(String email) throws BusinessException {
+    public void deleteUserApikey(String email) throws VipException {
         try {
             userDAO.updateUserApikey(email, null);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public String generateNewUserApikey(String email) throws BusinessException {
+    public String generateNewUserApikey(String email) throws VipException {
         try {
             SecureRandom random = new SecureRandom();
             String apikey = new BigInteger(130, random).toString(32);
             userDAO.updateUserApikey(email, apikey);
             return apikey;
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
@@ -958,12 +937,12 @@ public class ConfigurationBusiness {
 
             emailBusiness.sendEmailToAdmins("[VIP Admin] VIP error", emailContent.toString(),
                     true, userEmail);
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             logger.error("Cannot sent mail to admin. Ignoring", e);
         }
     }
 
-    public Set<Group> getOrLoadUserGroups(User user) throws BusinessException {
+    public Set<Group> getOrLoadUserGroups(User user) throws VipException {
         if (user.getGroups() == null || user.getGroups().isEmpty()) {
             user.setGroups(getUserGroups(user.getEmail()));
         }

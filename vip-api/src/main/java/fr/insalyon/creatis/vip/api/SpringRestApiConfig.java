@@ -1,56 +1,24 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.api;
-
-import fr.insalyon.creatis.vip.api.business.VipConfigurer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.*;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 
-import fr.insalyon.creatis.vip.core.server.business.Server;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import fr.insalyon.creatis.vip.api.business.VipConfigurer;
 
 /**
  * Configure the spring mvc DispatcherServlet. Few things to do, as the
  * controllers and dependencies are automatically configured through
  * scanning.
- *
- * Created by abonnet on 7/13/16.
- *
- * Modified by khalilkes
  */
 @EnableWebMvc
 @Configuration
@@ -61,18 +29,16 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 )
 public class SpringRestApiConfig implements WebMvcConfigurer {
 
-    private final Server server;
     private final VipConfigurer vipConfigurer;
 
     @Autowired
-    public SpringRestApiConfig(Server server, VipConfigurer vipConfigurer) {
-        this.server = server;
+    public SpringRestApiConfig(final VipConfigurer vipConfigurer) {
         this.vipConfigurer = vipConfigurer;
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public void configurePathMatch(PathMatchConfigurer configurer) {
+    public void configurePathMatch(final PathMatchConfigurer configurer) {
         // this is deprecated, but temporary necessary for shanoir
         // that uses requests like /rest/pipelines/
         // Shanoir should get rid of the trailing slash and we should
@@ -81,7 +47,7 @@ public class SpringRestApiConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+    public void configureContentNegotiation(final ContentNegotiationConfigurer configurer) {
         // necessary in the content negotiation stuff of carmin data
         // this should be the default in Spring 5.3 and may be removed then
         configurer.useRegisteredExtensionsOnly(true);
@@ -92,7 +58,7 @@ public class SpringRestApiConfig implements WebMvcConfigurer {
      to verify that the proxy is still valid each day
      */
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(vipConfigurer);
     }
 }

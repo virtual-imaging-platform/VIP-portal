@@ -2,10 +2,6 @@ package fr.insalyon.creatis.vip.core.server.dao;
 
 import fr.insalyon.creatis.vip.core.client.VipException;
 
-/**
- *
- * @author Rafael Silva
- */
 public class DAOException extends VipException {
 
     public DAOException(String message) {

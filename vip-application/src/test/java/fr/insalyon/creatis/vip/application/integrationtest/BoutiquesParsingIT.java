@@ -1,20 +1,21 @@
 package fr.insalyon.creatis.vip.application.integrationtest;
 
-import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
-import fr.insalyon.creatis.boutiques.model.ContainerImage;
-import fr.insalyon.creatis.boutiques.model.Input;
-import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
-import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.ContainerImage;
+import fr.insalyon.creatis.boutiques.model.Input;
+import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 
 public class BoutiquesParsingIT extends BaseApplicationSpringIT {
 
@@ -22,7 +23,7 @@ public class BoutiquesParsingIT extends BaseApplicationSpringIT {
     Resource resourceFile;
 
     @Test
-    public void testFreesurferParsing() throws BusinessException, IOException {
+    public void testFreesurferParsing() throws VipException, IOException {
         BoutiquesDescriptor desc = boutiquesBusiness.parseBoutiquesFile(resourceFile.getFile());
 
         // general stuff

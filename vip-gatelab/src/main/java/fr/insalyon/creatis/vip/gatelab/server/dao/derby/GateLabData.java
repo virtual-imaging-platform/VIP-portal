@@ -15,8 +15,6 @@ import org.springframework.stereotype.Component;
  * So a new instance is needed at each call and this needs the prototype scope
  *
  * The h2 connection is configured in AbstractJobData
- *
- * @author Ibrahim Kallel, Rafael Silva
  */
 @Component
 @Scope("prototype")

@@ -1,62 +1,16 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.model.PathProperties;
-import fr.insalyon.creatis.vip.api.model.UploadData;
-import fr.insalyon.creatis.vip.api.model.UploadDataType;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
-import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.input.ReaderInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.GROUP_APPEND;
+import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.ROOT;
+import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.TRASH_HOME;
+import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.USERS_HOME;
 
-import jakarta.annotation.PreDestroy;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -68,16 +22,41 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
-import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.ReaderInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import fr.insalyon.creatis.vip.api.exception.ApiError;
+import fr.insalyon.creatis.vip.api.model.PathProperties;
+import fr.insalyon.creatis.vip.api.model.UploadData;
+import fr.insalyon.creatis.vip.api.model.UploadDataType;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
+import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import jakarta.annotation.PreDestroy;
 
 
-/**
- * Created by abonnet on 1/18/17.
- *
- */
 @Service
 public class DataApiBusiness {
 
@@ -126,21 +105,21 @@ public class DataApiBusiness {
         logger.info("download threads succesfully shutdown");
     }
 
-    public boolean doesFileExist(String path) throws ApiException {
+    public boolean doesFileExist(String path) throws VipException {
         checkReadPermission(path);
         return path.equals(ROOT) || baseDoesFileExist(path);
     }
 
-    public void deletePath(String path) throws ApiException {
+    public void deletePath(String path) throws VipException {
         checkPermission(path, LFCAccessType.DELETE);
         if (!baseDoesFileExist(path)) {
             logger.error("trying to delete a non-existing file : {}", path);
-            throw new ApiException("trying to delete a non-existing dile");
+            throw new VipException("trying to delete a non-existing dile");
         }
         baseDeletePath(path);
     }
 
-    public PathProperties getPathProperties(String path ) throws ApiException {
+    public PathProperties getPathProperties(String path ) throws VipException {
         checkReadPermission(path);
         if (path.equals(ROOT)) {
             return getRootPathProperties();
@@ -173,7 +152,7 @@ public class DataApiBusiness {
         return pathProperties;
     }
 
-    public List<PathProperties> listDirectory(String path) throws ApiException {
+    public List<PathProperties> listDirectory(String path) throws VipException {
         checkReadPermission(path);
         if (path.equals(ROOT)) {
             return getRootSubDirectoriesPathProps();
@@ -181,11 +160,11 @@ public class DataApiBusiness {
         Optional<Data.Type> type = baseGetPathInfo(path);
         if (!type.isPresent()) { // path doesn't exist
             logger.error("Trying to list a non-existing path ({})", path);
-            throw new ApiException("Error listing a directory");
+            throw new VipException("Error listing a directory");
         }
         if (!type.get().equals(Data.Type.folder)) {
             logger.error("Trying to list {} , but is a file :", path);
-            throw new ApiException("Error listing a directory");
+            throw new VipException("Error listing a directory");
         }
         List<Data> directoryData = baseGetFileData(path);
         List<PathProperties> res = new ArrayList<>();
@@ -195,7 +174,7 @@ public class DataApiBusiness {
         return res;
     }
 
-    public File getFile(String path) throws ApiException {
+    public File getFile(String path) throws VipException {
         checkDownloadPermission(path);
         String downloadOperationId =
             downloadFileToLocalStorage(path);
@@ -203,7 +182,7 @@ public class DataApiBusiness {
     }
 
     public void uploadRawFileFromInputStream(String lfcPath, InputStream is)
-            throws ApiException {
+            throws VipException {
         // TODO : check upload size ?
         checkPermission(lfcPath, LFCAccessType.UPLOAD);
         java.nio.file.Path javaPath = Paths.get(lfcPath);
@@ -211,7 +190,7 @@ public class DataApiBusiness {
         // check if parent dir exists
         if (!baseDoesFileExist(parentLfcPath)) {
             logger.error("parent directory of upload {} does not exist :", lfcPath);
-            throw new ApiException("Upload Directory doest not exist");
+            throw new VipException("Upload Directory doest not exist");
         }
         // TODO : check if it already exists
         // TODO : support archive upload
@@ -233,7 +212,7 @@ public class DataApiBusiness {
     }
 
     public void uploadCustomData(String lfcPath, UploadData uploadData)
-            throws ApiException {
+            throws VipException {
         // TODO : check upload size ?
         // TODO : factorize with previous method
         checkPermission(lfcPath, LFCAccessType.UPLOAD);
@@ -242,11 +221,11 @@ public class DataApiBusiness {
         // check if parent dir exists
         if (!baseDoesFileExist(parentLfcPath)) {
             logger.error("parent directory of {} does not exist :", lfcPath);
-            throw new ApiException("Upload Directory doest not exist");
+            throw new VipException("Upload Directory doest not exist");
         }
         if (uploadData.getType().equals(UploadDataType.ARCHIVE)) {
             logger.error("archive upload not supported yet for ({})", lfcPath);
-            throw new ApiException("archive upload not supported yet");
+            throw new VipException("archive upload not supported yet");
         }
         // TODO : check if it already exists
         // TODO : support archive upload
@@ -264,56 +243,52 @@ public class DataApiBusiness {
 
     // #### PERMISSION STUFF
 
-    private void checkReadPermission(String path) throws ApiException {
+    private void checkReadPermission(String path) throws VipException {
         checkPermission(path, LFCAccessType.READ);
     }
 
-    private void checkDownloadPermission(String path) throws ApiException {
+    private void checkDownloadPermission(String path) throws VipException {
         checkReadPermission(path);
         if (path.equals(ROOT)) {
             logger.error("cannot download root ({})", path);
-            throw new ApiException("Illegal data API access");
+            throw new VipException("Illegal data API access");
         }
         Optional<Data.Type> type = baseGetPathInfo(path);
         if (!type.isPresent()) { // path doesn't exist
             logger.error("Trying to download a non-existing file ({})", path);
-            throw new ApiException("Illegal data API access");
+            throw new VipException("Illegal data API access");
         }
         if (!type.get().equals(Data.Type.file)) {
             // it works on a directory and return a zip, but we cant check the download size
             logger.error("Trying to download a directory ({})", path);
-            throw new ApiException("Illegal data API access");
+            throw new VipException("Illegal data API access");
         }
         // path exists and is a file: check its size
         List<Data> fileData = baseGetFileData(path);
         Long maxSize = server.getCarminApiDataTransfertMaxSize();
         if (fileData.get(0).getLength() > maxSize) {
             logger.error("Trying to download a file too big ({})", path);
-            throw new ApiException("Illegal data API access");
+            throw new VipException("Illegal data API access");
         }
     }
 
     private void checkPermission(String path, LFCAccessType accessType)
-            throws ApiException {
-        try {
-            if ( ! lfcPermissionBusiness.isLFCPathAllowed(
+            throws VipException {
+        if (!lfcPermissionBusiness.isLFCPathAllowed(
                 currentUserProvider.get(), path, accessType, true)) {
-                throw new ApiException(ApiError.UNAUTHORIZED_DATA_ACCESS, path);
-            }
-        } catch (BusinessException e) {
-            throw new ApiException("Error when checking permissions", e);
+            throw new VipException(ApiError.UNAUTHORIZED_DATA_ACCESS, path);
         }
     }
 
     // #### DOWNLOAD STUFF
 
-    private String downloadFileToLocalStorage(String path) throws ApiException {
+    private String downloadFileToLocalStorage(String path) throws VipException {
         String downloadOperationId = baseDownloadFile(path);
         waitForOperationOrTimeout(downloadOperationId);
         return downloadOperationId;
     }
 
-    private File getDownloadFile(String operationId) throws ApiException {
+    private File getDownloadFile(String operationId) throws VipException {
         PoolOperation operation = baseGetDownloadOperation(operationId);
         File file = new File(operation.getDest());
         if (file.isDirectory()) {
@@ -326,7 +301,7 @@ public class DataApiBusiness {
     // #### Operation stuff
 
     private void waitForOperationOrTimeout(String operationId)
-            throws ApiException {
+            throws VipException {
         // get user in main thread because spring store auth/user information in
         // thread bound structure and it wont be available in the
         // 'isDownloadOverCall' thread
@@ -353,19 +328,19 @@ public class DataApiBusiness {
 
     private void timeoutOperationCompletionFuture (
             String operationId,
-            Future<Boolean> completionFuture, int timeoutInSeconds) throws ApiException {
+            Future<Boolean> completionFuture, int timeoutInSeconds) throws VipException {
         try {
             completionFuture.get(timeoutInSeconds, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             logger.error("Waiting for operation completion interrupted : {}", operationId ,e);
-            throw new ApiException("Waiting for operation completion interrupted", e);
+            throw new VipException("Waiting for operation completion interrupted", e);
         } catch (ExecutionException e) {
             logger.error("Error waiting for operation completion : {}", operationId ,e);
-            throw new ApiException("Error waiting for operation completion", e);
+            throw new VipException("Error waiting for operation completion", e);
         } catch (TimeoutException e) {
             completionFuture.cancel(true);
             logger.error("Timeout operation completion : {}", operationId, e);
-            throw new ApiException("Aborting operation : too long", e);
+            throw new VipException("Aborting operation : too long", e);
         }
     }
 
@@ -378,7 +353,7 @@ public class DataApiBusiness {
     }
 
     private boolean isOperationOver(String operationId, User user)
-            throws ApiException {
+            throws VipException {
         PoolOperation operation = baseGetPoolOperation(operationId, user);
 
         switch (operation.getStatus()) {
@@ -392,15 +367,14 @@ public class DataApiBusiness {
             case Rescheduled:
             default:
                 logger.error("IO LFC Operation failed : {} : {}", operationId, operation.getStatus());
-                throw new ApiException("IO LFC Operation operation failed");
+                throw new VipException("IO LFC Operation operation failed");
         }
     }
 
     // #### UPLOAD STUFF
 
-    private void writeFileFromBase64(String base64Content, String localFilePath) throws ApiException {
+    private void writeFileFromBase64(String base64Content, String localFilePath) throws VipException {
         Base64.Decoder decoder = Base64.getDecoder();
-        StringReader stringReader = new StringReader(base64Content);
         try {
             InputStream inputStream = ReaderInputStream.builder()
                     .setReader(new StringReader(base64Content))
@@ -410,12 +384,12 @@ public class DataApiBusiness {
             Files.copy(base64InputStream, Paths.get(localFilePath));
         } catch (IOException e) {
             logger.error("Error writing base64 file in {}", localFilePath, e);
-            throw new ApiException("Error writing base64 file", e);
+            throw new VipException("Error writing base64 file", e);
         }
     }
 
-    private boolean saveInputStreamToFile(InputStream is, String path) throws ApiException {
-        try (FileOutputStream fos = new FileOutputStream(path)) {
+    private boolean saveInputStreamToFile(InputStream is, String path) throws VipException {
+        try (OutputStream fos = Files.newOutputStream(Paths.get(path))) {
             byte[] buffer = new byte[1024];
             int bytesRead;
             boolean isFileEmpty = true;
@@ -425,12 +399,9 @@ public class DataApiBusiness {
             }
             fos.flush();
             return isFileEmpty;
-        } catch (FileNotFoundException e) {
-            logger.error("Error creating new file {}", path ,e);
-            throw new ApiException("Upload error", e);
         } catch (IOException e) {
             logger.error("IO Error storing file {}", path, e);
-            throw new ApiException("Upload error", e);
+            throw new VipException("Upload error", e);
         }
     }
 
@@ -520,93 +491,49 @@ public class DataApiBusiness {
 
     // #### LOWER LEVELS CALLS, all prefixed with "base"
 
-    private boolean baseDoesFileExist(String path) throws ApiException {
-        try {
-            return lfcBusiness.exists(currentUserProvider.get(), path);
-        } catch (BusinessException e) {
-            throw new ApiException("Error testing file existence", e);
-        }
+    private boolean baseDoesFileExist(String path) throws VipException {
+        return lfcBusiness.exists(currentUserProvider.get(), path);
     }
 
-    private Optional<Data.Type> baseGetPathInfo(String path) throws ApiException {
-        try {
-            return lfcBusiness.getPathInfo(currentUserProvider.get(), path);
-        } catch (BusinessException e) {
-            throw new ApiException("Error getting path info", e);
-        }
+    private Optional<Data.Type> baseGetPathInfo(String path) throws VipException {
+        return lfcBusiness.getPathInfo(currentUserProvider.get(), path);
     }
 
-    private List<Data> baseGetFileData(String path) throws ApiException {
-        try {
-            return lfcBusiness.listDir(
-                currentUserProvider.get(), path, true);
-        } catch (BusinessException e) {
-            throw new ApiException("Error getting lfc information", e);
-        }
+    private List<Data> baseGetFileData(String path) throws VipException {
+        return lfcBusiness.listDir(currentUserProvider.get(), path, true);
     }
 
     /* return the operation id */
-    private String baseDownloadFile(String path) throws ApiException {
-        try {
-            return transferPoolBusiness.downloadFile(
-                currentUserProvider.get(), path);
-        } catch (BusinessException e) {
-            throw new ApiException("Error download LFC file", e);
-        }
+    private String baseDownloadFile(String path) throws VipException {
+        return transferPoolBusiness.downloadFile(currentUserProvider.get(), path);
     }
 
     private String baseUploadFile(String localPath, String lfcPath)
-            throws ApiException {
-        try {
-            return transferPoolBusiness.uploadFile(
+            throws VipException {
+        return transferPoolBusiness.uploadFile(
                 currentUserProvider.get(), localPath, lfcPath);
-        } catch (BusinessException e) {
-            throw new ApiException("Error uploading a lfc file", e);
-        }
     }
 
     private PoolOperation baseGetPoolOperation(String operationId, User user)
-            throws ApiException {
+            throws VipException {
         // need to specify the user to avoid accessing apiContext from another thread
-        try {
-            return transferPoolBusiness.getOperationById(
-                    operationId, user.getFolder());
-        } catch (BusinessException e) {
-            throw new ApiException("Error getting download operation", e);
-        }
+        return transferPoolBusiness.getOperationById(operationId, user.getFolder());
     }
 
-    private PoolOperation baseGetDownloadOperation(String operationId) throws ApiException {
-        try {
-            return transferPoolBusiness.getDownloadPoolOperation(operationId);
-        } catch (BusinessException e) {
-            throw new ApiException("Error getting download operation", e);
-        }
+    private PoolOperation baseGetDownloadOperation(String operationId) throws VipException {
+        return transferPoolBusiness.getDownloadPoolOperation(operationId);
     }
 
-    private Long baseGetFileModificationDate(String path) throws ApiException {
-        try {
-            return lfcBusiness.getModificationDate(
-                currentUserProvider.get(), path);
-        } catch (BusinessException e) {
-            throw new ApiException("Error getting lfc modification", e);
-        }
+    private Long baseGetFileModificationDate(String path) throws VipException {
+        return lfcBusiness.getModificationDate(currentUserProvider.get(), path);
     }
 
-    private void baseDeletePath(String path) throws ApiException {
-        try {
-            transferPoolBusiness.delete(currentUserProvider.get(), path);
-        } catch (BusinessException e) {
-            throw new ApiException("Error deleting lfc file", e);
-        }
+    private void baseDeletePath(String path) throws VipException {
+        transferPoolBusiness.delete(currentUserProvider.get(), path);
     }
 
-    private void baseMkdir(String path, String dirName) throws ApiException {
-        try {
-            lfcBusiness.createDir(currentUserProvider.get(), path, dirName);
-        } catch (BusinessException e) {
-            throw new ApiException("Error creating LFC directory", e);
-        }
+    private void baseMkdir(String path, String dirName) throws VipException {
+        lfcBusiness.createDir(currentUserProvider.get(), path, dirName);
     }
 
 }

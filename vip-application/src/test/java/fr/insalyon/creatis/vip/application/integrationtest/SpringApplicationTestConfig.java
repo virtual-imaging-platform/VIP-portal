@@ -1,18 +1,7 @@
 package fr.insalyon.creatis.vip.application.integrationtest;
 
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
-import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
-import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.integrationtest.TestConfigurer;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
+import java.util.HashSet;
+
 import org.hibernate.SessionFactory;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +11,24 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.ProcessorDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.StatsDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
+import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
+import fr.insalyon.creatis.vip.core.integrationtest.TestConfigurer;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 
 /*
    Replaces workflowsdb beans by mocks in tests.
@@ -51,7 +57,7 @@ public class SpringApplicationTestConfig {
             Mockito.reset(inputDAO);
         }
 
-        public void createAnApplication(String appName, String groupname) throws BusinessException {
+        public void createAnApplication(String appName, String groupname) throws VipException {
             Application app = new Application(appName, "test citation", "test note", new HashSet<>());
 
             applicationBusiness.add(app);
@@ -61,23 +67,23 @@ public class SpringApplicationTestConfig {
             }
         }
 
-        public void putApplicationInGroup(String appName, String groupname) throws BusinessException {
+        public void putApplicationInGroup(String appName, String groupname) throws VipException {
             applicationBusiness.associate(new Application(appName, null), groupname);
         }
 
-        public AppVersion createAVersion(String appName, String versionName, boolean visible) throws BusinessException {
+        public AppVersion createAVersion(String appName, String versionName, boolean visible) throws VipException {
             AppVersion appVersion = new AppVersion(appName, versionName, null, visible);
             appVersionBusiness.add(appVersion);
             return appVersion;
         }
 
-        public AppVersion configureAnApplication(String appName, String versionName, String groupName) throws BusinessException {
+        public AppVersion configureAnApplication(String appName, String versionName, String groupName) throws VipException {
             groupBusiness.add(new Group(groupName, true, GroupType.APPLICATION));
             createAnApplication(appName, groupName);
             return createAVersion(appName, versionName, true);
         }
 
-        public void configureVersion(AppVersion appVersion, String descriptor) throws BusinessException {
+        public void configureVersion(AppVersion appVersion, String descriptor) throws VipException {
             appVersion = new AppVersion(
                     appVersion.getApplicationName(), appVersion.getVersion(), descriptor,
                     appVersion.isVisible());

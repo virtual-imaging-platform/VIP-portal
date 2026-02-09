@@ -14,8 +14,8 @@ import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.bean.PublicExecution.PublicExecutionStatus;
 import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
 import fr.insalyon.creatis.vip.application.server.business.PublicExecutionBusiness;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
 public class PublicExecutionIT extends BaseApplicationSpringIT {
     
@@ -27,7 +27,7 @@ public class PublicExecutionIT extends BaseApplicationSpringIT {
         super.setUp();
     }
 
-    private PublicExecution dumbExecution(String name) throws BusinessException {
+    private PublicExecution dumbExecution(String name) throws VipException {
         var workflowData = new WorkflowData("a", "b", "c");
 
         PublicExecution execution = new PublicExecution(
@@ -44,7 +44,7 @@ public class PublicExecutionIT extends BaseApplicationSpringIT {
     }
 
     @Test
-    public void add() throws BusinessException {
+    public void add() throws VipException {
         PublicExecution execution = dumbExecution("test");
         PublicExecution retrieved = business.get(execution.getExperienceName());
 
@@ -53,7 +53,7 @@ public class PublicExecutionIT extends BaseApplicationSpringIT {
 
     // this test will also check that worklowsIds order is correct
     @Test
-    public void get() throws BusinessException {
+    public void get() throws VipException {
         var workflowsIds = List.of("workflow-b", "workflow-c", "workflow-a");
         var appNames = List.of("comet", "lcmodel", "cquest");
         var appVersions = List.of("0.3", "0.2", "0.1");
@@ -77,14 +77,14 @@ public class PublicExecutionIT extends BaseApplicationSpringIT {
     }
 
     @Test
-    public void exist() throws BusinessException {
+    public void exist() throws VipException {
         PublicExecution execution = dumbExecution("test");
 
         assertTrue(business.exist(execution.getExperienceName()));
     }
 
     @Test
-    public void getAll() throws BusinessException {
+    public void getAll() throws VipException {
         PublicExecution execution = dumbExecution("test");
         PublicExecution execution2 = dumbExecution("test2");
         List<PublicExecution> retrieved = business.getAll();
@@ -94,7 +94,7 @@ public class PublicExecutionIT extends BaseApplicationSpringIT {
     }
 
     @Test
-    public void update() throws BusinessException {
+    public void update() throws VipException {
         PublicExecution execution = dumbExecution("test");
 
         execution.setDoi("doi_super");
@@ -104,7 +104,7 @@ public class PublicExecutionIT extends BaseApplicationSpringIT {
     }
 
     @Test
-    public void updateStatus() throws BusinessException {
+    public void updateStatus() throws VipException {
         PublicExecution execution = dumbExecution("test");
 
         business.updateStatus(execution.getExperienceName(), PublicExecutionStatus.DIRECTORY_CREATED);

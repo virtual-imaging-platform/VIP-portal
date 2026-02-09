@@ -5,12 +5,6 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Representation of an input in an application Boutiques descriptor
- *
- * @author Guillaume Vanel
- * @version %I%, %G%
- */
 public abstract class BoutiquesInput implements IsSerializable {
     protected String id;
     protected String name;

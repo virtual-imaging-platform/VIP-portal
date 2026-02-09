@@ -1,20 +1,5 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.model.stats.StatUser;
-import fr.insalyon.creatis.vip.api.model.stats.UsersList;
-import fr.insalyon.creatis.vip.api.model.stats.UsersNumber;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.StatsBusiness;
-import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -24,12 +9,29 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import fr.insalyon.creatis.vip.api.exception.ApiError;
+import fr.insalyon.creatis.vip.api.model.stats.StatUser;
+import fr.insalyon.creatis.vip.api.model.stats.UsersList;
+import fr.insalyon.creatis.vip.api.model.stats.UsersNumber;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.StatsBusiness;
+import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
+
 @Service
 public class StatsApiBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final StatsBusiness statsBusiness;
+    private final String dateTimeFormat = "dd-MM-yyyy";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimeFormat);
 
     @Autowired
     public StatsApiBusiness(StatsBusiness statsBusiness) {
@@ -37,7 +39,7 @@ public class StatsApiBusiness {
     }
 
     public UsersNumber getUsersRegisteredNumber(
-            String startDateString, String endDateString) throws ApiException {
+            String startDateString, String endDateString) throws VipException {
         // build search criteria
         UserSearchCriteria searchCriteria =
                 new UserSearchCriteria()
@@ -46,11 +48,7 @@ public class StatsApiBusiness {
 
         // do search
         Long usersRegisteredNumber;
-        try {
-            usersRegisteredNumber = statsBusiness.getUsersRegisteredNumber(searchCriteria);
-        } catch (BusinessException e) {
-            throw new ApiException(e);
-        }
+        usersRegisteredNumber = statsBusiness.getUsersRegisteredNumber(searchCriteria);
         // build response object
         LocalDate startDate = searchCriteria.getRegistrationStart();
         if (startDate == null) {
@@ -64,29 +62,29 @@ public class StatsApiBusiness {
     }
 
 
-    public UsersList getAllUsers() throws ApiException {
+    public UsersList getAllUsers() throws VipException {
         return getUsersList(new UserSearchCriteria());
     }
 
-    public UsersList getAllUsersFromDate(String startDateString) throws ApiException {
+    public UsersList getAllUsersFromDate(String startDateString) throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withRegistrationStart(parseDate(startDateString)));
     }
 
     public UsersList getAllUsersBetweenDates(
-            String startDateString, String endDateString) throws ApiException {
+            String startDateString, String endDateString) throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withRegistrationStart(parseDate(startDateString))
                 .withRegistrationEnd(parseDate(endDateString)));
     }
 
-    public UsersList getAllUsersFromCountry(String country) throws ApiException {
+    public UsersList getAllUsersFromCountry(String country) throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country)));
     }
 
     public UsersList getAllUsersFromCountryFromDate(
-            String country, String startDateString) throws ApiException {
+            String country, String startDateString) throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country))
                 .withRegistrationStart(parseDate(startDateString)));
@@ -94,7 +92,7 @@ public class StatsApiBusiness {
     
     public UsersList getAllUsersFromCountryBetweenDates(
             String country, String startDateString, String endDateString)
-            throws ApiException {
+            throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country))
                 .withRegistrationStart(parseDate(startDateString))
@@ -102,13 +100,13 @@ public class StatsApiBusiness {
     }
 
     public UsersList getAllUsersFromInstitution(
-            String institution) throws ApiException {
+            String institution) throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withInstitution(institution));
     }
 
     public UsersList getAllUsersFromInstitutionFromDate(
-            String institution, String startDateString) throws ApiException {
+            String institution, String startDateString) throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withInstitution(institution)
                 .withRegistrationStart(parseDate(startDateString)));
@@ -116,7 +114,7 @@ public class StatsApiBusiness {
 
     public UsersList getAllUsersFromInstitutionBetweenDates(
             String institution, String startDateString, String endDateString)
-            throws ApiException {
+            throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withInstitution(institution)
                 .withRegistrationStart(parseDate(startDateString))
@@ -125,7 +123,7 @@ public class StatsApiBusiness {
 
     public UsersList getAllUsersFromCountryAndInstitution(
             String country, String institution)
-            throws ApiException {
+            throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country))
                 .withInstitution(institution));
@@ -133,7 +131,7 @@ public class StatsApiBusiness {
 
     public UsersList getAllUsersFromCountryAndInstitutionFromDate(
             String country, String institution, String startDateString)
-            throws ApiException {
+            throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country))
                 .withInstitution(institution)
@@ -142,7 +140,7 @@ public class StatsApiBusiness {
 
     public UsersList getAllUsersFromCountryAndInstitutionBetweenDates(
             String country, String institution, String startDateString,
-            String endDateString) throws ApiException {
+            String endDateString) throws VipException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country))
                 .withInstitution(institution)
@@ -151,14 +149,10 @@ public class StatsApiBusiness {
     }
 
     private UsersList getUsersList(UserSearchCriteria searchCriteria)
-            throws ApiException {
+            throws VipException {
 
         List<User> users;
-        try {
-            users = statsBusiness.getUsersRegistered(searchCriteria);
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
-        }
+        users = statsBusiness.getUsersRegistered(searchCriteria);
         List<StatUser> statUsers = users
                 .stream()
                 .map(this::mapVipUserToStatUser)
@@ -178,26 +172,24 @@ public class StatsApiBusiness {
         );
     }
 
-    private CountryCode getCountry(String countryString) throws ApiException {
+    private CountryCode getCountry(String countryString) throws VipException {
         CountryCode country = CountryCode.searchIgnoreCase(countryString);
         if (country == null) {
             logger.error("Wrong country {}", countryString);
-            throw new ApiException(ApiError.COUNTRY_UNKNOWN, countryString);
+            throw new VipException(ApiError.COUNTRY_UNKNOWN, countryString);
         }
         return country;
     }
 
-    private final String DATE_TIME_FORMAT = "dd-MM-yyyy";
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-    private LocalDate parseDate(String dateString) throws ApiException {
+    private LocalDate parseDate(String dateString) throws VipException {
         if (dateString == null) {
             return null;
         }
         try {
             return LocalDate.parse(dateString, formatter);
         } catch (DateTimeParseException e) {
-            logger.error("Wrong date format for {} (required : {})", dateString, DATE_TIME_FORMAT);
-            throw new ApiException(ApiError.WRONG_DATE_FORMAT, e, dateString, DATE_TIME_FORMAT);
+            logger.error("Wrong date format for {} (required : {})", dateString, dateTimeFormat);
+            throw new VipException(ApiError.WRONG_DATE_FORMAT, e, dateString, dateTimeFormat);
         }
     }
 }

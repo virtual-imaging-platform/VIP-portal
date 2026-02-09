@@ -1,41 +1,10 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
 import fr.insalyon.creatis.devtools.zip.FolderZipper;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.business.util.FileUtil;
+
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,25 +21,18 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class GetFileServiceImpl extends HttpServlet {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private UserDAO userDAO;
-    private Server server;
+    private FileUtil fileUtil;
 
     @Override
     public void init() throws ServletException {
         super.init();
         ApplicationContext applicationContext = WebApplicationContextUtils.findWebApplicationContext(getServletContext());
-        userDAO = applicationContext.getBean(UserDAO.class);
-        server = applicationContext.getBean(Server.class);
+        fileUtil = applicationContext.getBean(FileUtil.class);
     }
 
     @Override
@@ -88,13 +50,9 @@ public class GetFileServiceImpl extends HttpServlet {
             }
 
             if (filepath != null && !filepath.isEmpty()) {
+                Path requestedPath = fileUtil.getValidWorkflowPath(user, filepath);
 
-                // normalize and verify there is no risk of accessing a file outside the workflows directory
-                Path workflowsPath = Paths.get(server.getWorkflowsPath()).normalize().toAbsolutePath();
-                Path requestedPath = Paths.get(server.getWorkflowsPath(), filepath).normalize().toAbsolutePath(); // do not use resolve as filepath could be absolute
-
-                if ( ! requestedPath.startsWith(workflowsPath)) {
-                    logger.warn("(" + user.getEmail() + ") Attempt to access file outside workflows path: '" + filepath + "'.");
+                if (requestedPath == null) {
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid file path");
                     return;
                 }

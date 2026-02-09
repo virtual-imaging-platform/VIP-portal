@@ -1,60 +1,40 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.core.server.model.Module;
-import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
-import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_DATA_MAX_SIZE;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_DEFAULT_LIST_LIMIT;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_PLATFORM_DESCRIPTION;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_PLATFORM_EMAIL;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_PLATFORM_NAME;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_SUPPORTED_API_VERSION;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_SUPPORTED_MODULES;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_SUPPORTED_PROTOCOLS;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_UNSUPPORTED_METHOD;
+import static fr.insalyon.creatis.vip.api.data.ErrorCodeAndMessageTestUtils.jsonCorrespondsToErrorCodeAndMessage;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
 
-import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
-import static fr.insalyon.creatis.vip.api.data.ErrorCodeAndMessageTestUtils.jsonCorrespondsToErrorCodeAndMessage;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+
+import fr.insalyon.creatis.vip.api.exception.ApiError;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 
 /**
- * Created by abonnet on 7/20/16.
- *
  * Test method on platform path
  */
 public class PlatformControllerIT extends BaseRestApiSpringIT {
@@ -93,14 +73,13 @@ public class PlatformControllerIT extends BaseRestApiSpringIT {
                         .value(Integer.valueOf(TEST_DATA_MAX_SIZE)))
                 // it should be a long, be the test value being small it's actually an int
                 .andExpect(jsonPath("$.APIErrorCodesAndMessages[*]",
-                        hasSize(ApiError.values().length + ApplicationError.values().length)))
+                        hasSize(ApiError.values().length + DefaultError.values().length)))
                 .andExpect(jsonPath("$.APIErrorCodesAndMessages[*]",
                     hasItems(
-                        jsonCorrespondsToErrorCodeAndMessage(ApiError.GENERIC_API_ERROR),
+                        jsonCorrespondsToErrorCodeAndMessage(DefaultError.GENERIC_ERROR),
                         jsonCorrespondsToErrorCodeAndMessage(ApiError.NOT_ALLOWED_TO_USE_PIPELINE),
-                        jsonCorrespondsToErrorCodeAndMessage(ApplicationError.USER_MAX_EXECS),
-                        jsonCorrespondsToErrorCodeAndMessage(ApiError.BAD_CREDENTIALS),
-                        jsonCorrespondsToErrorCodeAndMessage(ApiError.INSUFFICIENT_AUTH.getCode(), "The error message for 'insufficient auth' cannot be known in advance"))));
+                        jsonCorrespondsToErrorCodeAndMessage(DefaultError.BAD_CREDENTIALS),
+                        jsonCorrespondsToErrorCodeAndMessage(DefaultError.INSUFFICIENT_AUTH))));
 
     }
 

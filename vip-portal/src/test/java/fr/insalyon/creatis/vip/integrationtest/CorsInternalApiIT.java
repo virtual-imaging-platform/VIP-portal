@@ -31,22 +31,19 @@
  */
 package fr.insalyon.creatis.vip.integrationtest;
 
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
-import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.integrationtest.BaseInternalApiSpringIT;
-import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Arrays;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.integrationtest.BaseInternalApiSpringIT;
+import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import jakarta.servlet.http.Cookie;
 
 public class CorsInternalApiIT extends BaseInternalApiSpringIT {
 
@@ -60,7 +57,7 @@ public class CorsInternalApiIT extends BaseInternalApiSpringIT {
     public String sessionCode;
 
     @BeforeEach
-    public void setUpTestUser() throws BusinessException, GRIDAClientException, DAOException {
+    public void setUpTestUser() throws VipException, GRIDAClientException, DAOException {
         createUserWithPassword(emailUser2, "coucou");
         sessionCode = getConfigurationBusiness().getUserWithSession(emailUser2).getSession();
     }
