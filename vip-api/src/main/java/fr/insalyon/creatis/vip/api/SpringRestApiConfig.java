@@ -1,16 +1,19 @@
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.api.business.VipConfigurer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.*;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.web.bind.annotation.RestController;
-
 import java.util.Collections;
 
-import fr.insalyon.creatis.vip.core.server.business.Server;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import fr.insalyon.creatis.vip.api.business.VipConfigurer;
 
 /**
  * Configure the spring mvc DispatcherServlet. Few things to do, as the
@@ -26,18 +29,16 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 )
 public class SpringRestApiConfig implements WebMvcConfigurer {
 
-    private final Server server;
     private final VipConfigurer vipConfigurer;
 
     @Autowired
-    public SpringRestApiConfig(Server server, VipConfigurer vipConfigurer) {
-        this.server = server;
+    public SpringRestApiConfig(final VipConfigurer vipConfigurer) {
         this.vipConfigurer = vipConfigurer;
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public void configurePathMatch(PathMatchConfigurer configurer) {
+    public void configurePathMatch(final PathMatchConfigurer configurer) {
         // this is deprecated, but temporary necessary for shanoir
         // that uses requests like /rest/pipelines/
         // Shanoir should get rid of the trailing slash and we should
@@ -46,7 +47,7 @@ public class SpringRestApiConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+    public void configureContentNegotiation(final ContentNegotiationConfigurer configurer) {
         // necessary in the content negotiation stuff of carmin data
         // this should be the default in Spring 5.3 and may be removed then
         configurer.useRegisteredExtensionsOnly(true);
@@ -57,7 +58,7 @@ public class SpringRestApiConfig implements WebMvcConfigurer {
      to verify that the proxy is still valid each day
      */
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(vipConfigurer);
     }
 }

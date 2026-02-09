@@ -57,8 +57,8 @@ public class OidcLoginController {
         Object institution = userAttributes.get("eduperson_scoped_affiliation");
         String domainName;
         if(institution != null){
-            String institution_string = institution.toString();
-            String temp = institution_string .substring(institution_string .indexOf("@") + 1);
+            String institutionString = institution.toString();
+            String temp = institutionString.substring(institutionString.indexOf("@") + 1);
             domainName = temp.substring(0, temp.indexOf("."));
             domainName = domainName.toUpperCase();
         } else {

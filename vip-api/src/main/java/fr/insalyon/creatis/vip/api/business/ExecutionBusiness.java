@@ -153,7 +153,7 @@ public class ExecutionBusiness {
                 s.getSimulationName(),
                 pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
                 0, // timeout (no timeout set in VIP)
-                VIPtoCarminStatus(s.getStatus()),
+                convertVIPtoCarminStatus(s.getStatus()),
                 null, // study identifier (not available in VIP yet)
                 null, // error codes and mesasges (not available in VIP yet)
                 s.getDate().getTime(),
@@ -480,7 +480,7 @@ public class ExecutionBusiness {
         return pathResults;
     }
 
-    private ExecutionStatus VIPtoCarminStatus(SimulationStatus s) {
+    private ExecutionStatus convertVIPtoCarminStatus(SimulationStatus s) {
 
         switch (s) {
             case Running:

@@ -56,7 +56,7 @@ public class VipConfigurer implements ApplicationListener<ContextRefreshedEvent>
             configurationBusiness.configure();
             lastConfiguration = Calendar.getInstance();
         } catch (VipException e) {
-            throw new RuntimeException("Cannot init VIP", e);
+            throw new IllegalStateException("Cannot init VIP", e);
         }
     }
 

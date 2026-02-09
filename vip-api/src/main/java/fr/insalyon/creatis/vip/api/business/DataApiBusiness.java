@@ -7,9 +7,9 @@ import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.US
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -375,7 +375,6 @@ public class DataApiBusiness {
 
     private void writeFileFromBase64(String base64Content, String localFilePath) throws VipException {
         Base64.Decoder decoder = Base64.getDecoder();
-        StringReader stringReader = new StringReader(base64Content);
         try {
             InputStream inputStream = ReaderInputStream.builder()
                     .setReader(new StringReader(base64Content))
@@ -390,7 +389,7 @@ public class DataApiBusiness {
     }
 
     private boolean saveInputStreamToFile(InputStream is, String path) throws VipException {
-        try (FileOutputStream fos = new FileOutputStream(path)) {
+        try (OutputStream fos = Files.newOutputStream(Paths.get(path))) {
             byte[] buffer = new byte[1024];
             int bytesRead;
             boolean isFileEmpty = true;
