@@ -76,49 +76,43 @@ public class ExecutionBusiness {
     }
 
     public String getLog(String executionId, Integer invocationId, String type) throws VipException {
-        try {
-            Simulation s = workflowBusiness.getSimulation(executionId);
-            List<Task> tasks = simulationBusiness.getJobsList(s.getID());
+        Simulation s = workflowBusiness.getSimulation(executionId);
+        List<Task> tasks = simulationBusiness.getJobsList(s.getID());
 
-            if (tasks.isEmpty()) {
-                logger.debug("Warning: no .sh.out log file found for execution ID = {} ", executionId);
-                return "no log found";
-            }
+        if (tasks.isEmpty()) {
+            logger.debug("Warning: no .sh.out log file found for execution ID = {} ", executionId);
+            return "no log found";
+        }
 
-            String extension = ".sh.app." + type;
+        String extension = ".sh.app." + type;
 
-            Task targetTask = null;
+        Task targetTask = null;
 
-            if (invocationId == null) {
-                if (tasks.size() == 1) {
-                    targetTask = tasks.get(0);
-                    logger.debug("jobId is null, using the only available task with ID = {}", targetTask.getId());
-                } else {
-                    logger.debug("jobId is null but multiple tasks found for execution ID = {}", executionId);
-                    return "jobId is required when multiple tasks exist";
-                }
+        if (invocationId == null) {
+            if (tasks.size() == 1) {
+                targetTask = tasks.get(0);
+                logger.debug("jobId is null, using the only available task with ID = {}", targetTask.getId());
             } else {
-                targetTask = tasks.stream()
-                        .filter(t -> invocationId.equals(t.getInvocationID()))
-                        .max(Comparator.comparing(Task::getCreationDate))
-                        .orElse(null);
+                logger.debug("jobId is null but multiple tasks found for execution ID = {}", executionId);
+                return "jobId is required when multiple tasks exist";
             }
+        } else {
+            targetTask = tasks.stream()
+                    .filter(t -> invocationId.equals(t.getInvocationID()))
+                    .max(Comparator.comparing(Task::getCreationDate))
+                    .orElse(null);
+        }
 
+        if (targetTask == null) {
+            logger.debug("No job {} found for execution ID = {}", invocationId, executionId);
+            return "no log found for job " + invocationId;
+        }
 
-
-            if (targetTask == null) {
-                logger.debug("No job {} found for execution ID = {}", invocationId, executionId);
-                return "no log found for job " + invocationId;
-            }
-
-            String fileName = targetTask.getFileName();
-            if (fileName != null) {
-                return simulationBusiness.readFile(executionId, type, fileName, extension);
-            } else {
-                throw new VipException("no file name for job " + invocationId + " in execution " + executionId);
-            }
-        } catch (VipException e) {
-            throw new VipException(e);
+        String fileName = targetTask.getFileName();
+        if (fileName != null) {
+            return simulationBusiness.readFile(executionId, type, fileName, extension);
+        } else {
+            throw new VipException("no file name for job " + invocationId + " in execution " + executionId);
         }
     }
 
@@ -227,95 +221,76 @@ public class ExecutionBusiness {
     }
 
     public List<Execution> listExecutions(int maxReturned) throws VipException {
-        try {
-
-            List<Simulation> simulations = workflowBusiness.getSimulations(
-                    currentUserProvider.get().getFullName(),
-                    null, // application
-                    null, // status
-                    null, // class
-                    null, // startDate
-                    null // endDate
-            );
-            logger.debug("Found {} simulations", simulations.size());
-            ArrayList<Execution> executions = new ArrayList<>();
-            int count = 0;
-            for (Simulation s : simulations) {
-                if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
-                    count++;
-                    executions.add(getExecutionFromSimulation(s, true));
-                    if(count >= maxReturned){
-                        logger.warn("Only the {} most recent pipelines were returned.", maxReturned);
-                        break;
-                    }
+        List<Simulation> simulations = workflowBusiness.getSimulations(
+                currentUserProvider.get().getFullName(),
+                null, // application
+                null, // status
+                null, // class
+                null, // startDate
+                null // endDate
+        );
+        logger.debug("Found {} simulations", simulations.size());
+        ArrayList<Execution> executions = new ArrayList<>();
+        int count = 0;
+        for (Simulation s : simulations) {
+            if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
+                count++;
+                executions.add(getExecutionFromSimulation(s, true));
+                if (count >= maxReturned) {
+                    logger.warn("Only the {} most recent pipelines were returned.", maxReturned);
+                    break;
                 }
             }
-            logger.debug("Returning {} executions", executions.size());
-            return executions;
-        } catch (VipException ex) {
-            throw new VipException(ex);
         }
+        logger.debug("Returning {} executions", executions.size());
+        return executions;
     }
 
     public List<Execution> listExamples() throws VipException {
-        try {
-            List<Simulation> simulations = workflowBusiness.getSimulations(
-                    null, // User must be null to take examples from other users
-                    null, // application
-                    WorkflowStatus.Completed.name(), // status
-                    null, // startDate
-                    null, // endDate
-                    ApplicationConstants.WORKKFLOW_EXAMPLE_TAG
-            );
-            List<Execution> executions = new ArrayList<>();
-            for (Simulation simulation : simulations) {
-                executions.add(getExecutionFromSimulation(simulation, true));
-            }
-            return executions;
-        } catch (VipException e) {
-            throw new VipException(e);
+        List<Simulation> simulations = workflowBusiness.getSimulations(
+                null, // User must be null to take examples from other users
+                null, // application
+                WorkflowStatus.Completed.name(), // status
+                null, // startDate
+                null, // endDate
+                ApplicationConstants.WORKKFLOW_EXAMPLE_TAG);
+        List<Execution> executions = new ArrayList<>();
+        for (Simulation simulation : simulations) {
+            executions.add(getExecutionFromSimulation(simulation, true));
         }
+        return executions;
     }
 
     public int countExecutions() throws VipException {
-        try {
-
-            List<Simulation> simulations = workflowBusiness.getSimulations(
-                    currentUserProvider.get().getFullName(),
-                    null, // application
-                    null, // status
-                    null, // startDate
-                    null, // endDate
-                    null // endDate
-            );
-            logger.debug("Counting executions, found {} simulations.", simulations.size());
-            int count = 0;
-            for (Simulation s : simulations) {
-                if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
-                    count++;
-                }
+        List<Simulation> simulations = workflowBusiness.getSimulations(
+                currentUserProvider.get().getFullName(),
+                null, // application
+                null, // status
+                null, // startDate
+                null, // endDate
+                null // endDate
+        );
+        logger.debug("Counting executions, found {} simulations.", simulations.size());
+        int count = 0;
+        for (Simulation s : simulations) {
+            if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
+                count++;
             }
-            logger.debug("After removing null and cleaned, found {}", count);
-            return count;
-        } catch (VipException ex) {
-            throw new VipException(ex);
         }
+        logger.debug("After removing null and cleaned, found {}", count);
+        return count;
     }
 
     public void updateExecution(Execution execution) throws VipException {
-        try {
-            if (execution.getTimeout() > 0) {
-                logger.error("Unsupported change of execution timeout {}",
-                        execution.getIdentifier());
-                throw new VipException("Update of execution timeout is not supported.");
-            }
-            checkInputExecNameIsValid(execution.getName());
-            logger.info("updating execution " + execution.getIdentifier()
-                    + " name to " + execution.getName());
-            workflowBusiness.updateDescription(execution.getIdentifier(), execution.getName());
-        } catch (VipException e) {
-            throw new VipException(e);
+        if (execution.getTimeout() > 0) {
+            logger.error("Unsupported change of execution timeout {}",
+                    execution.getIdentifier());
+            throw new VipException("Update of execution timeout is not supported.");
         }
+        checkInputExecNameIsValid(execution.getName());
+        logger.info("updating execution " + execution.getIdentifier()
+                + " name to " + execution.getName());
+        workflowBusiness.updateDescription(execution.getIdentifier(), execution.getName());
     }
 
     public String initExecution(Execution execution) throws VipException {
@@ -378,126 +353,117 @@ public class ExecutionBusiness {
     }
 
     private String initExecution(String pipelineId,
-                                Map<String,String> inputValues,
-                                Integer timeoutInSeconds,
-                                String executionName,
-                                String studyId) throws VipException {
-        try {
-            // We cannot easily initialize an execution without starting it.
-            // So we will just launch the execution, and launch an error in case playExecution is not true.
-            // Set warnings
-            if (studyId != null) {
-                logger.warn("Study identifier ({}) was ignored.", studyId);
-            }
-            if (timeoutInSeconds != null && timeoutInSeconds != 0) {
-                logger.warn("Timeout value ({}) was ignored.", timeoutInSeconds);
-            }
-
-            // Check that all pipeline inputs are present
-            Pipeline p = pipelineBusiness.getPipelineWithResultsDirectory(pipelineId);
-            for (PipelineParameter pp : p.getParameters()) {
-                // always true on vip
-                if (pp.isReturnedValue()) {
-                    continue;
-                }
-                // ok if input is present
-                if ( inputValues.get(pp.getName()) != null) {
-                    continue;
-                }
-                // then ok if input has a default value (and we set it)
-                if (pp.getDefaultValue() != null) {
-                    inputValues.put(pp.getName(), pp.getDefaultValue().toString());
-                    continue;
-                }
-                // then ok if it is optional
-                if (pp.isOptional()) {
-                    continue;
-                }
-                // error : pp is an empty input with no default value and it is not optional
-                logger.error("Error initialising {}, missing {} parameter", pipelineId, pp.getName());
-                throw new VipException(ApiError.INPUT_FIELD_MISSING, pp.getName());
-            }
-
-            // fill in overriddenInputs from explicit inputs
-            Map<String, String> overriddenInputs = p.getOverriddenInputs();
-            if (overriddenInputs != null) {
-                for (String key : overriddenInputs.keySet()) {
-                    String value = overriddenInputs.get(key);
-                    if (inputValues.containsKey(value)) {
-                        inputValues.put(key, inputValues.get(value));
-                    } else {
-                        logger.error("Error initialising {}, missing {} parameter", pipelineId, value);
-                        throw new VipException(ApiError.INPUT_FIELD_MISSING, value);
-                    }
-                }
-            }
-
-            boolean inputsContainsResultsDirectoryInput = inputValues.containsKey(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
-            boolean pipelineHasResultsDirectoryInput = p.getParameters().stream().anyMatch(param ->
-                        param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));
-
-            if (inputsContainsResultsDirectoryInput && ! pipelineHasResultsDirectoryInput) {
-                logger.error("Missing results-directory for {}", pipelineId);
-                throw new VipException(ApiError.INVALID_EXECUTION_INIT,
-                    "Input has parameter results-directory but it is not defined in pipeline.");
-            }
-
-            // Get user groups
-            List<String> groupNames = new ArrayList<>();
-            for (Group g : configurationBusiness
-                    .getUserGroups(currentUserProvider.get().getEmail())
-                    .keySet()) {
-                groupNames.add(g.getName());
-            }
-
-            // Get application name and version
-            String applicationName = pipelineBusiness.getApplicationName(pipelineId);
-            String applicationVersion = pipelineBusiness.getApplicationVersion(pipelineId);
-
-
-            logger.info("Launching workflow with the following parameters: ");
-            logger.info(currentUserProvider.get().toString());
-            logger.info(groupNames.toString());
-            logger.info(inputValues.toString());
-            logger.info(applicationName);
-            logger.info(applicationVersion);
-            logger.info(executionName);
-
-            // Launch the workflow
-            return workflowBusiness.launch(
-                    currentUserProvider.get(),
-                    groupNames,
-                    inputValues,
-                    applicationName,
-                    applicationVersion,
-                    executionName);
-        } catch (VipException ex) {
-            throw new VipException(ex);
+            Map<String, String> inputValues,
+            Integer timeoutInSeconds,
+            String executionName,
+            String studyId) throws VipException {
+        // We cannot easily initialize an execution without starting it.
+        // So we will just launch the execution, and launch an error in case
+        // playExecution is not true.
+        // Set warnings
+        if (studyId != null) {
+            logger.warn("Study identifier ({}) was ignored.", studyId);
         }
+        if (timeoutInSeconds != null && timeoutInSeconds != 0) {
+            logger.warn("Timeout value ({}) was ignored.", timeoutInSeconds);
+        }
+
+        // Check that all pipeline inputs are present
+        Pipeline p = pipelineBusiness.getPipelineWithResultsDirectory(pipelineId);
+        for (PipelineParameter pp : p.getParameters()) {
+            // always true on vip
+            if (pp.isReturnedValue()) {
+                continue;
+            }
+            // ok if input is present
+            if (inputValues.get(pp.getName()) != null) {
+                continue;
+            }
+            // then ok if input has a default value (and we set it)
+            if (pp.getDefaultValue() != null) {
+                inputValues.put(pp.getName(), pp.getDefaultValue().toString());
+                continue;
+            }
+            // then ok if it is optional
+            if (pp.isOptional()) {
+                continue;
+            }
+            // error : pp is an empty input with no default value and it is not optional
+            logger.error("Error initialising {}, missing {} parameter", pipelineId, pp.getName());
+            throw new VipException(ApiError.INPUT_FIELD_MISSING, pp.getName());
+        }
+
+        // fill in overriddenInputs from explicit inputs
+        Map<String, String> overriddenInputs = p.getOverriddenInputs();
+        if (overriddenInputs != null) {
+            for (String key : overriddenInputs.keySet()) {
+                String value = overriddenInputs.get(key);
+                if (inputValues.containsKey(value)) {
+                    inputValues.put(key, inputValues.get(value));
+                } else {
+                    logger.error("Error initialising {}, missing {} parameter", pipelineId, value);
+                    throw new VipException(ApiError.INPUT_FIELD_MISSING, value);
+                }
+            }
+        }
+
+        boolean inputsContainsResultsDirectoryInput = inputValues
+                .containsKey(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
+        boolean pipelineHasResultsDirectoryInput = p.getParameters().stream()
+                .anyMatch(param -> param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));
+
+        if (inputsContainsResultsDirectoryInput && !pipelineHasResultsDirectoryInput) {
+            logger.error("Missing results-directory for {}", pipelineId);
+            throw new VipException(ApiError.INVALID_EXECUTION_INIT,
+                    "Input has parameter results-directory but it is not defined in pipeline.");
+        }
+
+        // Get user groups
+        List<String> groupNames = new ArrayList<>();
+        for (Group g : configurationBusiness
+                .getUserGroups(currentUserProvider.get().getEmail())
+                .keySet()) {
+            groupNames.add(g.getName());
+        }
+
+        // Get application name and version
+        String applicationName = pipelineBusiness.getApplicationName(pipelineId);
+        String applicationVersion = pipelineBusiness.getApplicationVersion(pipelineId);
+
+        logger.info("Launching workflow with the following parameters: ");
+        logger.info(currentUserProvider.get().toString());
+        logger.info(groupNames.toString());
+        logger.info(inputValues.toString());
+        logger.info(applicationName);
+        logger.info(applicationVersion);
+        logger.info(executionName);
+
+        // Launch the workflow
+        return workflowBusiness.launch(
+                currentUserProvider.get(),
+                groupNames,
+                inputValues,
+                applicationName,
+                applicationVersion,
+                executionName);
     }
 
     public void killExecution(String executionId) throws VipException {
-        try {
-            workflowBusiness.kill(executionId);
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        workflowBusiness.kill(executionId);
     }
 
     public void deleteExecution(String executionId, Boolean deleteFiles) throws VipException {
         checkIfUserCanAccessExecution(executionId);
-        try {
-            Simulation s = workflowBusiness.getSimulation(executionId);
-            if (s.getStatus() != SimulationStatus.Completed && s.getStatus() != SimulationStatus.Killed) {
-                logger.error("Cannot delete exec {}, it is {}", executionId, s.getStatus());
-                throw new VipException("Cannot delete execution " + executionId + " because status is " + s.getStatus().toString());
-            }
-            // Note: this won't delete the intermediate files in case the execution was run locally, which violates the spec.
-            // Purge should be called in that case but purge also violates the spec.
-            workflowBusiness.clean(executionId, currentUserProvider.get().getEmail(), deleteFiles);
-        } catch (VipException ex) {
-            throw new VipException(ex);
+        Simulation s = workflowBusiness.getSimulation(executionId);
+        if (s.getStatus() != SimulationStatus.Completed && s.getStatus() != SimulationStatus.Killed) {
+            logger.error("Cannot delete exec {}, it is {}", executionId, s.getStatus());
+            throw new VipException(
+                    "Cannot delete execution " + executionId + " because status is " + s.getStatus().toString());
         }
+        // Note: this won't delete the intermediate files in case the execution was run
+        // locally, which violates the spec.
+        // Purge should be called in that case but purge also violates the spec.
+        workflowBusiness.clean(executionId, currentUserProvider.get().getEmail(), deleteFiles);
     }
 
     public List<PathProperties> getExecutionResultsPaths(String executionId)
@@ -505,12 +471,8 @@ public class ExecutionBusiness {
 
         List<PathProperties> pathResults = new ArrayList<>();
         List<InOutData> outputs;
-        try {
-            outputs = workflowBusiness.getOutputData(
+        outputs = workflowBusiness.getOutputData(
                 executionId, currentUserProvider.get().getFolder());
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
         for (InOutData output : outputs) {
             String outputPath = output.getPath();
             pathResults.add(dataApiBusiness.getPathProperties(outputPath));
@@ -539,21 +501,16 @@ public class ExecutionBusiness {
     }
 
     public void checkIfUserCanAccessExecution(String executionId) throws VipException {
-        try {
-            User user = currentUserProvider.get();
-            if (user.isSystemAdministrator()) {
-                return;
-            }
-            Simulation s = workflowBusiness.getSimulation(executionId);
-            if (s.getUserName().equals(user.getFullName())) {
-                return;
-            }
-            logger.error("Permission denied for {} on exec {}", user, executionId);
-            throw new VipException("Permission denied");
-        } catch (VipException ex) {
-            throw new VipException(ex.getMessage(), ex);
+        User user = currentUserProvider.get();
+        if (user.isSystemAdministrator()) {
+            return;
         }
-
+        Simulation s = workflowBusiness.getSimulation(executionId);
+        if (s.getUserName().equals(user.getFullName())) {
+            return;
+        }
+        logger.error("Permission denied for {} on exec {}", user, executionId);
+        throw new VipException("Permission denied");
     }
 
 }

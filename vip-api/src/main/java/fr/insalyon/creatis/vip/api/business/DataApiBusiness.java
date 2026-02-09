@@ -274,13 +274,9 @@ public class DataApiBusiness {
 
     private void checkPermission(String path, LFCAccessType accessType)
             throws VipException {
-        try {
-            if ( ! lfcPermissionBusiness.isLFCPathAllowed(
+        if (!lfcPermissionBusiness.isLFCPathAllowed(
                 currentUserProvider.get(), path, accessType, true)) {
-                throw new VipException(ApiError.UNAUTHORIZED_DATA_ACCESS, path);
-            }
-        } catch (VipException e) {
-            throw new VipException("Error when checking permissions", e);
+            throw new VipException(ApiError.UNAUTHORIZED_DATA_ACCESS, path);
         }
     }
 
@@ -500,92 +496,48 @@ public class DataApiBusiness {
     // #### LOWER LEVELS CALLS, all prefixed with "base"
 
     private boolean baseDoesFileExist(String path) throws VipException {
-        try {
-            return lfcBusiness.exists(currentUserProvider.get(), path);
-        } catch (VipException e) {
-            throw new VipException("Error testing file existence", e);
-        }
+        return lfcBusiness.exists(currentUserProvider.get(), path);
     }
 
     private Optional<Data.Type> baseGetPathInfo(String path) throws VipException {
-        try {
-            return lfcBusiness.getPathInfo(currentUserProvider.get(), path);
-        } catch (VipException e) {
-            throw new VipException("Error getting path info", e);
-        }
+        return lfcBusiness.getPathInfo(currentUserProvider.get(), path);
     }
 
     private List<Data> baseGetFileData(String path) throws VipException {
-        try {
-            return lfcBusiness.listDir(
-                currentUserProvider.get(), path, true);
-        } catch (VipException e) {
-            throw new VipException("Error getting lfc information", e);
-        }
+        return lfcBusiness.listDir(currentUserProvider.get(), path, true);
     }
 
     /* return the operation id */
     private String baseDownloadFile(String path) throws VipException {
-        try {
-            return transferPoolBusiness.downloadFile(
-                currentUserProvider.get(), path);
-        } catch (VipException e) {
-            throw new VipException("Error download LFC file", e);
-        }
+        return transferPoolBusiness.downloadFile(currentUserProvider.get(), path);
     }
 
     private String baseUploadFile(String localPath, String lfcPath)
             throws VipException {
-        try {
-            return transferPoolBusiness.uploadFile(
+        return transferPoolBusiness.uploadFile(
                 currentUserProvider.get(), localPath, lfcPath);
-        } catch (VipException e) {
-            throw new VipException("Error uploading a lfc file", e);
-        }
     }
 
     private PoolOperation baseGetPoolOperation(String operationId, User user)
             throws VipException {
         // need to specify the user to avoid accessing apiContext from another thread
-        try {
-            return transferPoolBusiness.getOperationById(
-                    operationId, user.getFolder());
-        } catch (VipException e) {
-            throw new VipException("Error getting download operation", e);
-        }
+        return transferPoolBusiness.getOperationById(operationId, user.getFolder());
     }
 
     private PoolOperation baseGetDownloadOperation(String operationId) throws VipException {
-        try {
-            return transferPoolBusiness.getDownloadPoolOperation(operationId);
-        } catch (VipException e) {
-            throw new VipException("Error getting download operation", e);
-        }
+        return transferPoolBusiness.getDownloadPoolOperation(operationId);
     }
 
     private Long baseGetFileModificationDate(String path) throws VipException {
-        try {
-            return lfcBusiness.getModificationDate(
-                currentUserProvider.get(), path);
-        } catch (VipException e) {
-            throw new VipException("Error getting lfc modification", e);
-        }
+        return lfcBusiness.getModificationDate(currentUserProvider.get(), path);
     }
 
     private void baseDeletePath(String path) throws VipException {
-        try {
-            transferPoolBusiness.delete(currentUserProvider.get(), path);
-        } catch (VipException e) {
-            throw new VipException("Error deleting lfc file", e);
-        }
+        transferPoolBusiness.delete(currentUserProvider.get(), path);
     }
 
     private void baseMkdir(String path, String dirName) throws VipException {
-        try {
-            lfcBusiness.createDir(currentUserProvider.get(), path, dirName);
-        } catch (VipException e) {
-            throw new VipException("Error creating LFC directory", e);
-        }
+        lfcBusiness.createDir(currentUserProvider.get(), path, dirName);
     }
 
 }

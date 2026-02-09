@@ -30,10 +30,6 @@ public class ExternalPlatformController extends ApiController {
     @GetMapping
     public List<ExternalPlatform> listExternalPlatforms() throws VipException {
         logMethodInvocation(logger,"listExternalPlatforms");
-        try{
-            return externalPlatformBusiness.listAll();
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        return externalPlatformBusiness.listAll();
     }
 }

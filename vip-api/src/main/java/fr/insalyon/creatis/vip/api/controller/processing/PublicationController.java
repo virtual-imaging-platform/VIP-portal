@@ -29,10 +29,6 @@ public class PublicationController extends ApiController {
     @RequestMapping
     public List<Publication> listPublication() throws VipException {
         logMethodInvocation(logger, "listPublication");
-        try {
-            return publicationBusiness.getPublications();
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        return publicationBusiness.getPublications();
     }
 }

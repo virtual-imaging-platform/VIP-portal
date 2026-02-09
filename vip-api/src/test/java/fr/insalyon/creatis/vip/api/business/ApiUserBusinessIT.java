@@ -41,24 +41,24 @@ public class ApiUserBusinessIT extends BaseSpringIT {
     }
 
     @Test
-    public void testInitialization() throws VipException, VipException {
+    public void testInitialization() throws VipException {
         Assertions.assertEquals(2, configurationBusiness.getUsers().size(), "Incorrect number of users"); // admin + user1
     }
 
     @Test
-    public void testSignup() throws VipException, VipException {
+    public void testSignup() throws VipException {
         User user2 = new User("firstName2", "lastName2", "email2@test.fr", "test3@test.fr", "institution", "password", false, "code", "folder", "session", new Date(), new Date(), Beginner, CountryCode.fr, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), 0, false);
         apiUserBusiness.signup(user2, "comment");
         Assertions.assertEquals(3, configurationBusiness.getUsers().size(), "Incorrect number of users");
     }
 
     @Test
-    public void testResetPassword() throws VipException, VipException {
+    public void testResetPassword() throws VipException {
         apiUserBusiness.resetPassword("email1@test.fr", configurationBusiness.getUser("email1@test.fr").getCode(), "test new password");
     }
 
     @Test
-    public void testResetCode() throws VipException, VipException {
+    public void testResetCode() throws VipException {
         String oldCode = configurationBusiness.getUser("email1@test.fr").getCode();
         apiUserBusiness.sendResetCode("email1@test.fr");
         String newCode = configurationBusiness.getUser("email1@test.fr").getCode();

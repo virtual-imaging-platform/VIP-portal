@@ -34,25 +34,17 @@ public class ApplicationController extends ApiController {
     @RequestMapping(method = RequestMethod.GET)
     public List<Application> listApplications() throws VipException {
         logMethodInvocation(logger, "listApplications");
-        try {
-            return applicationBusiness.getApplications();
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        return applicationBusiness.getApplications();
     }
 
     @RequestMapping(value = "{applicationId}", method = RequestMethod.GET)
     public Application getApplication(@PathVariable String applicationId) throws VipException {
         logMethodInvocation(logger, "getApplication", applicationId);
-        try {
-            Application app = applicationBusiness.getApplication(applicationId);
-            if (app == null) {
-                throw new VipException(ApiError.APPLICATION_NOT_FOUND, applicationId);
-            }
-            return app;
-        } catch (VipException e) {
-            throw new VipException(e);
+        Application app = applicationBusiness.getApplication(applicationId);
+        if (app == null) {
+            throw new VipException(ApiError.APPLICATION_NOT_FOUND, applicationId);
         }
+        return app;
     }
 
     @RequestMapping(value = "/{applicationId}", method = RequestMethod.PUT)
@@ -63,17 +55,13 @@ public class ApplicationController extends ApiController {
             logger.error("applicationId mismatch: {}!={}", applicationId, app.getName());
             throw new VipException(DefaultError.BAD_INPUT_FIELD, applicationId);
         }
-        try {
-            Application existingApp = applicationBusiness.getApplication(applicationId);
-            if (existingApp == null) {
-                applicationBusiness.add(app);
-            } else {
-                applicationBusiness.update(app);
-            }
-            return applicationBusiness.getApplication(applicationId);
-        } catch (VipException e) {
-            throw new VipException(e);
+        Application existingApp = applicationBusiness.getApplication(applicationId);
+        if (existingApp == null) {
+            applicationBusiness.add(app);
+        } else {
+            applicationBusiness.update(app);
         }
+        return applicationBusiness.getApplication(applicationId);
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -84,10 +72,6 @@ public class ApplicationController extends ApiController {
     @RequestMapping(value = "/{applicationId}", method = RequestMethod.DELETE)
     public void deleteApplication(@PathVariable String applicationId) throws VipException {
         logMethodInvocation(logger, "deleteApplication", applicationId);
-        try {
-            applicationBusiness.remove(applicationId);
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        applicationBusiness.remove(applicationId);
     }
 }

@@ -72,12 +72,7 @@ public class SessionController {
 
     @DeleteMapping
     public void deleteSession(HttpServletRequest request, HttpServletResponse response) throws VipException {
-        try {
-            sessionBusiness.signout();
-            sessionBusiness.clearLoginCookies(response);
-
-        } catch (VipException e) {
-            throw new VipException(e); // change
-        }
+        sessionBusiness.signout();
+        sessionBusiness.clearLoginCookies(response);
     }
 }
