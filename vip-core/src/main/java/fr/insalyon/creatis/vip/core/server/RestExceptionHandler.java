@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.core.server.security.common;
+package fr.insalyon.creatis.vip.core.server;
 
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @ExceptionHandler(VipException.class)
-    public ResponseEntity<Object> handleException(VipException e) {
+    public ResponseEntity<Object> handleVipException(VipException e) {
         // No need to log, VIP errors are logged when they are created
 
         // to find the error message : look for an error code in the vip
