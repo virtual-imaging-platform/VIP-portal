@@ -50,7 +50,7 @@ public class GetFileServiceImpl extends HttpServlet {
             }
 
             if (filepath != null && !filepath.isEmpty()) {
-                Path requestedPath = fileUtil.getValidWorkflowPath(filepath);
+                Path requestedPath = fileUtil.getValidWorkflowPath(user, filepath);
 
                 if (requestedPath == null) {
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid file path");

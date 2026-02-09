@@ -25,7 +25,7 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.server.dao.ExecutionNodeDAO;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
 import fr.insalyon.creatis.vip.core.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
@@ -33,18 +33,16 @@ import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 
 @Service
 @Transactional
-public class SimulationBusiness {
+public class SimulationBusiness extends CommonBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final LfcPathsBusiness lfcPathsBusiness;
-    private final Server server;
     private final FileUtil fileUtil;
 
     @Autowired
-    public SimulationBusiness(LfcPathsBusiness lfcPathsBusiness, Server server, FileUtil fileUtil) {
+    public SimulationBusiness(LfcPathsBusiness lfcPathsBusiness, FileUtil fileUtil) {
         this.lfcPathsBusiness = lfcPathsBusiness;
-        this.server = server;
         this.fileUtil = fileUtil;
     }
 
@@ -255,7 +253,7 @@ public class SimulationBusiness {
         try {
             fileName += extension;
 
-            Path requestedPath = fileUtil.getValidWorkflowPath(simulationID + "/" + folder + "/" + fileName);
+            Path requestedPath = fileUtil.getValidWorkflowPath(getUser(), simulationID + "/" + folder + "/" + fileName);
             if ( requestedPath == null) {
                 throw new VipException("Invalid workflow path!");
             }
