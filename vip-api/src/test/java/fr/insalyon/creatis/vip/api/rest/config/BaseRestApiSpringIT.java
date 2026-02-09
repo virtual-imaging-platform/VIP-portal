@@ -34,10 +34,10 @@ import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowExecutionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
-import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.integrationtest.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+import fr.insalyon.creatis.vip.core.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
@@ -52,7 +52,6 @@ import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
         @ContextConfiguration(name="rest-api", classes = SpringRestApiConfig.class)
 )
 abstract public class BaseRestApiSpringIT extends BaseWebSpringIT {
-
 
     @Autowired
     protected TransferPoolBusiness transferPoolBusiness;
@@ -73,6 +72,7 @@ abstract public class BaseRestApiSpringIT extends BaseWebSpringIT {
     @Autowired protected ApplicationBusiness applicationBusiness;
     @Autowired protected EngineBusiness engineBusiness;
     @Autowired protected AppVersionBusiness appVersionBusiness;
+    @Autowired protected FileUtil fileUtil;
 
     @Override
     protected String getServletPath() {
@@ -125,7 +125,7 @@ abstract public class BaseRestApiSpringIT extends BaseWebSpringIT {
     protected AppVersion configureTestApp(String appName, String groupName, String versionName) throws VipException, GRIDAClientException, IOException {
         setAdminContext();
         AppVersion appVersion = applicationTestConfigurer.configureAnApplication(appName, versionName, groupName);
-        applicationTestConfigurer.configureVersion(appVersion, FileUtil.read(getBoutiquesTestFile()));
+        applicationTestConfigurer.configureVersion(appVersion, fileUtil.read(getBoutiquesTestFile()));
 
         Mockito.when(server.getDataManagerPath()).thenReturn("/test/folder");
 

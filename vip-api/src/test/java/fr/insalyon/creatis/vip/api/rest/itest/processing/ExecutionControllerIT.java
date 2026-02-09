@@ -62,7 +62,6 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
-import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -416,7 +415,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 ));
 
         // verify workflow path
-        Assertions.assertEquals(FileUtil.read(getBoutiquesTestFile()), workflowContentCaptor.getValue());
+        Assertions.assertEquals(fileUtil.read(getBoutiquesTestFile()), workflowContentCaptor.getValue());
 
         // verify inputs / same as gwendia without optional one
         String inputs = inputsCaptor.getValue();

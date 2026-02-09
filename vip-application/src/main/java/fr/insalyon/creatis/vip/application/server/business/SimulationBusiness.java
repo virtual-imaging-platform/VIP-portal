@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +26,7 @@ import fr.insalyon.creatis.vip.application.server.dao.ExecutionNodeDAO;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
@@ -38,11 +39,13 @@ public class SimulationBusiness {
 
     private final LfcPathsBusiness lfcPathsBusiness;
     private final Server server;
+    private final FileUtil fileUtil;
 
     @Autowired
-    public SimulationBusiness(LfcPathsBusiness lfcPathsBusiness, Server server) {
+    public SimulationBusiness(LfcPathsBusiness lfcPathsBusiness, Server server, FileUtil fileUtil) {
         this.lfcPathsBusiness = lfcPathsBusiness;
         this.server = server;
+        this.fileUtil = fileUtil;
     }
 
     /*
@@ -252,9 +255,12 @@ public class SimulationBusiness {
         try {
             fileName += extension;
 
-            Scanner scanner = new Scanner(new FileInputStream(server.getWorkflowsPath()
-                    + "/" + simulationID + "/" + folder + "/" + fileName));
+            Path requestedPath = fileUtil.getValidWorkflowPath(simulationID + "/" + folder + "/" + fileName);
+            if ( requestedPath == null) {
+                throw new VipException("Invalid workflow path!");
+            }
 
+            Scanner scanner = new Scanner(requestedPath);
             StringBuilder sb = new StringBuilder();
 
             while (scanner.hasNext()) {
