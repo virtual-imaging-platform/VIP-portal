@@ -17,5 +17,6 @@ public interface VipError {
 
     Integer getCode();
     Integer getExpectedParameters();
+    Integer getHttpCode();
     String getMessage();
 }

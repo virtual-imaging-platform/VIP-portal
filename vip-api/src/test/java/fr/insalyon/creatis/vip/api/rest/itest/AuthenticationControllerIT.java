@@ -24,7 +24,7 @@ public class AuthenticationControllerIT extends BaseRestApiSpringIT {
                                 .contentType("application/json")
                                 .content(getResourceAsString("jsonObjects/user-credentials.json")))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
                         .value(DefaultError.BAD_CREDENTIALS.getCode()));;

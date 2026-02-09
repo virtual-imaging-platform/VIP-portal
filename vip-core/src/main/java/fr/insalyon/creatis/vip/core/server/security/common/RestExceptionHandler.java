@@ -19,6 +19,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import fr.insalyon.creatis.vip.core.client.DefaultError;
+import fr.insalyon.creatis.vip.core.client.VipError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 
@@ -36,7 +37,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorCodeAndMessage codeAndMessage = fetchErrorInException(e);
         // we are now using specific return codes inside the response itself
         // like 8xxx codes
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        HttpStatus status = HttpStatus.resolve(e.getVipError()
+                .map(VipError::getHttpCode)
+                .orElse(400));
+
         return new ResponseEntity<>(codeAndMessage, status);
     }
 

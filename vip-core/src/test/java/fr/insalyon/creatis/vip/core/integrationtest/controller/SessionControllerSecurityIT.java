@@ -147,7 +147,7 @@ public class SessionControllerSecurityIT extends BaseInternalApiSpringIT {
                         .content(mapper.writeValueAsString(credentials))
                         .cookie(cookie))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.errorCode").value("8002"));
     }
 }

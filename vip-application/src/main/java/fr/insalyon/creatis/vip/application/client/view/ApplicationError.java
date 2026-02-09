@@ -11,14 +11,18 @@ public enum ApplicationError implements VipError {
     private final String message;
     private final Integer code;
     private final Integer expectedParams;
+    private final Integer httpCode;
 
     private ApplicationError(Integer code, String message, Integer expectedParams) {
         this.message = message;
         this.code = code;
         this.expectedParams = expectedParams;
+        this.httpCode = 400;
     }
 
     @Override public Integer getCode() { return code; }
     @Override public String getMessage() { return message; }
     @Override public Integer getExpectedParameters() { return expectedParams; }
+    @Override public Integer getHttpCode() { return httpCode; }
 }
+
