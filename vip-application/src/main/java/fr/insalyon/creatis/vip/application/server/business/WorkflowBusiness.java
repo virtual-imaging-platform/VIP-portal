@@ -160,11 +160,9 @@ public class WorkflowBusiness {
             appVersion.getSettings().put(ApplicationConstants.DEFAULT_EXECUTOR_GASW, resource.getType().toString());
             try {
                 workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, parameters, resource.getConfiguration());
-            } catch (VipException e) {
+            } catch (Exception e) {
                 // no code mean not intended exception = engine deactivation
-                if (e.getVipErrorCode().isEmpty()) {
-                    logger.error("Unexpected exception caught on launch workflow, engine {} will be disabled", engine.getName(), e);
-
+                if (e instanceof VipException vipEx && vipEx.getVipErrorCode().isEmpty()) {
                     engine.setStatus("disabled");
                     engineBusiness.update(engine);
 

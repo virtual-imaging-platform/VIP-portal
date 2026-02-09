@@ -113,14 +113,14 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
                     throw new VipException(ApplicationError.ENGINE_SATURATED, e);
                 case 400:
                     logger.warn("Application likely misconfigured: {}", e.getMessage(), e);
-                    throw new VipException(DefaultError.GENERIC_ERROR, e);
+                    throw new VipException(ApplicationError.LAUNCH_ERROR, e);
                 default:
                     logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
                     throw new VipException("Internal server error while fetching workflow status", e);
             }
         } catch (RestClientException e) {
-            logger.error("REST client error while fetching workflow status", e);
-            throw new VipException("REST client error while fetching workflow status", e);
+            logger.error("REST error launching execution", e);
+            throw new VipException("REST error launching execution", e);
         }
     }
 
