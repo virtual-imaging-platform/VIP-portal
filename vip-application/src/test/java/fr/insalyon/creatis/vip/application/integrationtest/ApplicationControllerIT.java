@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -56,7 +57,7 @@ public class ApplicationControllerIT extends BaseInternalApiSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                    .andExpect(jsonPath("$.errorCode").value(1001))
+                    .andExpect(jsonPath("$.errorCode").value(DefaultError.ACCESS_DENIED.getCode()))
                     .andExpect(status().is4xxClientError());
 
         // developer not in the private group
@@ -65,7 +66,7 @@ public class ApplicationControllerIT extends BaseInternalApiSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                    .andExpect(jsonPath("$.errorCode").value(1001))
+                    .andExpect(jsonPath("$.errorCode").value(DefaultError.ACCESS_DENIED.getCode()))
                     .andExpect(status().is4xxClientError());
 
         configurationBusiness.addUserToGroup(emailUser2, nameGroup1);
@@ -108,7 +109,7 @@ public class ApplicationControllerIT extends BaseInternalApiSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app.getName())))
-                    .andExpect(jsonPath("$.errorCode").value(1000))
+                    .andExpect(jsonPath("$.errorCode").value(DefaultError.NOT_FOUND.getCode()))
                     .andExpect(status().is4xxClientError());
 
         configurationBusiness.addUserToGroup(emailUser2, nameGroup1);
@@ -150,7 +151,7 @@ public class ApplicationControllerIT extends BaseInternalApiSpringIT {
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.errorCode").value(1001));
+                    .andExpect(jsonPath("$.errorCode").value(DefaultError.ACCESS_DENIED.getCode()));
 
         // update app wrong matching ids
         mockMvc.perform(put("/internal/applications/not_good_name")
@@ -159,7 +160,7 @@ public class ApplicationControllerIT extends BaseInternalApiSpringIT {
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.errorCode").value(8009));
+                    .andExpect(jsonPath("$.errorCode").value(DefaultError.BAD_INPUT_FIELD.getCode()));
 
         // do update
         mockMvc.perform(put("/internal/applications/" + app.getName())
@@ -183,7 +184,7 @@ public class ApplicationControllerIT extends BaseInternalApiSpringIT {
         // retrieve wrong
         mockMvc.perform(get("/internal/applications/wrong")
                 .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf()))
-                    .andExpect(jsonPath("$.errorCode").value(1000))
+                    .andExpect(jsonPath("$.errorCode").value(DefaultError.NOT_FOUND.getCode()))
                     .andExpect(status().is4xxClientError());
 
         // good one
