@@ -12,20 +12,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ContextHierarchy;
 
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
-/**
- * These tests check the authentication with the spring test tools.
- * It requests a wrong url that should be secured and expects a 404 when OK
- * <p>
- * Use common vip spring test configuration ({@link BaseWebSpringIT}
+
+/*
+ Needs to merge the mock of UserDAO into the root application context
  */
-@ContextConfiguration(classes = SpringAuthenticationWithMockedUserDaoIT.TestContextConfiguration.class)
-public class SpringAuthenticationWithMockedUserDaoIT extends BaseWebSpringIT {
+@ContextHierarchy(
+    @ContextConfiguration(name="root", classes = SpringAuthenticationWithMockedUserDaoIT.TestContextConfiguration.class)
+)
+public class SpringAuthenticationWithMockedUserDaoIT extends BaseRestApiSpringIT {
 
     static class TestContextConfiguration {
         @Bean

@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:vip-core/src/main/java/fr/insalyon/creatis/vip/core/server/RestExceptionHandler.java
 package fr.insalyon.creatis.vip.core.server;
-========
-package fr.insalyon.creatis.vip.core.server.security.common;
->>>>>>>> 96fa24389 (move ApiException):vip-core/src/main/java/fr/insalyon/creatis/vip/core/server/security/common/RestExceptionHandler.java
 
 import java.util.Optional;
 
@@ -22,11 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-<<<<<<<< HEAD:vip-core/src/main/java/fr/insalyon/creatis/vip/core/server/RestExceptionHandler.java
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipError;
-========
->>>>>>>> 96fa24389 (move ApiException):vip-core/src/main/java/fr/insalyon/creatis/vip/core/server/security/common/RestExceptionHandler.java
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 
