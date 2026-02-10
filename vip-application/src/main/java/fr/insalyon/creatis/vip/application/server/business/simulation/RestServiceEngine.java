@@ -88,17 +88,16 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
 
         RestWorkflow restWorkflow = new RestWorkflow(base64Workflow, base64Input, base64Proxy, base64Settings, base64ExecutorConfig);
 
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonBody;
+
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonBody;
-
-            try {
-                jsonBody = mapper.writeValueAsString(restWorkflow);
-            } catch (JsonProcessingException e) {
-                logger.error("Error serializing RestWorkflow to JSON", e);
-                throw new VipException("Error serializing RestWorkflow to JSON", e);
-            }
-
+            jsonBody = mapper.writeValueAsString(restWorkflow);
+        } catch (JsonProcessingException e) {
+            logger.error("Error serializing RestWorkflow to JSON", e);
+            throw new VipException("Error serializing RestWorkflow to JSON", e);
+        }
+        try {
             RestClient restClient = buildRestClient(addressWS);
             return restClient.post()
                     .uri("/submit")
