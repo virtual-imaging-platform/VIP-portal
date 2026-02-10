@@ -6,7 +6,6 @@ import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.TR
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.USERS_HOME;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,11 +42,11 @@ import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.api.model.UploadData;
 import fr.insalyon.creatis.vip.api.model.UploadDataType;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.models.Data;
+import fr.insalyon.creatis.vip.datamanager.models.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
@@ -55,7 +54,6 @@ import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import jakarta.annotation.PreDestroy;
-
 
 @Service
 public class DataApiBusiness {
@@ -274,8 +272,8 @@ public class DataApiBusiness {
 
     private void checkPermission(String path, LFCAccessType accessType)
             throws VipException {
-        if (!lfcPermissionBusiness.isLFCPathAllowed(
-                currentUserProvider.get(), path, accessType, true)) {
+        if ( ! lfcPermissionBusiness.isLFCPathAllowed(
+            currentUserProvider.get(), path, accessType, true)) {
             throw new VipException(ApiError.UNAUTHORIZED_DATA_ACCESS, path);
         }
     }
@@ -535,5 +533,4 @@ public class DataApiBusiness {
     private void baseMkdir(String path, String dirName) throws VipException {
         lfcBusiness.createDir(currentUserProvider.get(), path, dirName);
     }
-
 }

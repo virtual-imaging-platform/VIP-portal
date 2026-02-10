@@ -13,12 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
 import fr.insalyon.creatis.vip.publication.client.view.PublicationTypes;
+import fr.insalyon.creatis.vip.publication.models.Publication;
 import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
 import jakarta.servlet.ServletException;
 

@@ -1,17 +1,24 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
 import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesInput;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  * Representation of an input in application launch form: name, description, value field or fields

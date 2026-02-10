@@ -4,13 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-import fr.insalyon.creatis.vip.visualization.client.bean.Image;
-import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationService;
 import fr.insalyon.creatis.vip.visualization.client.view.VisualizationException;
+import fr.insalyon.creatis.vip.visualization.models.Image;
+import fr.insalyon.creatis.vip.visualization.models.VisualizationItem;
 import fr.insalyon.creatis.vip.visualization.server.business.VisualizationBusiness;
 import jakarta.servlet.ServletException;
 

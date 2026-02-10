@@ -2,7 +2,7 @@ package fr.insalyon.creatis.vip.application.client.inter;
 
 import java.util.List;
 
-import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.models.Tag;
 
 public interface CustomApplicationModule {
     

@@ -16,12 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
-import fr.insalyon.creatis.vip.visualization.client.bean.Image;
-import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
+import fr.insalyon.creatis.vip.visualization.models.Image;
+import fr.insalyon.creatis.vip.visualization.models.VisualizationItem;
 
 @Service
 @Transactional

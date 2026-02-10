@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.insalyon.creatis.vip.api.business.ApiUserBusiness;
 import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.models.User;
 import jakarta.validation.Valid;
 
 @RestController

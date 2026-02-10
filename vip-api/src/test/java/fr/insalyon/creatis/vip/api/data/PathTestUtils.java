@@ -2,8 +2,9 @@ package fr.insalyon.creatis.vip.api.data;
 
 import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
+import fr.insalyon.creatis.vip.datamanager.models.Data;
+import fr.insalyon.creatis.vip.datamanager.models.Data.Type;
+
 import org.hamcrest.Matcher;
 
 import java.util.Arrays;

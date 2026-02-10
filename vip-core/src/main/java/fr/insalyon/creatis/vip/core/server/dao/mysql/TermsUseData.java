@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
+import fr.insalyon.creatis.vip.core.models.TermsOfUse;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.TermsUseDAO;
 

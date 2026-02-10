@@ -1,7 +1,8 @@
 package fr.insalyon.creatis.vip.core.client;
 
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+
+import fr.insalyon.creatis.vip.core.models.User;
 
 import java.util.Set;
 

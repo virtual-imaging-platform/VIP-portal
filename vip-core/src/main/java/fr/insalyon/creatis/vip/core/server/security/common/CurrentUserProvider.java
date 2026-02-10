@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.models.User;
 
 // Provide authenticated user after a successful authentification (session, API and OIDC)
 // this class use the SecurityContextHolder defined in AuthenticationProvider classes

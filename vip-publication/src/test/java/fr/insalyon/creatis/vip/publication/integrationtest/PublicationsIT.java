@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.models.Publication;
 import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
 
 public class PublicationsIT extends BaseSpringIT {
