@@ -1,11 +1,8 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
-import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.rpc.ServiceException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,13 +44,14 @@ public class WorkflowExecutionBusiness {
             String inputs = (parameters != null) ? getParametersAsJSONInput(parameters) : null;
             String proxyFileName = server.getServerProxy(server.getVoName());
             String settingsJSON = new ObjectMapper().writeValueAsString(appVersion.getSettings());
-            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, settingsJSON, executorConfig, proxyFileName);
-            return new Workflow(workflowID, user.getFullName(),
-                    WorkflowStatus.Running, new Date(), null, simulationName, 
+            String id = engine.launch(engineEndpoint, workflowContent, inputs, settingsJSON, executorConfig, proxyFileName);
+
+            return new Workflow(id, user.getFullName(),
+                    WorkflowStatus.Running, new Date(), null, simulationName,
                     appVersion.getApplicationName(), appVersion.getVersion(), "",
                     engineEndpoint, null);
 
-        } catch (ServiceException | RemoteException | JsonProcessingException ex) {
+        } catch (JsonProcessingException ex) {
             logger.error("Error launching simulation {} ({}/{})",
                     simulationName, appVersion.getApplicationName(), appVersion.getVersion(), ex);
             throw new VipException(ex);
@@ -61,24 +59,11 @@ public class WorkflowExecutionBusiness {
     }
 
     public SimulationStatus getStatus(String engineEndpoint, String simulationID) throws VipException {
-        SimulationStatus status = SimulationStatus.Unknown;
-        try {
-            status = engine.getStatus(engineEndpoint, simulationID);
-        } catch (RemoteException | ServiceException e) {
-            logger.error("Error getting status of simulation {} on engine {}", simulationID, engineEndpoint, e);
-            throw new VipException(e);
-        }
-
-        return status;
+        return engine.getStatus(engineEndpoint, simulationID);
     }
 
     public void kill(String engineEndpoint, String simulationID) throws VipException {
-        try {
-            engine.kill(engineEndpoint, simulationID);
-        } catch (RemoteException | ServiceException e) {
-            logger.error("Error killing simulation {} on engine {}", simulationID, engineEndpoint, e);
-            throw new VipException(e);
-        }
+        engine.kill(engineEndpoint, simulationID);
     }
 
     public String getParametersAsJSONInput(Map<String, List<String>> parameters) throws VipException {

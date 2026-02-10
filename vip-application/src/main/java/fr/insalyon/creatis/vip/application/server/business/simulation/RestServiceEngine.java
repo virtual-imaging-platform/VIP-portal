@@ -3,11 +3,8 @@ package fr.insalyon.creatis.vip.application.server.business.simulation;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.nio.charset.StandardCharsets;
-import java.rmi.RemoteException;
 import java.util.Base64;
 import java.util.Map;
-
-import javax.xml.rpc.ServiceException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +19,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.insalyon.creatis.vip.application.client.view.ApplicationError;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.ProxyUtil;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 
@@ -68,12 +67,10 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
     /**
      * Call the WS that is going to run the workflow and return the HTTP link
      * that can be used to monitor the workflow status.
-     *
-     * @return the HTTP link that shows the workflow current status
      */
     @Override
     public String launch(String addressWS, String workflow, String inputs, String settings, String executorConfig, String proxyFileName)
-            throws RemoteException, ServiceException, VipException {
+            throws VipException {
         loadTrustStore(server);
 
         String strProxy = null;
@@ -91,10 +88,16 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
 
         RestWorkflow restWorkflow = new RestWorkflow(base64Workflow, base64Input, base64Proxy, base64Settings, base64ExecutorConfig);
 
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonBody = mapper.writeValueAsString(restWorkflow);
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonBody;
 
+        try {
+            jsonBody = mapper.writeValueAsString(restWorkflow);
+        } catch (JsonProcessingException e) {
+            logger.error("Error serializing RestWorkflow to JSON", e);
+            throw new VipException("Error serializing RestWorkflow to JSON", e);
+        }
+        try {
             RestClient restClient = buildRestClient(addressWS);
             return restClient.post()
                     .uri("/submit")
@@ -103,14 +106,20 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
                     .retrieve()
                     .body(String.class);
         } catch (HttpServerErrorException | HttpClientErrorException e) {
-            logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
-            throw new VipException("Internal server error while fetching workflow status", e);
+            switch (e.getStatusCode().value()) {
+                case 503:
+                    logger.warn("Engine satured!: {}", e.getMessage(), e);
+                    throw new VipException(ApplicationError.ENGINE_SATURATED, e);
+                case 400:
+                    logger.warn("Application likely misconfigured: {}", e.getMessage(), e);
+                    throw new VipException(ApplicationError.LAUNCH_ERROR, e);
+                default:
+                    logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
+                    throw new VipException("Internal server error while fetching workflow status", e);
+            }
         } catch (RestClientException e) {
-            logger.error("REST client error while fetching workflow status", e);
-            throw new VipException("REST client error while fetching workflow status", e);
-        } catch (JsonProcessingException e) {
-            logger.error("Error serializing RestWorkflow to JSON", e);
-            throw new VipException("Error serializing RestWorkflow to JSON", e);
+            logger.error("REST error launching execution", e);
+            throw new VipException("REST error launching execution", e);
         }
     }
 
