@@ -63,7 +63,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <springsecurity.version>6.3.4</springsecurity.version>
         <springoauth.version>6.3.4</springoauth.version>
         <jackson.version>2.18.0</jackson.version>
-        <h2database.version>2.4.240</h2database.version>
+        <h2database.version>1.4.200</h2database.version>
+        <!-- <h2database.version>2.4.240</h2database.version> -->
     </properties>
 
     <description>VIP</description>
@@ -173,11 +174,16 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <version>${spring-framework.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${h2database.version}</version>
             <scope>test</scope>
+        </dependency> -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2database.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>

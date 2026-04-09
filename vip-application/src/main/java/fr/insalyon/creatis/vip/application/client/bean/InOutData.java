@@ -36,4 +36,13 @@ public class InOutData implements IsSerializable {
     public String getProcessor() {
         return processor;
     }
+    private int invocationID;
+
+    public int getInvocationID() {
+        return invocationID;
+    }
+
+    public void setInvocationID(int invocationID) {
+        this.invocationID = invocationID;
+    }
 }
