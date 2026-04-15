@@ -192,4 +192,9 @@ public class Execution {
     public Map<Integer, Map<String, Object>> getJobs() { return jobs; }
 
     public void setJobs(Map<Integer, Map<String, Object>> jobs) { this.jobs = jobs; }
+
+    public void setLastStatusModificationDate(long maxTimestamp) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setLastStatusModificationDate'");
+    }
 }

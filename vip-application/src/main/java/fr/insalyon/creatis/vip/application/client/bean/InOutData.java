@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -45,4 +46,6 @@ public class InOutData implements IsSerializable {
     public void setInvocationID(int invocationID) {
         this.invocationID = invocationID;
     }
+
+
 }

@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
@@ -97,53 +98,6 @@ public class ExecutionBusiness {
         return getLog(executionId, null, type);
     }
 
-    // public String getLog(String executionId, Integer invocationId, String type) throws ApiException {
-    //     try {
-    //         Simulation s = workflowBusiness.getSimulation(executionId);
-    //         List<Task> tasks = simulationBusiness.getJobsList(s.getID());
-
-    //         if (tasks.isEmpty()) {
-    //             logger.debug("Warning: no .sh.out log file found for execution ID = {} ", executionId);
-    //             return "no log found";
-    //         }
-
-    //         String extension = ".sh.app." + type;
-
-    //         Task targetTask = null;
-
-    //         if (invocationId == null) {
-    //             if (tasks.size() == 1) {
-    //                 targetTask = tasks.get(0);
-    //                 logger.debug("jobId is null, using the only available task with ID = {}", targetTask.getId());
-    //             } else {
-    //                 logger.debug("jobId is null but multiple tasks found for execution ID = {}", executionId);
-    //                 return "jobId is required when multiple tasks exist";
-    //             }
-    //         } else {
-    //             targetTask = tasks.stream()
-    //                     .filter(t -> invocationId.equals(t.getInvocationID()))
-    //                     .max(Comparator.comparing(Task::getCreationDate))
-    //                     .orElse(null);
-    //         }
-
-
-
-    //         if (targetTask == null) {
-    //             logger.debug("No job {} found for execution ID = {}", invocationId, executionId);
-    //             return "no log found for job " + invocationId;
-    //         }
-
-    //         String fileName = targetTask.getFileName();
-    //         if (fileName != null) {
-    //             return simulationBusiness.readFile(executionId, type, fileName, extension);
-    //         } else {
-    //             throw new ApiException("no file name for job " + invocationId + " in execution " + executionId);
-    //         }
-
-    //     } catch (BusinessException e) {
-    //         throw new ApiException(e);
-    //     }
-    // }
     public String getLog(String executionId, Integer invocationId, String type) throws ApiException {
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
@@ -161,7 +115,6 @@ public class ExecutionBusiness {
                     return "jobId is required when multiple tasks exist";
                 }
             } else {
-                // FILTRE : On cherche la tâche qui correspond à l'invocationID
                 targetTask = tasks.stream()
                         .filter(t -> invocationId.equals(t.getInvocationID()))
                         .max(Comparator.comparing(Task::getCreationDate))
@@ -212,186 +165,15 @@ public class ExecutionBusiness {
         }
     }
 
-    // private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws BusinessException {
-    //     // Build Carmin's execution object
-    //     Execution e = new Execution(
-    //             s.getID(),
-    //             s.getSimulationName(),
-    //             pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
-    //             0, // timeout (no timeout set in VIP)
-    //             VIPtoCarminStatus(s.getStatus()),
-    //             null, // study identifier (not available in VIP yet)
-    //             null, // error codes and mesasges (not available in VIP yet)
-    //             s.getDate().getTime(),
-    //             null, // last status modification date (not available in VIP yet)
-    //             null // results location (not available in VIP yet)
-    //     );
-
-    //     if(summarize) // don't look into inputs and outputs
-    //         return e;
-
-    //     // Inputs
-    //     List<InOutData> inputs = workflowBusiness.getInputData(
-    //         s.getID(), currentUserProvider.get().getFolder());
-    //     logger.debug("Execution has " + inputs.size() + " inputs ");
-    //     for (InOutData iod : inputs) {
-    //         e.getInputValues().put(iod.getProcessor(), iod.getPath());
-    //     }
-
-    //     // Outputs
-    //     List<InOutData> outputs = workflowBusiness.getOutputData(
-    //         s.getID(), currentUserProvider.get().getFolder());
-    //     for (InOutData iod : outputs) {
-    //         if (!e.getReturnedFiles().containsKey(iod.getProcessor())) {
-    //              e.getReturnedFiles().put(iod.getProcessor(), new ArrayList<>());
-    //         }
-    //         e.getReturnedFiles().get(iod.getProcessor()).add(iod.getPath());
-    //     }
-
-    //     // Jobs
-    //     List<Task> tasks = simulationBusiness.getJobsList(s.getID());
-    //     Map<Integer, Task> latestTaskPerInvocation = new HashMap<>();
-
-    //     for (Task t : tasks) {
-    //         int invId = t.getInvocationID();
-    //         Task current = latestTaskPerInvocation.get(invId);
-
-    //         if (current == null || t.getCreationDate().after(current.getCreationDate())) {
-    //             latestTaskPerInvocation.put(invId, t);
-    //         }
-    //     }
-
-    //     Map<Integer, Map<String, Object>> jobsMap = new HashMap<>();
-    //     for (Map.Entry<Integer, Task> entry : latestTaskPerInvocation.entrySet()) {
-    //         Task t = entry.getValue();
-    //         Map<String, Object> jobInfo = new HashMap<>();
-    //         jobInfo.put("status", t.getStatus().toString());
-    //         jobInfo.put("exitCode", t.getExitCode());
-    //         jobInfo.put("exitMessage", t.getExitMessage());
-    //         jobsMap.put(entry.getKey(), jobInfo);
-    //     }
-    //     e.setJobs(jobsMap);
-    //     if (!(e.getStatus() == ExecutionStatus.FINISHED) && !(e.getStatus() == ExecutionStatus.KILLED) && e.getReturnedFiles().isEmpty()) {
-    //         e.clearReturnedFiles();
-    //     }
-
-    //     return e;
-    // }
 
     private boolean isSimulationAnExample(Simulation simulation) {
         return simulation.getTags() != null &&
                 simulation.getTags().contains(ApplicationConstants.WORKKFLOW_EXAMPLE_TAG);
     }
-//--------------------------------
-    // private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws BusinessException {
-    //     // Build Carmin's execution object
-    //     Execution e = new Execution(
-    //             s.getID(),
-    //             s.getSimulationName(),
-    //             pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
-    //             0, 
-    //             null, 
-    //             null, null,
-    //             s.getDate().getTime(),
-    //             null, null
-    //     );
-
-    //     // Map VIP Simulation status to Carmin standardized status
-    //     if (s.getStatus() != null) {
-    //         e.setStatus(VIPtoCarminStatus(s.getStatus()));
-    //     }
-
-    //     // If the request only asks for a summary return the object 
-    //     if (summarize) return e;
-
-
-    //     String userFolder = currentUserProvider.get().getFolder();
-    //     // Fetch all inputs and outputs associated with this simulation from the db
-    //     List<InOutData> inputs = workflowBusiness.getInputData(s.getID(), userFolder);
-    //     for (InOutData iod : inputs) {
-    //         e.getInputValues().put(iod.getProcessor(), iod.getPath());
-    //     }
-
-    //     List<InOutData> outputs = workflowBusiness.getOutputData(s.getID(), userFolder);
-    //     for (InOutData iod : outputs) {
-    //         e.getReturnedFiles().computeIfAbsent(iod.getProcessor(), k -> new ArrayList<>()).add(iod.getPath());
-    //     }
-
-    //   //JOb precessing
-    //   // Get the list of all jobs for this simulation
-    //   List<Task> tasks = simulationBusiness.getJobsList(s.getID());
-    //     if (tasks == null) tasks = new ArrayList<>();
-
-    //     Map<Integer, Task> latestTaskPerInvocation = new HashMap<>();
-    //     for (Task t : tasks) {
-    //         int invId = t.getInvocationID();
-    //         Task current = latestTaskPerInvocation.get(invId);
-    //         if (current == null || t.getCreationDate().after(current.getCreationDate())) {
-    //             latestTaskPerInvocation.put(invId, t);
-    //         }
-    //     }
-
-    //     // job details 
-    //     //store the specific data for each single job
-    //     Map<Integer, Map<String, Object>> jobsMap = new HashMap<>(); 
-        
-    //     for (Map.Entry<Integer, Task> entry : latestTaskPerInvocation.entrySet()) {
-    //         Integer invocationId = entry.getKey(); 
-    //         Task t = entry.getValue();
-    //         String jobName = t.getFileName(); 
-
-    //         // EXtract to  inputs 
-    //         Map<String, String> jobInputs = new HashMap<>();
-    //         try {
-    //             // Read the job's configuration file (invocation.json) from the "inv" folder
-    //             // This file contains the exact mapping used during execution
-    //             String jsonContent = simulationBusiness.readFile(s.getID(), "inv", jobName, "-invocation.json");
-    //             // If the global input path is found inside the invocation JSON, it means this specific job consumed that file
-    //             if (jsonContent != null && !jsonContent.isEmpty()) {
-    //                 for (InOutData iod : inputs) {
-    //                     if (jsonContent.contains(iod.getPath())) {
-    //                         jobInputs.put(iod.getProcessor(), iod.getPath());
-    //                     }
-    //                 }
-    //             }
-    //         } catch (Exception ex) {
-    //             logger.warn("Impossible de lire le fichier d'invocation pour le job {}", jobName);
-    //         }
-
-    //         // EXtract the outputs
-    //         Map<String, List<String>> jobOutputs = new HashMap<>();
-    //         if (outputs != null && jobName != null) {
-    //             String processorPrefix = jobName.split("-")[0].toLowerCase();
-    //             for (InOutData iod : outputs) {
-    //                 // file belongs to this job if its path contains the job's jobName
-    //                 // or if the processor name matches the job's type
-    //                 if (iod.getPath().contains(jobName) || 
-    //                     iod.getProcessor().toLowerCase().contains(processorPrefix)) {
-    //                     jobOutputs.computeIfAbsent(iod.getProcessor(), k -> new ArrayList<>()).add(iod.getPath());
-    //                 }
-    //             }
-    //         }
-
-    //         //json construction for the job
-    //         // Create the map containing the job details for the JSON response
-    //         Map<String, Object> jobData = new HashMap<>();
-    //         jobData.put("status", (t.getStatus() != null) ? t.getStatus().name() : "UNKNOWN");
-    //         jobData.put("exitCode", t.getExitCode());
-    //         jobData.put("inputs", jobInputs);   
-    //         jobData.put("outputs", jobOutputs);
-    //         jobData.put("jobName", jobName);
-
-    //         // Link the job data to its invocation ID
-    //         jobsMap.put(invocationId, jobData);
-    //     }
-
-    //     e.setJobs(jobsMap);
-    //     return e;
-    // }
 
     @SuppressWarnings("unchecked")
     private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws BusinessException {
-        // Build Carmin's execution object
+        //Build Carmin's execution object
         Execution e = new Execution(
                 s.getID(),
                 s.getSimulationName(),
@@ -407,13 +189,10 @@ public class ExecutionBusiness {
         if (s.getStatus() != null) {
             e.setStatus(VIPtoCarminStatus(s.getStatus()));
         }
-
+        
+        //get the current user's folder to filter file access
         String userFolder = currentUserProvider.get().getFolder();
-        // Fetch all inputs and outputs associated with this simulation from the db
-        // List<InOutData> inputs = workflowBusiness.getInputData(s.getID(), userFolder);
-        // for (InOutData iod : inputs) {
-        //     e.getInputValues().put(iod.getProcessor(), iod.getPath());
-        // }
+
         List<InOutData> inputs = workflowBusiness.getInputData(s.getID(), userFolder);
         for (InOutData iod : inputs) {
             String key = iod.getProcessor();
@@ -527,144 +306,7 @@ public class ExecutionBusiness {
         e.setJobs(jobsMap);
         return e;
     }
-    // ----------------------------------------------------------------
-    // @SuppressWarnings("unchecked")
-    // private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws BusinessException {
-    //     // Build Carmin's execution object
-    //     Execution e = new Execution(
-    //             s.getID(),
-    //             s.getSimulationName(),
-    //             pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
-    //             0, 
-    //             null, 
-    //             null, null,
-    //             s.getDate().getTime(),
-    //             null, null
-    //     );
-
-    //     // Map VIP Simulation status to Carmin standardized status
-    //     if (s.getStatus() != null) {
-    //         e.setStatus(VIPtoCarminStatus(s.getStatus()));
-    //     }
-
-    //      String userFolder = currentUserProvider.get().getFolder();
-    //     // Fetch all inputs and outputs associated with this simulation from the db
-    //     // List<InOutData> inputs = workflowBusiness.getInputData(s.getID(), userFolder);
-    //     // for (InOutData iod : inputs) {
-    //     //     e.getInputValues().put(iod.getProcessor(), iod.getPath());
-    //     // }
-    //     List<InOutData> inputs = workflowBusiness.getInputData(s.getID(), userFolder);
-    //     for (InOutData iod : inputs) {
-    //         String key = iod.getProcessor();
-    //         String value = iod.getPath();
-
-    //         List<Object> values = (List<Object>) e.getInputValues().get(key);
-    //         if (values == null) {
-    //             values = new ArrayList<>();
-    //             e.getInputValues().put(key, values);
-    //         }
-    //         values.add(value);
-    //     }
-
-    //     List<Object> resDirList = (List<Object>) e.getInputValues().get("results-directory");
-    //     if (resDirList != null && !resDirList.isEmpty()) {
-    //     e.setResultsLocation(resDirList.get(0).toString());
-    //     }
-
-    //     // If the request only asks for a summary return the object 
-    //     if (summarize) return e;
-
-       
-    //     List<InOutData> outputs = workflowBusiness.getOutputData(s.getID(), userFolder);
-    //     for (InOutData iod : outputs) {
-    //         e.getReturnedFiles().computeIfAbsent(iod.getProcessor(), k -> new ArrayList<>()).add(iod.getPath());
-    //     }
-
-    //     //JOb precessing
-    //     // Get the list of all jobs for this simulation
-    //     List<Task> tasks = simulationBusiness.getJobsList(s.getID());
-    //     if (tasks == null) tasks = new ArrayList<>();
-
-    //     Map<Integer, Task> latestTaskPerInvocation = new HashMap<>();
-    //     for (Task t : tasks) {
-    //         int invId = t.getInvocationID();
-    //         Task current = latestTaskPerInvocation.get(invId);
-    //         if (current == null || t.getCreationDate().after(current.getCreationDate())) {
-    //             latestTaskPerInvocation.put(invId, t);
-    //         }
-    //     }
-
-    //     // job details 
-    //     //store the specific data for each single job
-    //     Map<Integer, Map<String, Object>> jobsMap = new HashMap<>(); 
-        
-    //     for (Map.Entry<Integer, Task> entry : latestTaskPerInvocation.entrySet()) {
-    //         Integer invocationId = entry.getKey(); 
-    //         Task t = entry.getValue();
-    //         String jobName = t.getFileName(); 
-
-    //         // EXtract to  inputs 
-    //        Map<String, String> jobInputs = new HashMap<>();
-    //     try {
-    //         String jsonContent = simulationBusiness.readFile(s.getID(), "inv", jobName, "-invocation.json");
-            
-    //         if (jsonContent != null && !jsonContent.isEmpty()) {
-    //             for (InOutData iod : inputs) {
-    //                 if (jsonContent.contains(iod.getPath())) {
-    //                     jobInputs.put(iod.getProcessor(), iod.getPath());
-    //                 }
-    //             }
-    //         }
-    //     } catch (Exception ex) {
-    //         logger.warn("file not found {}", jobName);
-    //     }
-
-    //         // EXtract the outputs
-    //         Map<String, List<String>> jobOutputs = new HashMap<>();
-    //         if (outputs != null && jobName != null) {
-    //             for (InOutData iod : outputs) {
-    //                 String filePath = iod.getPath();
-    //                 String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
-                    
-    //                 boolean match = false;
-    //                 // file belongs to this job if its path contains the job's jobName
-    //                 if (filePath.contains(jobName)) {
-    //                     match = true;
-    //                 } 
-    //                 // Or if the filename contains one of the input values (like the pattern)
-    //                 else {
-    //                     for (String inputValue : jobInputs.values()) {
-    //                         if (!inputValue.contains("/") && fileName.contains(inputValue)) {
-    //                             match = true;
-    //                             break;
-    //                         }
-    //                     }
-    //                 }
-
-    //                 if (match) {
-    //                     jobOutputs.computeIfAbsent(iod.getProcessor(), k -> new ArrayList<>()).add(filePath);
-    //                 }
-    //             }
-    //         }
-
-    //         //json construction for the job
-    //         // Create the map containing the job details for the JSON response
-    //         Map<String, Object> jobData = new HashMap<>();
-    //         jobData.put("status", (t.getStatus() != null) ? t.getStatus().name() : "UNKNOWN");
-    //         jobData.put("exitCode", t.getExitCode());
-    //         jobData.put("inputs", jobInputs);   
-    //         jobData.put("outputs", jobOutputs);
-            
-    //         // Replaced jobName with jobName
-    //         jobData.put("jobName", jobName);
-
-    //         // Link the job data to its invocation ID
-    //         jobsMap.put(invocationId, jobData);
-    //     }
-
-    //     e.setJobs(jobsMap);
-    //     return e;
-    // }
+    
     public List<Execution> listExecutions(int maxReturned) throws ApiException {
         try {
 
