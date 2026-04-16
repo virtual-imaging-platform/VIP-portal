@@ -4,6 +4,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URISyntaxException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *  Created by Alae Es-saki on 12/04/2022
@@ -185,5 +189,66 @@ public class ShanoirStorageBusiness {
             logger.error("Cannot get {} from the uri", urlKey.errorKey);
             throw new BusinessException("Cannot get " + urlKey.errorKey + " from the uri");
         }
+    }
+    @SuppressWarnings("unused")
+    public
+    static String adaptUri(String value) {
+        if (value == null || value.isEmpty()) return value;
+        try {
+            URI uri = new URI(value);
+            String scheme = uri.getScheme();
+            
+            if (scheme == null) return value;
+
+            if ("shanoir".equals(scheme)) {
+                return adaptShanoirUri(uri);
+            } else if ("girder".equals(scheme)) {
+                return adaptGirderUri(uri);
+            }
+        } catch (URISyntaxException ex) {
+            return value;
+        }
+        return value;
+    }
+
+    @SuppressWarnings("unused")
+    public
+    static List<String> adaptUriList(List<String> rawList) {
+        if (rawList == null) {
+            return new ArrayList<>();
+        }
+        List<String> cleanList = new ArrayList<>();
+        for (String value : rawList) {
+            cleanList.add(adaptUri(value));
+        }
+        return cleanList;
+    }
+
+    private static String adaptGirderUri(URI uri) {
+        return selectUriQueries(uri, "apiurl", "fileId");
+    }
+
+    private static String adaptShanoirUri(URI uri) {
+        return selectUriQueries(uri, "apiUrl", "upload_url", "resourceId", "type", "format", "keycloak_client_id", "converterId");
+    }
+
+    private static String selectUriQueries(URI uri, String... parametersToKeep) {
+        if (uri.getQuery() == null || uri.getQuery().isEmpty()) {
+            return uri.toString();
+        }
+        
+        List<String> whitelist = java.util.Arrays.asList(parametersToKeep);
+        String newQuery = java.util.Arrays.stream(uri.getQuery().split("&"))
+                .filter(q -> {
+                    int index = q.indexOf("=");
+                    return index > 0 && whitelist.contains(q.substring(0, index));
+                })
+                .collect(java.util.stream.Collectors.joining("&"));
+        
+        String uriStr = uri.toString();
+        int sep = uriStr.indexOf("?");
+        String base = (sep == -1) ? uriStr : uriStr.substring(0, sep);
+        
+        return newQuery.isEmpty() ? base : base + "?" + newQuery;
     }
 }

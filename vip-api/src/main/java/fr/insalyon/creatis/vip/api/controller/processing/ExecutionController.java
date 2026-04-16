@@ -124,7 +124,7 @@ public class ExecutionController extends ApiController {
     public Execution getExecutionSummary(@PathVariable String executionId)
             throws ApiException {
         logMethodInvocation(logger, "getExecutionSummary", executionId);
-        return executionBusiness.getExecution(executionId, true);
+        return executionBusiness.getExecution(executionId, false);
     }
     
 

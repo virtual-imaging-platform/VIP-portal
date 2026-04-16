@@ -423,4 +423,40 @@ public class SimulationBusiness {
             throw new BusinessException(ex);
         }
     }
+
+  public List<String> getJobInputs(String simulationID, String jobName, String currentUserFolder) throws BusinessException {
+        try {
+            List<String> rawInputs = getSimulationDAO(simulationID).getInputData(jobName);
+            List<String> cleanedInputs = new ArrayList<>();
+            
+            for (String rawPath : rawInputs) {
+                String pathWithoutScheme = rawPath.replace("file:", "");
+                String vipPath = lfcPathsBusiness.parseRealDir(pathWithoutScheme, currentUserFolder);
+                cleanedInputs.add(vipPath);
+            }
+            return cleanedInputs;
+            
+        } catch (DAOException | DataManagerException ex) {
+            logger.error("Error getting job inputs for simulation {} and job {}", simulationID, jobName, ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    public List<String> getJobOutputs(String simulationID, String jobName, String currentUserFolder) throws BusinessException {
+        try {
+            List<String> rawOutputs = getSimulationDAO(simulationID).getOutputData(jobName);
+            List<String> cleanedOutputs = new ArrayList<>();
+            
+            for (String rawPath : rawOutputs) {
+                String pathWithoutScheme = rawPath.replace("file:", "");
+                String vipPath = lfcPathsBusiness.parseRealDir(pathWithoutScheme, currentUserFolder);
+                cleanedOutputs.add(vipPath);
+            }
+            return cleanedOutputs;
+            
+        } catch (DAOException | DataManagerException ex) {
+            logger.error("Error getting job outputs for simulation {} and job {}", simulationID, jobName, ex);
+            throw new BusinessException(ex);
+        }
+    }
 }

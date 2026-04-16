@@ -47,6 +47,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.ShanoirStorageBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,7 @@ import java.util.function.Supplier;
 
 import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.INPUT_VALID_CHARS;
+import static fr.insalyon.creatis.vip.core.client.view.CoreConstants.RESULTS_DIRECTORY_PARAM_NAME;
 
 /**
  *
@@ -103,7 +105,10 @@ public class ExecutionBusiness {
             Simulation s = workflowBusiness.getSimulation(executionId);
             List<Task> tasks = simulationBusiness.getJobsList(s.getID());
 
-            if (tasks.isEmpty()) return "no log found";
+            if (tasks.isEmpty()) {
+                logger.debug("Warning: no .sh.out log file found for execution ID = {} ", executionId);
+                return "no log found";
+            }
 
             String extension = ".sh.app." + type;
             Task targetTask = null;
@@ -111,6 +116,9 @@ public class ExecutionBusiness {
             if (invocationId == null) {
                 if (tasks.size() == 1) {
                     targetTask = tasks.get(0);
+                    logger.debug("jobId is null, using the only available task with ID = {}",
+                    targetTask.getId());
+
                 } else {
                     return "jobId is required when multiple tasks exist";
                 }
@@ -121,7 +129,10 @@ public class ExecutionBusiness {
                         .orElse(null);
             }
 
-            if (targetTask == null) return "no log found for job " + invocationId;
+                if (targetTask == null) {
+                logger.debug("No job {} found for execution ID = {}", invocationId, executionId);
+                return "no log found for job " + invocationId;
+            }
 
             String fileName = targetTask.getFileName();
             return (fileName != null) ? 
@@ -165,7 +176,6 @@ public class ExecutionBusiness {
         }
     }
 
-
     private boolean isSimulationAnExample(Simulation simulation) {
         return simulation.getTags() != null &&
                 simulation.getTags().contains(ApplicationConstants.WORKKFLOW_EXAMPLE_TAG);
@@ -173,31 +183,37 @@ public class ExecutionBusiness {
 
     @SuppressWarnings("unchecked")
     private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws BusinessException {
-        //Build Carmin's execution object
+
+        // Initialize the CARMIN Execution object with basic simulation metadata
         Execution e = new Execution(
                 s.getID(),
                 s.getSimulationName(),
                 pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
-                0, 
+                0,// timeout (no timeout set in VIP)
                 null, 
-                null, null,
+                null, // study identifier (not available in VIP yet)
+                null,// error codes and mesasges (not available in VIP yet)
                 s.getDate().getTime(),
-                null, null
+                null,// last status modification date (not available in VIP yet)
+                null// results location (not available in VIP yet)
         );
+
+        if (summarize) 
+            {return e;}
 
         // Map VIP Simulation status to Carmin standardized status
         if (s.getStatus() != null) {
             e.setStatus(VIPtoCarminStatus(s.getStatus()));
         }
-        
         //get the current user's folder to filter file access
         String userFolder = currentUserProvider.get().getFolder();
 
+        // retrieves all input data associated with this simulation
         List<InOutData> inputs = workflowBusiness.getInputData(s.getID(), userFolder);
         for (InOutData iod : inputs) {
-            String key = iod.getProcessor();
-            String value = iod.getPath();
-
+            String key = iod.getProcessor(); 
+            // Sanitize URI to remove sensitive tokens before exposing to the API
+            String value = ShanoirStorageBusiness.adaptUri(iod.getPath());
             List<Object> values = (List<Object>) e.getInputValues().get(key);
             if (values == null) {
                 values = new ArrayList<>();
@@ -205,27 +221,32 @@ public class ExecutionBusiness {
             }
             values.add(value);
         }
-
-        // Ajout du results-directory dans resultsLocation
-        List<Object> resDirList = (List<Object>) e.getInputValues().get("results-directory");
+        // retrieves results directory
+        List<Object> resDirList = (List<Object>) e.getInputValues().get(RESULTS_DIRECTORY_PARAM_NAME);
         if (resDirList != null && !resDirList.isEmpty()) {
             e.setResultsLocation(resDirList.get(0).toString());
         }
 
-        // If the request only asks for a summary return the object 
-        if (summarize) return e;
-
         List<InOutData> outputs = workflowBusiness.getOutputData(s.getID(), userFolder);
         for (InOutData iod : outputs) {
-            e.getReturnedFiles().computeIfAbsent(iod.getProcessor(), k -> new ArrayList<>()).add(iod.getPath());
+            String key = iod.getProcessor();
+            // Sanitize output URI to ensure security and persistence
+            String value = ShanoirStorageBusiness.adaptUri(iod.getPath());
+        
+            List<Object> fileList = (List<Object>) e.getReturnedFiles().get(key);
+            if (fileList == null) {
+                fileList = new ArrayList<Object>();
+                e.getReturnedFiles().put(key, fileList);
+            }
+            fileList.add(value);
         }
 
-        //JOb precessing
-        // Get the list of all jobs for this simulation
         List<Task> tasks = simulationBusiness.getJobsList(s.getID());
         if (tasks == null) tasks = new ArrayList<>();
 
         Map<Integer, Task> latestTaskPerInvocation = new HashMap<>();
+
+        // Group tasks by invocation ID to keep only the most recent attempt for each job
         for (Task t : tasks) {
             int invId = t.getInvocationID();
             Task current = latestTaskPerInvocation.get(invId);
@@ -234,79 +255,41 @@ public class ExecutionBusiness {
             }
         }
 
-        // job details 
-        //store the specific data for each single job
         Map<Integer, Map<String, Object>> jobsMap = new HashMap<>(); 
-        
+        //  detailed job data including sanitized inputs and outputs
         for (Map.Entry<Integer, Task> entry : latestTaskPerInvocation.entrySet()) {
             Integer invocationId = entry.getKey(); 
             Task t = entry.getValue();
             String jobName = t.getFileName(); 
 
-            // EXtract to inputs 
-           Map<String, String> jobInputs = new HashMap<>();
-            try {
-                String jsonContent = simulationBusiness.readFile(s.getID(), "inv", jobName, "-invocation.json");
-                
-                if (jsonContent != null && !jsonContent.isEmpty()) {
-                    for (InOutData iod : inputs) {
-                        String fullPath = iod.getPath();
-                        String fileName = fullPath.substring(fullPath.lastIndexOf("/") + 1);
+            List<String> jobInputs = new ArrayList<>();
+            List<String> jobOutputs = new ArrayList<>();
 
-                        if (jsonContent.contains(fullPath) || jsonContent.contains(fileName)) {
-                            jobInputs.put(iod.getProcessor(), fullPath);
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                logger.warn("Impossible de lire l'invocation pour {}", jobName);
-            }
+        try {
+            List<String> dbInputs = simulationBusiness.getJobInputs(s.getID(), jobName, userFolder);
+            List<String> dbOutputs = simulationBusiness.getJobOutputs(s.getID(), jobName, userFolder);
 
-            // EXtract the outputs
-            Map<String, List<String>> jobOutputs = new HashMap<>();
-            if (outputs != null && jobName != null) {
-                for (InOutData iod : outputs) {
-                    String filePath = iod.getPath();
-                    String fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
-                    
-                    boolean match = false;
-                    // file belongs to this job if its path contains the job's jobName
-                    if (filePath.contains(jobName)) {
-                        match = true;
-                    } 
-                    // Or if the filename contains one of the input values (like the pattern)
-                    else {
-                        for (String inputValue : jobInputs.values()) {
-                            if (!inputValue.contains("/") && fileName.contains(inputValue)) {
-                                match = true;
-                                break;
-                            }
-                        }
-                    }
+            jobInputs.addAll(ShanoirStorageBusiness.adaptUriList(dbInputs));
+            jobOutputs.addAll(ShanoirStorageBusiness.adaptUriList(dbOutputs));
+            
+        } catch (Exception ex) {
+            logger.error("H2 Data Extraction failed for job: {} in simulation {}", jobName, s.getID(), ex);
+        }
 
-                    if (match) {
-                        jobOutputs.computeIfAbsent(iod.getProcessor(), k -> new ArrayList<>()).add(filePath);
-                    }
-                }
-            }
-
-            //json construction for the job
-            // Create the map containing the job details for the JSON response
+            // Build the data structure 
             Map<String, Object> jobData = new HashMap<>();
             jobData.put("status", (t.getStatus() != null) ? t.getStatus().name() : "UNKNOWN");
             jobData.put("exitCode", t.getExitCode());
+            jobData.put("jobName", jobName);
             jobData.put("inputs", jobInputs);   
             jobData.put("outputs", jobOutputs);
-            jobData.put("jobName", jobName);
-            // Link the job data to its invocation ID
-        
             jobsMap.put(invocationId, jobData);
         }
-
+        // Attach the compiled jobs map to the Execution object
         e.setJobs(jobsMap);
         return e;
     }
-    
+
     public List<Execution> listExecutions(int maxReturned) throws ApiException {
         try {
 

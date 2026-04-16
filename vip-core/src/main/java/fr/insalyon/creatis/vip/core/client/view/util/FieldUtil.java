@@ -1,5 +1,10 @@
 package fr.insalyon.creatis.vip.core.client.view.util;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.net.URI;
+
 import com.google.gwt.i18n.client.NumberFormat;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DateDisplayFormat;
@@ -330,4 +335,24 @@ public class FieldUtil {
         link.addClickHandler(clickHandler);
         return link;
     }
+
+    // @SuppressWarnings("unused")
+    // private static String selectUriQueries(URI uri, String... parametersToKeep){
+    //     if (uri.getQuery() == null) {
+    //         return uri.toString();
+    //     }
+    //     List<String> queryWhiteList = Arrays.asList(parametersToKeep);
+    //     String newQuery = Arrays.stream(uri.getQuery().split("&"))
+    //             .filter(q -> {
+    //                 int index = q.indexOf("=");
+    //                 if (index < 0) return false;
+    //                 return queryWhiteList.contains(q.substring(0,index));
+    //             })
+    //             .collect(Collectors.joining("&"));
+    //     // build a new URI
+    //     String newUri = uri.toString();
+    //     newUri = newUri.substring(0, newUri.indexOf("?"));
+    //     return newUri + "?" + newQuery;
+    // }
+    
 }
