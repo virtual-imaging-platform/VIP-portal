@@ -80,7 +80,7 @@ public class ExecutionBusinessTest {
     private Simulation prepareSimulation(String exedId, SimulationStatus status, int userIndex) {
         User creator = prepareTestUser(userIndex, false);
         return new Simulation(null, null, null, exedId, creator.getFullName(), null, null,
-                status.name(), null, null);
+                status.name(), null, null, exedId);
     }
 
     private WorkflowBusiness prepareMockedWorkflowBusiness(String execId, Simulation simu) throws Exception {

@@ -18,6 +18,7 @@ public class Simulation implements IsSerializable {
     private String simulationName;
     private String userName;
     private Date date;
+    private Date endDate;
     private SimulationStatus status;
     private String engine;
     private String tags;
@@ -26,13 +27,14 @@ public class Simulation implements IsSerializable {
     }
 
     public Simulation(String application, String applicationVersion,
-            String applicationClass, String id, String userName, Date date, 
+            String applicationClass, String id, String userName, Date date, Date endDate, 
             String simulationName, String status, String engine, String tags) {
 
         this.applicationName = application;
         this.applicationVersion = applicationVersion;
         this.applicationClass = applicationClass;
         this.id = id;
+        this.endDate = endDate;
         this.userName = userName;
         this.date = date;
         this.simulationName = simulationName;
@@ -96,6 +98,14 @@ public class Simulation implements IsSerializable {
 
     public void setSimulationName(String simulationName) {
         this.simulationName = simulationName;
+    }
+
+    public Date getEndDate() {
+            return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
     
 }

@@ -677,6 +677,7 @@ public class WorkflowBusiness {
                     workflow.getId(),
                     workflow.getUsername(),
                     workflow.getStartedTime(),
+                    workflow.getFinishedTime(),
                     workflow.getDescription(),
                     workflow.getStatus().name(),
                     workflow.getEngine(),

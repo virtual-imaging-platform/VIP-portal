@@ -5,6 +5,7 @@ import static fr.insalyon.creatis.vip.core.client.view.CoreConstants.RESULTS_DIR
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -149,16 +150,26 @@ public class ExecutionBusiness {
     private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws VipException {
         // Build Carmin's execution object
         Execution e = new Execution(
+                // s.getID(),
+                // s.getSimulationName(),
+                // pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
+                // 0,// timeout (no timeout set in VIP)
+                // s.getStatus() == null ? null : convertVIPtoCarminStatus(s.getStatus()),
+                // null, // study identifier (not available in VIP yet)
+                // null,// error codes and mesasges (not available in VIP yet)
+                // s.getDate().getTime(),
+                // null,// last status modification date (not available in VIP yet)
+                // null// results location (not available in VIP yet)
                 s.getID(),
                 s.getSimulationName(),
                 pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
-                0,// timeout (no timeout set in VIP)
+                0, // timeout
                 s.getStatus() == null ? null : convertVIPtoCarminStatus(s.getStatus()),
-                null, // study identifier (not available in VIP yet)
-                null,// error codes and mesasges (not available in VIP yet)
-                s.getDate().getTime(),
-                null,// last status modification date (not available in VIP yet)
-                null// results location (not available in VIP yet)
+                null, // study identifier
+                null, // error codes
+                s.getDate().getTime(), // startDate
+                s.getEndDate() != null ? ((Date) s.getEndDate()).getTime() : null, 
+                null  // results location
         );
 
         if (summarize) {
@@ -173,10 +184,8 @@ public class ExecutionBusiness {
         for (InOutData iod : inputs) {
             String key = iod.getProcessor();
             String value = iod.getPath();
-            if (e.getInputValues().containsKey(key)) {
-                e.getInputValues().put(key, new ArrayList<>());
-            }
-            ((List<Object>) e.getInputValues().get(key)).add(value);
+            
+            ((List<Object>) e.getInputValues().computeIfAbsent(key, k -> new ArrayList<>())).add(value);
         }
         // retrieves results directory
         List<Object> resDirList = (List<Object>) e.getInputValues().get(RESULTS_DIRECTORY_PARAM_NAME);
