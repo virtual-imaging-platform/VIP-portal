@@ -154,10 +154,10 @@ public class ExecutionBusiness {
                 pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
                 0, // timeout
                 s.getStatus() == null ? null : convertVIPtoCarminStatus(s.getStatus()),
-                null, // study identifier
-                null, // error codes
+                null, //study identifier (not available in VIP yet)
+                null, //  error codes and mesasges (not available in VIP yet)
                 s.getDate().getTime(), // startDate
-                s.getEndDate() != null ? ((Date) s.getEndDate()).getTime() : null, 
+                s.getEndDate() != null ? ((Date) s.getEndDate()).getTime() : null, //endDate
                 null  // results location
         );
 
