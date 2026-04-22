@@ -29,16 +29,18 @@ public class ExecutionBusinessTest {
     public void checkIfAdminCanAccessAnyExecution() throws Exception {
         Supplier<User> userSupplier = () -> prepareTestUser(0, true);
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, new Simulation());
-        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
+        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null, null, null);
         sut.checkIfUserCanAccessExecution(EXEC_ID);
     }
 
     @Test
     public void checkIfBasicUserCannotAccessAnyExecution() throws Exception {
         Supplier<User> userSupplier = () -> prepareTestUser(0, false);
-        Simulation simulation = prepareRunningSimulation(EXEC_ID, 1); // choose a different user
+        Simulation simulation = prepareRunningSimulation(EXEC_ID, 1); 
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
-        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
+        
+        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null, null, null);
+        
         VipException vipException = assertThrows(VipException.class,
             () -> sut.checkIfUserCanAccessExecution(EXEC_ID)
         );
@@ -50,7 +52,7 @@ public class ExecutionBusinessTest {
         Supplier<User> userSupplier = () -> prepareTestUser(0, false);
         Simulation simulation = prepareRunningSimulation(EXEC_ID, 0); // the creator of the execution is the same user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
-        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
+        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null, null, null);
         sut.checkIfUserCanAccessExecution(EXEC_ID);
     }
 
@@ -59,7 +61,7 @@ public class ExecutionBusinessTest {
         Supplier<User> userSupplier = () -> prepareTestUser(0, false);
         Simulation simulation = prepareSimulation(EXEC_ID, SimulationStatus.Cleaned, 0); // the creator of the execution is the same user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
-        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
+        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null, null, null);
         VipException ex = Assertions.assertThrows(VipException.class, () -> sut.getExecution(EXEC_ID, false));
         Assertions.assertEquals(ApiError.INVALID_EXECUTION_ID.getCode(), ex.getVipErrorCode());
     }
@@ -77,11 +79,23 @@ public class ExecutionBusinessTest {
     }
 
     private Simulation prepareSimulation(String exedId, SimulationStatus status, int userIndex) {
-        User creator = prepareTestUser(userIndex, false);
-        return new Simulation(null, null, null, exedId, creator.getFullName(), null, null,
-                status.name(), null, null, exedId);
-    }
-
+            User creator = prepareTestUser(userIndex, false);
+        
+            return new Simulation(
+                "simuName",
+                "1.0",
+                null,
+                exedId,
+                creator.getFullName(),
+                new java.util.Date(),
+                null,
+                "description",
+                status.toString(),
+                "engine",
+                null
+            );
+                
+        }
     private WorkflowBusiness prepareMockedWorkflowBusiness(String execId, Simulation simu) throws Exception {
         WorkflowBusiness mockedWb = Mockito.mock(WorkflowBusiness.class);
         Mockito.when(mockedWb.getSimulation(execId)).thenReturn(simu);

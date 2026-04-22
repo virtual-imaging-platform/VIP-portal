@@ -63,7 +63,7 @@ public class ExecutionBusiness {
                              PipelineBusiness pipelineBusiness,
                              DataApiBusiness dataApiBusiness,
                              UserBusiness userBusiness,
-                             ExternalPlatformBusiness externalPlatformBusiness) {
+                             ExternalPlatformBusiness externalPlatformBusiness, Object object, Object object2) {
         this.currentUserProvider = currentUserProvider;
         this.simulationBusiness = simulationBusiness;
         this.workflowBusiness = workflowBusiness;
