@@ -150,32 +150,21 @@ public class ExecutionBusiness {
     private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws VipException {
         // Build Carmin's execution object
         Execution e = new Execution(
-                // s.getID(),
-                // s.getSimulationName(),
-                // pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
-                // 0,// timeout (no timeout set in VIP)
-                // s.getStatus() == null ? null : convertVIPtoCarminStatus(s.getStatus()),
-                // null, // study identifier (not available in VIP yet)
-                // null,// error codes and mesasges (not available in VIP yet)
-                // s.getDate().getTime(),
-                // null,// last status modification date (not available in VIP yet)
-                // null// results location (not available in VIP yet)
                 s.getID(),
                 s.getSimulationName(),
                 pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
                 0, // timeout
                 s.getStatus() == null ? null : convertVIPtoCarminStatus(s.getStatus()),
-                null, // study identifier
-                null, // error codes
+                null, //study identifier (not available in VIP yet)
+                null, //  error codes and mesasges (not available in VIP yet)
                 s.getDate().getTime(), // startDate
-                s.getEndDate() != null ? ((Date) s.getEndDate()).getTime() : null, 
+                s.getEndDate() != null ? ((Date) s.getEndDate()).getTime() : null, //endDate
                 null  // results location
         );
 
         if (summarize) {
                 return e;
         }
-
         //get the current user's folder to filter file access
         String userFolder = currentUserProvider.get().getFolder();
 
