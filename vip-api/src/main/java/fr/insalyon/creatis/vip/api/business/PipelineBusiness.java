@@ -151,6 +151,7 @@ public class PipelineBusiness {
         p.setDescription(boutiques.getDescription());
 
         Map<String, String> overriddenInputs = boutiquesBusiness.getOverriddenInputs(boutiques);
+        List<String> dotInputs = boutiquesBusiness.getDotInputs(boutiques);
         for (Input input : boutiques.getInputs()) {
             if (overriddenInputs != null && overriddenInputs.containsKey(input.getId())) {
                 continue; // hide overriddenInputs from pipeline visible parameters
@@ -165,6 +166,11 @@ public class PipelineBusiness {
         if (overriddenInputs != null) {
             p.setOverriddenInputs(overriddenInputs);
         }
+
+        if (dotInputs != null) {
+            p.setDotInputs(dotInputs);
+        }
+
         return p;
     }
 

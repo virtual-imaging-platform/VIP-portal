@@ -155,21 +155,12 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                                         String applicationName, String applicationVersion) throws VipException {
         AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
         BoutiquesDescriptor descriptor = boutiquesBusiness.parseBoutiquesString(appVersion.getDescriptor());
-
-        final String dotKeyName = "vip:dot";
-        if (!descriptor.getCustom().getAdditionalProperties().containsKey(dotKeyName)) {
-            return;
-        }
-
-        Object dotInputs = descriptor.getCustom().getAdditionalProperties().get(dotKeyName);
-        if (!(dotInputs instanceof List)) {
-            return;
-        }
         // Get the string list of dot inputs
-        List<String> dotInputList = ((List<?>) dotInputs).stream()
-                .filter(String.class::isInstance)
-                .map(String.class::cast)
-                .toList();
+        List<String> dotInputList = boutiquesBusiness.getDotInputs(descriptor);
+        if (dotInputList == null || dotInputList.isEmpty()) {
+            return;
+        }
+
         // Build a map of inputId to Input for easy lookup
         Map<String, Input> dotInputsById = descriptor.getInputs().stream()
                 .filter(input ->  dotInputList.contains(input.getId()))

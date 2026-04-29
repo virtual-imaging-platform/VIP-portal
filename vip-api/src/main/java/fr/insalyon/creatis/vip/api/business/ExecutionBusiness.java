@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
+import java.util.Collections;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -435,21 +438,8 @@ public class ExecutionBusiness {
             throw new VipException(ApiError.INPUT_FIELD_MISSING, pp.getName());
         }
 
-        // fill in overriddenInputs from explicit inputs
-        Map<String, String> overriddenInputs = p.getOverriddenInputs();
-        if (overriddenInputs != null) {
-            for (String key : overriddenInputs.keySet()) {
-                String value = overriddenInputs.get(key);
-                for (Map<String, String> inputMap : inputValues) {
-                    if (inputMap.containsKey(value)) {
-                        inputMap.put(key, inputMap.get(value));
-                    } else {
-                        logger.error("Error initialising {}, missing {} parameter", pipelineId, value);
-                        throw new VipException(ApiError.INPUT_FIELD_MISSING, value);
-                    }
-                }
-            }
-        }
+        fillInOverriddenInputs(inputValues, p);
+        fillInDefaultDotInputs(inputValues, p);
 
         boolean inputsContainsResultsDirectoryInput = inputValues.stream()
                 .allMatch(inputMap -> inputMap.containsKey(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));
@@ -557,4 +547,78 @@ public class ExecutionBusiness {
         throw new VipException("Permission denied");
     }
 
+    private void fillInOverriddenInputs(List<Map<String, String>> inputValues, Pipeline p) throws VipException {
+        // fill in overriddenInputs from explicit inputs
+        Map<String, String> overriddenInputs = p.getOverriddenInputs();
+        if (overriddenInputs != null) {
+            for (String key : overriddenInputs.keySet()) {
+                String value = overriddenInputs.get(key);
+                for (Map<String, String> inputMap : inputValues) {
+                    if (inputMap.containsKey(value)) {
+                        inputMap.put(key, inputMap.get(value));
+                    } else {
+                        logger.error("Error initialising {}, missing {} parameter", p.getIdentifier(), value);
+                        throw new VipException(ApiError.INPUT_FIELD_MISSING, value);
+                    }
+                }
+            }
+        }
+    }
+
+    private void fillInDefaultDotInputs(List<Map<String, String>> inputValues, Pipeline p) throws VipException {
+        List<String> dotInputList = p.getDotInputs();
+        if (dotInputList == null || dotInputList.isEmpty()) {
+            return;
+        }
+
+        boolean isInputMapList = inputValues.size() > 1;
+        // Find the maximum number of dot inputs
+        int dotMaxCount = isInputMapList ? 1 : inputValues.getFirst().entrySet().stream()
+            .filter(entry -> dotInputList.contains(entry.getKey()))
+            .mapToInt(v -> v.getValue().split(ApplicationConstants.SEPARATOR_LIST, -1).length)
+            .max()
+            .orElse(1);
+
+        ArrayList<PipelineParameter> dotParameters = p.getParameters().stream()
+                .filter(pp -> dotInputList.contains(pp.getName()))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        for (PipelineParameter pp : dotParameters) {
+            // always true on vip
+            if (pp.isReturnedValue()) {
+                continue;
+            }
+
+            if (pp.getDefaultValue() == null) {
+                continue;
+            }
+
+            String defaultVal = pp.getDefaultValue().toString();
+            for (Map<String, String> inputMap : inputValues) {
+                if (!inputMap.containsKey(pp.getName())) {
+                    // One map per job
+                    if (isInputMapList) {
+                        inputMap.put(pp.getName(), defaultVal);
+                    } else {
+                        inputMap.put(pp.getName(),
+                            String.join(ApplicationConstants.SEPARATOR_LIST,
+                                    Collections.nCopies(dotMaxCount, defaultVal)));
+                    }
+                } else {
+                    String[] currentValues = inputMap.get(pp.getName())
+                            .split(ApplicationConstants.SEPARATOR_LIST, -1);
+                    // Complete the input with default values if it has fewer values than the maximum
+                    if (currentValues.length < dotMaxCount) {
+                        List<String> valuesList = new ArrayList<>(Arrays.asList(currentValues));
+                        while (valuesList.size() < dotMaxCount) {
+                            valuesList.add(defaultVal);
+                        }
+
+                        inputMap.put(pp.getName(),
+                                String.join(ApplicationConstants.SEPARATOR_LIST, valuesList));
+                    }
+                }
+            }
+        }
+    }
 }

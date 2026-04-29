@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Pipeline {
@@ -16,6 +17,8 @@ public class Pipeline {
     private boolean canExecute;
     @JsonIgnore
     private Map<String, String> overriddenInputs;
+    @JsonIgnore
+    private List<String> dotInputs;
 
     public Pipeline() {
     }
@@ -64,4 +67,13 @@ public class Pipeline {
     public void setOverriddenInputs(Map<String, String> overriddenInputs) {
         this.overriddenInputs = overriddenInputs;
     }
+
+    public List<String> getDotInputs() {
+        return dotInputs;
+    }
+
+    public void setDotInputs(List<String> dotInputs) {
+        this.dotInputs = dotInputs;
+    }
+
 }

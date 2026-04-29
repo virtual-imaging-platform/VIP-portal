@@ -272,4 +272,27 @@ public class BoutiquesBusiness {
         }
         return result;
     }
+
+    public List<String> getDotInputs(BoutiquesDescriptor descriptor) {
+        final String customKeyName = "vip:dot";
+        Custom custom = descriptor.getCustom();
+        if (custom == null) {
+            return null;
+        }
+
+        Map<String, Object> customProperties = custom.getAdditionalProperties();
+        if (!customProperties.containsKey(customKeyName)) {
+            return null;
+        }
+;
+        Object dotInputs = customProperties.get(customKeyName);
+        if (!(dotInputs instanceof List)) {
+            return null;
+        }
+
+        return ((List<?>) dotInputs).stream()
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .toList();
+    }
 }
