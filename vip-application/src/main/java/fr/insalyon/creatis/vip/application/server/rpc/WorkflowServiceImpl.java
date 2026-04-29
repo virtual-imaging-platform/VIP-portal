@@ -4,18 +4,23 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.Input;
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.models.Activity;
 import fr.insalyon.creatis.vip.application.models.AppVersion;
 import fr.insalyon.creatis.vip.application.models.InOutData;
@@ -146,6 +151,65 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
+    private void fillInDefaultDotInputs(Map<String, String> parametersMap,
+                                        String applicationName, String applicationVersion) throws VipException {
+        AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
+        BoutiquesDescriptor descriptor = boutiquesBusiness.parseBoutiquesString(appVersion.getDescriptor());
+
+        final String dotKeyName = "vip:dot";
+        if (!descriptor.getCustom().getAdditionalProperties().containsKey(dotKeyName)) {
+            return;
+        }
+
+        Object dotInputs = descriptor.getCustom().getAdditionalProperties().get(dotKeyName);
+        if (!(dotInputs instanceof List)) {
+            return;
+        }
+        // Get the string list of dot inputs
+        List<String> dotInputList = ((List<?>) dotInputs).stream()
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .toList();
+        // Build a map of inputId to Input for easy lookup
+        Map<String, Input> dotInputsById = descriptor.getInputs().stream()
+                .filter(input ->  dotInputList.contains(input.getId()))
+                .collect(Collectors.toMap(Input::getId, i -> i));
+        // Find the maximum number of dot inputs
+        int dotMaxCount = parametersMap.entrySet().stream()
+                .filter(entry -> dotInputsById.containsKey(entry.getKey()))
+                .mapToInt(v -> v.getValue().split(ApplicationConstants.SEPARATOR_LIST, -1).length)
+                .max()
+                .orElse(1);
+
+        for (Input dotInput : dotInputsById.values()) {
+            if (dotInput.getDefaultValue() == null) {
+                continue;
+            }
+
+            String defaultVal = dotInput.getDefaultValue().toString();
+            String dotInputId = dotInput.getId();
+            // If the input is not set, fill it with default values
+            if (!parametersMap.containsKey(dotInputId)) {
+                parametersMap.put(dotInputId,
+                        String.join(ApplicationConstants.SEPARATOR_LIST,
+                                Collections.nCopies(dotMaxCount, defaultVal)));
+            } else {
+                String[] currentValues = parametersMap.get(dotInputId)
+                        .split(ApplicationConstants.SEPARATOR_LIST, -1);
+                // Complete the input with default values if it has fewer values than the maximum
+                if (currentValues.length < dotMaxCount) {
+                    List<String> valuesList = new ArrayList<>(Arrays.asList(currentValues));
+                    while (valuesList.size() < dotMaxCount) {
+                        valuesList.add(defaultVal);
+                    }
+
+                    parametersMap.put(dotInputId,
+                            String.join(ApplicationConstants.SEPARATOR_LIST, valuesList));
+              }
+            }
+        }
+    }
+
     @Override
     public void launchSimulation(Map<String, String> parametersMap,
             String applicationName, String applicationVersion,
@@ -164,7 +228,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         for (Map.Entry<String, String> p : parametersMap.entrySet()) {
             logger.info("received param {} : {}", p.getKey(), p.getValue());
         }
+
         fillInOverriddenInputs(parametersMap, applicationName, applicationVersion);
+        fillInDefaultDotInputs(parametersMap, applicationName, applicationVersion);
         List<Map<String, String>> parametersMaps = new ArrayList<>();
         parametersMaps.add(parametersMap);
         String simulationID = workflowBusiness.launch(user, groups,
