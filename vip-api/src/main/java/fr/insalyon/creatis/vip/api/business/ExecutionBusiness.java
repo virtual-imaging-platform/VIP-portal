@@ -579,46 +579,37 @@ public class ExecutionBusiness {
             .max()
             .orElse(1);
 
-        ArrayList<PipelineParameter> dotParameters = p.getParameters().stream()
-                .filter(pp -> dotInputList.contains(pp.getName()))
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        for (PipelineParameter pp : dotParameters) {
-            // always true on vip
-            if (pp.isReturnedValue()) {
-                continue;
-            }
-
-            if (pp.getDefaultValue() == null) {
-                continue;
-            }
-
-            String defaultVal = pp.getDefaultValue().toString();
-            for (Map<String, String> inputMap : inputValues) {
-                if (!inputMap.containsKey(pp.getName())) {
-                    // One map per job
-                    if (isInputMapList) {
-                        inputMap.put(pp.getName(), defaultVal);
-                    } else {
-                        inputMap.put(pp.getName(),
-                            String.join(ApplicationConstants.SEPARATOR_LIST,
-                                    Collections.nCopies(dotMaxCount, defaultVal)));
-                    }
-                } else {
-                    String[] currentValues = inputMap.get(pp.getName())
-                            .split(ApplicationConstants.SEPARATOR_LIST, -1);
-                    // Complete the input with default values if it has fewer values than the maximum
-                    if (currentValues.length < dotMaxCount) {
-                        List<String> valuesList = new ArrayList<>(Arrays.asList(currentValues));
-                        while (valuesList.size() < dotMaxCount) {
-                            valuesList.add(defaultVal);
+        p.getParameters().stream()
+            .filter(pp -> dotInputList.contains(pp.getName()))
+            .filter(pp -> !pp.isReturnedValue())
+            .filter(pp -> pp.getDefaultValue() != null)
+            .forEach(pp -> {
+                String defaultVal = pp.getDefaultValue().toString();
+                for (Map<String, String> inputMap : inputValues) {
+                    if (!inputMap.containsKey(pp.getName())) {
+                        // One map per job
+                        if (isInputMapList) {
+                            inputMap.put(pp.getName(), defaultVal);
+                        } else {
+                            inputMap.put(pp.getName(),
+                                    String.join(ApplicationConstants.SEPARATOR_LIST,
+                                            Collections.nCopies(dotMaxCount, defaultVal)));
                         }
+                    } else {
+                        String[] currentValues = inputMap.get(pp.getName())
+                                .split(ApplicationConstants.SEPARATOR_LIST, -1);
+                        // Complete the input with default values if it has fewer values than the maximum
+                        if (currentValues.length < dotMaxCount) {
+                            List<String> valuesList = new ArrayList<>(Arrays.asList(currentValues));
+                            while (valuesList.size() < dotMaxCount) {
+                                valuesList.add(defaultVal);
+                            }
 
-                        inputMap.put(pp.getName(),
-                                String.join(ApplicationConstants.SEPARATOR_LIST, valuesList));
+                            inputMap.put(pp.getName(),
+                                    String.join(ApplicationConstants.SEPARATOR_LIST, valuesList));
+                        }
                     }
                 }
-            }
-        }
+            });
     }
 }
