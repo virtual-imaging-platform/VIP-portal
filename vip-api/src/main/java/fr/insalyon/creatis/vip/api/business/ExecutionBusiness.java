@@ -145,7 +145,8 @@ public class ExecutionBusiness {
 
         return getExecutionFromSimulation(s, summarize);
     }
-
+    
+    @SuppressWarnings("unchecked")
     private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws VipException {
         // Build Carmin's execution object
         Execution e = new Execution(
