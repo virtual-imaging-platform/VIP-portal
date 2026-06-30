@@ -69,6 +69,8 @@ public interface ApplicationService extends RemoteService {
     public void removeEngine(String engineName) throws VipException;
     
     public List<Engine> getEngines() throws VipException;
+
+    public Engine getEngine(String engineName) throws VipException;
     
     public String addResource(Resource resource) throws VipException;
 

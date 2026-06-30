@@ -25,7 +25,7 @@ public class EngineIT extends BaseApplicationSpringIT {
     @Test
     public void testInitialization() throws VipException {
         // verify engines number
-        Assertions.assertEquals(1, engineBusiness.get().size());
+        Assertions.assertEquals(1, engineBusiness.getAll().size());
 
         // verify engine1 properties
         Assertions.assertEquals("test engine", engine.getName());
@@ -43,12 +43,12 @@ public class EngineIT extends BaseApplicationSpringIT {
         engineBusiness.add(engine2);
 
         // verify engines number
-        Assertions.assertEquals(2, engineBusiness.get().size());
+        Assertions.assertEquals(2, engineBusiness.getAll().size());
 
         // verify engine2 properties
-        Assertions.assertEquals("test engine 2", engineBusiness.get().get(1).getName());
-        Assertions.assertEquals("test endpoint 2", engineBusiness.get().get(1).getEndpoint());
-        Assertions.assertEquals("enabled", engineBusiness.get().get(1).getStatus());
+        Assertions.assertEquals("test engine 2", engineBusiness.getAll().get(1).getName());
+        Assertions.assertEquals("test endpoint 2", engineBusiness.getAll().get(1).getEndpoint());
+        Assertions.assertEquals("enabled", engineBusiness.getAll().get(1).getStatus());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class EngineIT extends BaseApplicationSpringIT {
         engineBusiness.update(engine);
 
         // verify engines number
-        Assertions.assertEquals(1, engineBusiness.get().size());
+        Assertions.assertEquals(1, engineBusiness.getAll().size());
 
         // verify engine1 properties
         Assertions.assertEquals("test engine", engine.getName());
@@ -105,7 +105,7 @@ public class EngineIT extends BaseApplicationSpringIT {
     @Test
     public void testRemove() throws VipException, DAOException {
         engineBusiness.remove("test engine");
-        Assertions.assertEquals(0, engineBusiness.get().size());
+        Assertions.assertEquals(0, engineBusiness.getAll().size());
     }
 
     @Test
@@ -114,10 +114,10 @@ public class EngineIT extends BaseApplicationSpringIT {
         // DELETE + nonExistent primary key engine name => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be deleted
         engineBusiness.remove("nonExistent engine");
-        Assertions.assertEquals("test engine", engineBusiness.get().get(0).getName());
+        Assertions.assertEquals("test engine", engineBusiness.getAll().get(0).getName());
 
         // verify engines number
-        Assertions.assertEquals(1, engineBusiness.get().size());
+        Assertions.assertEquals(1, engineBusiness.getAll().size());
 
     }
 
@@ -126,7 +126,12 @@ public class EngineIT extends BaseApplicationSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
+    public void testGetAllEngine() throws VipException {
+        Assertions.assertEquals("test engine", engineBusiness.getAll().get(0).getName());
+    }
+
+    @Test
     public void testGetEngine() throws VipException {
-        Assertions.assertEquals("test engine", engineBusiness.get().get(0).getName());
+        Assertions.assertEquals(engine, engineBusiness.get("test engine"));
     }
 }
