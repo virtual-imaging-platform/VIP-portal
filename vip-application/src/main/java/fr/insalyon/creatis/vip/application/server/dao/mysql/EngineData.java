@@ -29,6 +29,14 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
         setDataSource(dataSource);
     }
 
+    private Engine resultsetToEngine(ResultSet rs) throws SQLException {
+        return new Engine(
+            rs.getString("name"), 
+            rs.getString("endpoint"), 
+            rs.getString("status")
+        );
+    }
+
     @Override
     public void add(Engine engine) throws DAOException {
         String query = "INSERT INTO VIPEngines(name, endpoint, status) VALUES (?,?,?)";
@@ -86,7 +94,7 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
     }
 
     @Override
-    public List<Engine> get() throws DAOException {
+    public List<Engine> getAll() throws DAOException {
         String query = "SELECT name, endpoint, status FROM VIPEngines ORDER BY name";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
@@ -101,6 +109,23 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
         } catch (SQLException ex) {
             logger.error("Error getting all engines", ex);
             throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public Engine get(String name) throws DAOException {
+        String query = "SELECT name, endpoint, status FROM VIPEngines WHERE name = ? ORDER BY name";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            if (rs.first()) {
+                return resultsetToEngine(rs);
+            }
+            return null;
+        } catch (SQLException e) {
+            logger.error("Error retrieving engine " + name, e);
+            throw new DAOException(e);
         }
     }
 
