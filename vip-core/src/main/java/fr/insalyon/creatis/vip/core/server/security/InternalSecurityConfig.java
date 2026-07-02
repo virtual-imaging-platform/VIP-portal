@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.core.server.security;
 
 import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.withDefaults;
 
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +15,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationFilter;
 import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationProvider;
-import org.springframework.security.web.firewall.RequestRejectedHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -51,6 +53,7 @@ public class InternalSecurityConfig {
                         .requestMatchers(internal.matcher(HttpMethod.PUT, "/users/*/activate")).permitAll()
                         .requestMatchers(internal.matcher(HttpMethod.GET, "/applications/public")).permitAll()
                         .requestMatchers(internal.matcher(HttpMethod.GET, "/publications/public")).permitAll()
+                        .requestMatchers(internal.matcher("/internal/engines")).hasRole(UserLevel.Administrator.name().toUpperCase())
                         .requestMatchers(internal.matcher("/**")).authenticated())
                 // default CORS : no configuration, so block preflight and let the rest
                 .cors(Customizer.withDefaults())
