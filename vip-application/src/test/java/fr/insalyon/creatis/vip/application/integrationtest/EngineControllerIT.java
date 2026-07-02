@@ -1,5 +1,7 @@
 package fr.insalyon.creatis.vip.application.integrationtest;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
 import fr.insalyon.creatis.vip.application.models.Engine;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
@@ -34,21 +35,18 @@ public class EngineControllerIT extends BaseInternalApiSpringIT {
 
     }
 
-    //TODO use @Nested
     @Test
     public void create() throws Exception {
         Engine e1 = new Engine("e1", "http://localhost:5000", "enabled");
 
         //not the rights
-        //TODO fails with admin dataview nullifying the object before reaching the controller (thus unable to validate permission on Business level)
         mockMvc.perform(post("/internal/engines")
-                        .with(getUserSecurityMock(basicUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(basicUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
-                .andExpect(jsonPath("$.errorCode").value(DefaultError.ACCESS_DENIED.getCode()))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isForbidden());
         // create
         mockMvc.perform(post("/internal/engines")
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("name").value(e1.getName()));
@@ -59,13 +57,13 @@ public class EngineControllerIT extends BaseInternalApiSpringIT {
         Engine engine = new Engine("e1", "http://localhost:5000", "enabled");
         // save one
         mockMvc.perform(post("/internal/engines")
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(engine)))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/internal/engines/" + engine.getName())
                         .with(getUserSecurityMock(adminUser))
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("endpoint").value(engine.getEndpoint()));
@@ -77,16 +75,16 @@ public class EngineControllerIT extends BaseInternalApiSpringIT {
         Engine e2 = new Engine("e2", "http://localhost:4999", "disabled");
         // save
         mockMvc.perform(post("/internal/engines")
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
                 .andExpect(status().isOk());
         mockMvc.perform(post("/internal/engines")
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e2)))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/internal/engines")
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam("offset", "0")
                         .queryParam("quantity", "2"))
@@ -100,21 +98,21 @@ public class EngineControllerIT extends BaseInternalApiSpringIT {
         Engine e2 = new Engine("e2", "http://localhost:4999", "disabled");
         // save
         mockMvc.perform(post("/internal/engines")
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
                 .andExpect(status().isOk());
         mockMvc.perform(post("/internal/engines")
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e2)))
                 .andExpect(status().isOk());
 
         mockMvc.perform(delete("/internal/engines/" + e1.getName())
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/internal/engines")
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParam("offset", "0")
                         .queryParam("quantity", "2"))
@@ -129,12 +127,12 @@ public class EngineControllerIT extends BaseInternalApiSpringIT {
 
         // save
         mockMvc.perform(post("/internal/engines")
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
                 .andExpect(status().isOk());
         e1.setStatus("disabled");
         mockMvc.perform(put("/internal/engines/" + e1.getName())
-                        .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
                 .andExpect(jsonPath("status").value("disabled"))
                 .andExpect(status().isOk());

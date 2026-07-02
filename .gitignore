@@ -57,3 +57,6 @@ node_modules
 
 #vite
 .vite
+
+#asdf
+.tool-versions
