@@ -1,4 +1,4 @@
-export type EngineStatus = 'enabled' | 'disabled'
+export enum EngineStatus {'enabled' , 'disabled'}
 
 export interface Engine {
   name: string

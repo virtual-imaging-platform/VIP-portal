@@ -10,6 +10,7 @@ import {
   FolderOpen,
   BookOpen,
   Mail,
+  ServerCog,
   User,
   Shield,
   Users,
@@ -55,6 +56,11 @@ const mainNav = computed<NavItem[]>(() => [
     to: '/messages',
     icon: Mail,
   },
+  {
+    name: 'Engines',
+    to: '/engines',
+    icon: ServerCog,
+  }
 ])
 
 const bottomNav = computed<NavItem[]>(() => [
