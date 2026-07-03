@@ -1,41 +1,41 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
-import { useResourcesStore } from './resources.store'
+import { useEnginesStore } from './engines.store'
 
 const mocks = vi.hoisted(() => ({
   getAll: vi.fn(),
 }))
 
-vi.mock('@/api/resources.api', () => ({
-  resourcesApi: {
+vi.mock('@/api/engines.api', () => ({
+  enginesApi: {
     getAll: mocks.getAll,
   },
 }))
 
-describe('useResourcesStore', () => {
+describe('useEnginesStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
   })
 
-  it('fetches and stores resources', async () => {
+  it('fetches and stores engines', async () => {
     mocks.getAll.mockResolvedValue({
       data: [
-        { name: 'cluster-a', status: true, type: 'BATCH', configuration: 'queue=short', engines: [], groups: [] },
-        { name: 'cluster-b', status: false, type: 'BATCH', configuration: '', engines: [], groups: [] },
+        { name: 'e1', status: 'enabled', endpoint: 'http://localhost:5000'},
+        { name: 'e2', status: 'disabled', endpoint: 'http://localhost:4999'},
       ],
       total: 2,
     })
 
-    const store = useResourcesStore()
+    const store = useEnginesStore()
     expect(store.isLoading).toBe(false)
 
-    const result = await store.fetchResources(0, 50)
+    const result = await store.fetchEngines(0, 50)
 
-    expect(mocks.getAll).toHaveBeenCalledWith(0, 50, undefined)
+    expect(mocks.getAll).toHaveBeenCalledWith(0, 50)
     expect(store.isLoading).toBe(false)
     expect(store.totalCount).toBe(2)
-    expect(store.resources.map((resource) => resource.name)).toEqual(['cluster-a', 'cluster-b'])
-    expect(result).toEqual(store.resources)
+    expect(store.engines.map((engine) => engine.name)).toEqual(['e1', 'e2'])
+    expect(result).toEqual(store.engines)
   })
 })
