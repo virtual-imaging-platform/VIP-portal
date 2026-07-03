@@ -78,6 +78,12 @@ const router = createRouter({
       meta: { requiresAuth: true, title: 'Executions' },
     },
     {
+      path: '/engines',
+      name: 'engines',
+      component: () => import('@/views/EnginesView.vue'),
+      meta: { requiresAuth: true, title: 'Engines' },
+    },
+    {
       path: '/workflows/:id',
       name: 'workflow-detail',
       component: () => import('@/views/WorkflowDetailView.vue'),
