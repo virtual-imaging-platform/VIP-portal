@@ -17,6 +17,7 @@ public class EngineIT extends BaseApplicationSpringIT {
 
     @BeforeEach
     public void setUp() throws Exception {
+        setAdminContext();
         super.setUp();
         engine = new Engine("test engine", "test endpoint", "enabled");
         engineBusiness.add(engine);
