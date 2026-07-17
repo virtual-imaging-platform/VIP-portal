@@ -38,12 +38,29 @@ public class EngineControllerIT extends BaseInternalApiSpringIT {
     @Test
     public void create() throws Exception {
         Engine e1 = new Engine("e1", "http://localhost:5000", "enabled");
+        Engine empty_e1 = new Engine("", "http://localhost:5000", "enabled");
+        Engine null_e1 = new Engine(null, "http://localhost:5000", "enabled");
 
         //not the rights
         mockMvc.perform(post("/internal/engines")
                         .with(getUserSecurityMock(basicUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
                 .andExpect(status().isForbidden());
+
+        //check validation on empty name input
+        mockMvc.perform(post("/internal/engines")
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(empty_e1)))
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.BAD_INPUT_FIELD.getCode()))
+                .andExpect(status().isBadRequest());
+        
+        //check validation on null name input
+        mockMvc.perform(post("/internal/engines")
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(null_e1)))
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.BAD_INPUT_FIELD.getCode()))
+                .andExpect(status().isBadRequest());
+
         // create
         mockMvc.perform(post("/internal/engines")
                         .with(getUserSecurityMock(adminUser)).with(csrf())
