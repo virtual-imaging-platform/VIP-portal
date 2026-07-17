@@ -63,7 +63,6 @@ public class EngineBusiness extends CommonBusiness {
         }
     }
 
-    @VIPExternalSafe
     public PrecisePage<Engine> getAll(int offset, int quantity) throws VipException {
         return pageBuilder.doPrecise(offset, quantity, getAll());
     }

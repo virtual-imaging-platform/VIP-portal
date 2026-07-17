@@ -12,6 +12,7 @@ import fr.insalyon.creatis.vip.application.models.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.models.Engine;
 import fr.insalyon.creatis.vip.application.models.Resource;
 import fr.insalyon.creatis.vip.application.models.Tag;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.models.Pair;
 
 public interface ApplicationServiceAsync {
@@ -53,6 +54,8 @@ public interface ApplicationServiceAsync {
     public void removeEngine(String engineName, AsyncCallback<Void> asyncCallback);
     
     public void getEngines(AsyncCallback<List<Engine>> asyncCallback);
+
+    public void getEngine(String engineName, AsyncCallback<Engine> asyncCallback);
     
     public void addResource(Resource resource, AsyncCallback<String> asyncCallback);
 

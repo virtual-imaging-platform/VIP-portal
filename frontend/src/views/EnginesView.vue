@@ -5,11 +5,10 @@ import { Search } from 'lucide-vue-next'
 import AppBadge from '@/components/ui/AppBadge.vue'
 import AppCard from '@/components/ui/AppCard.vue'
 import { useEnginesStore } from '@/stores/engines.store'
-import { EngineStatus, EngineListParams } from '@/types/engine.types'
+import type { EngineStatus, EngineListParams } from '@/types/engine.types'
 import { useFormatters } from '@/composables/useFormatters'
 
 const enginesStore = useEnginesStore()
-const { formatRelativeTime } = useFormatters()
 
 const searchQuery = ref('')
 const endpointFilter = ref('')
@@ -17,15 +16,10 @@ const statusFilter = ref('')
 
 const statusColors = {
   enabled: 'primary',
-  disabled: 'gray',
-  Completed: 'success',
-  Failed: 'danger',
-  Killed: 'warning',
-  Queued: 'info',
-  Unknown: 'gray',
+  disabled: 'gray'
 } as const
 
-const statusList: EngineStatus[] = Object.values(EngineStatus)
+const statusList: EngineStatus[] = ['enabled', 'disabled']
 
 const page = ref(0)
 const pageSize = 20
@@ -36,10 +30,9 @@ function buildParams(): EngineListParams {
     quantity: pageSize,
   }
   //TODO add name/status/endpoint filter
-  //if totalCount >= page * pageSize => faire la recherche avec ce qui est dans le store, sinon fetch à nouveau
-  if (searchQuery.value) params.search = searchQuery.value
+  //if totalCount <= page * pageSize => faire la recherche avec ce qui est dans le store, sinon fetch à nouveau
   if (statusFilter.value) params.status = statusFilter.value
-  if (endpointFilter.value) params.endDate = endpointFilter.value
+  if (endpointFilter.value) params.endpoint = endpointFilter.value
   return params
 }
 
@@ -158,7 +151,7 @@ onMounted(loadEngines)
           </button>
           <span class="font-medium">Page {{ page + 1 }}</span>
           <button
-            :disabled="(page + 1) * pageSize >= enginesStore.total"
+            :disabled="(page + 1) * pageSize >= enginesStore.totalCount"
             class="rounded-lg border border-gray-300 px-3 py-1.5 disabled:opacity-40"
             @click="onPage(1)"
           >
