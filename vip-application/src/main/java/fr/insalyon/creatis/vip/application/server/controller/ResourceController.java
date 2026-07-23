@@ -23,6 +23,13 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
+/**
+ * Permissions:
+ * - User cannot use this
+ * - Developers can only see the resources in their private groups
+ * - Developers can NOT create / edit / delete
+ * - Admin can do everything
+ */
 @RestController
 @RequestMapping("/resources")
 public class ResourceController {

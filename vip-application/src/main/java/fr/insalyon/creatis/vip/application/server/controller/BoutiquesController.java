@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.core.client.VipException;
 
+/**
+ * Permission : only developers can check a boutiques file
+ */
 
 @RestController
 @RequestMapping("/boutiques")

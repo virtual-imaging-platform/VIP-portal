@@ -1,14 +1,11 @@
 package fr.insalyon.creatis.vip.core.models;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -19,52 +16,62 @@ import fr.insalyon.creatis.vip.core.server.inter.DataViews;
 
 public class User implements IsSerializable {
 
-    @JsonView(DataViews.Admin.class) private Boolean confirmed;
     @JsonView(DataViews.Admin.class) private Boolean accountLocked;
+    @JsonView(DataViews.Admin.class) private String folder;
 
     @JsonView(DataViews.User.class) private String id;
     @JsonView(DataViews.User.class) private String firstName;
     @JsonView(DataViews.User.class) private String lastName;
     @JsonView(DataViews.User.class) private String email;
+    @JsonView(DataViews.User.class) private Boolean confirmed;
     @JsonView(DataViews.User.class) private String institution;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @JsonView(DataViews.User.class) private Timestamp registration;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @JsonView(DataViews.User.class) private Timestamp lastLogin;
     @JsonView(DataViews.User.class) private UserLevel level;
-    @JsonView(DataViews.User.class) private int maxRunningSimulations;
+    @JsonView(DataViews.User.class) private Integer maxRunningSimulations;
     @JsonView(DataViews.User.class) private CountryCode countryCode;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @JsonView(DataViews.User.class) private Timestamp termsOfUse;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @JsonView(DataViews.User.class) private Timestamp lastUpdatePublications;
     @JsonView(DataViews.User.class) private Set<Group> groups;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @JsonView(DataViews.User.class) private String apiKey;
     
     private Map<Group, GROUP_ROLE> groupsMap;
     private String nextEmail;
     private String code;
-    private String folder;
     private String session;
     private String password;
-    private int failedAuthentications;
+    private Integer failedAuthentications;
 
-    public User() { }
-
-    public User(String id, String firstName, String lastName, String email, String institution,
-                UserLevel level, CountryCode countryCode) {
-        this(id, firstName, lastName, email, null, institution,
-                false, "", "", "",
-                null, null, level, countryCode, 1,null,null,0,false, null);
-
+    public User() {
+        this.groupsMap = new HashMap<>();
+        this.groups = new HashSet<>();
     }
 
-    public User(String id, String firstName, String lastName, String email, String institution,
-                CountryCode countryCode, Timestamp lastUpdatePublications) {
-
-        this(id, firstName, lastName, email, null, institution,
-                false, "", "", null,
-                new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), null, countryCode, 1, null,lastUpdatePublications, 0, false, null);
+    public User(User user) {
+        // when copying, keep only mandatory stuff : id and groups
+        this();
+        setId(user.getId());
+        setGroups(user.groupsMap);
     }
 
     public User(String id, String firstName, String lastName) {
-        this(id, firstName, lastName, null, null, null, null, null, null, null, null, null, null, null, 0,null,null,0,false,null);
+        this(firstName, lastName, null, null, null, null);
+        setId(id);
+    }
+
+    public User(String firstName, String lastName, String email, String institution, CountryCode countryCode) {
+        this(firstName, lastName, email, institution, null, countryCode);
+    }
+
+    public User(String firstName, String lastName, String email, String institution, UserLevel level, CountryCode countryCode) {
+        this(null, firstName, lastName, email, null, institution,
+                null, null, null, null,
+                null, null, level, countryCode, null,null,null,null,null, null);
     }
 
     public User(
@@ -81,11 +88,11 @@ public class User implements IsSerializable {
             Timestamp registration,
             Timestamp lastLogin,
             UserLevel level,
-            CountryCode countryCode, 
-            int maxRunningSimulations,
+            CountryCode countryCode,
+            Integer maxRunningSimulations,
             Timestamp termsOfUse,
             Timestamp lastUpdatePublications,
-            int failedAuthentications,
+            Integer failedAuthentications,
             Boolean locked,
             String apiKey
     ) {
@@ -95,7 +102,7 @@ public class User implements IsSerializable {
         this.email = email;
         this.nextEmail = nextEmail;
         this.institution = institution;
-        this.password = "";
+        this.password = null;
         this.confirmed = confirmed;
         this.code = code;
         this.folder = folder;
@@ -178,14 +185,17 @@ public class User implements IsSerializable {
         this.password = password;
     }
 
+    @JsonIgnore
     public String getFullName() {
         return firstName + " " + lastName;
     }
 
+    @JsonIgnore
     public boolean isSystemAdministrator() {
         return level == UserLevel.Administrator;
     }
 
+    @JsonIgnore
     public boolean isDeveloper() {
         return level == UserLevel.Developer;
     }
@@ -214,11 +224,11 @@ public class User implements IsSerializable {
         this.level = level;
     }
 
-    public int getMaxRunningSimulations() {
+    public Integer getMaxRunningSimulations() {
         return maxRunningSimulations;
     }
 
-    public void setMaxRunningSimulations(int maxRunningSimulations) {
+    public void setMaxRunningSimulations(Integer maxRunningSimulations) {
         this.maxRunningSimulations = maxRunningSimulations;
     }
 
@@ -261,6 +271,22 @@ public class User implements IsSerializable {
         this.lastUpdatePublications = lastUpdatePublications;
     }
 
+    public void setInstitution(String institution) {
+        this.institution = institution;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
     @JsonIgnore // this field can't be jsonified (need a string as key of map)
     public boolean hasGroupAccess(String groupName) {
         for (Group group : groupsMap.keySet()) {
@@ -272,9 +298,10 @@ public class User implements IsSerializable {
     }
 
     public Set<Group> getGroups() {
-        return groups;
+        return groups == null ? Collections.emptySet() : groups;
     }
 
+    @JsonIgnore
     public Set<Group> getAdminGroups() {
         return groupsMap.entrySet().stream()
                 .filter(e -> e.getValue() == GROUP_ROLE.Admin)
@@ -322,11 +349,11 @@ public class User implements IsSerializable {
         return this.groups.isEmpty();
     }
 
-    public int getFailedAuthentications() {
+    public Integer getFailedAuthentications() {
         return this.failedAuthentications;
     }
 
-    public void setFailedAuthentications(int failedAuthentications) {
+    public void setFailedAuthentications(Integer failedAuthentications) {
         this.failedAuthentications = failedAuthentications;
     }
 
@@ -349,5 +376,40 @@ public class User implements IsSerializable {
     @Override
     public String toString() {
         return email;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(accountLocked, user.accountLocked)
+                && Objects.equals(folder, user.folder)
+                && Objects.equals(id, user.id)
+                && Objects.equals(firstName, user.firstName)
+                && Objects.equals(lastName, user.lastName)
+                && Objects.equals(email, user.email)
+                && Objects.equals(confirmed, user.confirmed)
+                && Objects.equals(institution, user.institution)
+                && Objects.equals(registration, user.registration)
+                && Objects.equals(lastLogin, user.lastLogin)
+                && level == user.level
+                && Objects.equals(maxRunningSimulations, user.maxRunningSimulations)
+                && countryCode == user.countryCode
+                && Objects.equals(termsOfUse, user.termsOfUse)
+                && Objects.equals(lastUpdatePublications, user.lastUpdatePublications)
+                && Objects.equals(groups, user.groups)
+                && Objects.equals(apiKey, user.apiKey)
+                && Objects.equals(nextEmail, user.nextEmail)
+                && Objects.equals(code, user.code)
+                && Objects.equals(session, user.session)
+                && Objects.equals(password, user.password)
+                && Objects.equals(failedAuthentications, user.failedAuthentications);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accountLocked, folder, id, firstName, lastName, email, confirmed, institution,
+                registration, lastLogin, level, maxRunningSimulations, countryCode, termsOfUse, lastUpdatePublications,
+                groups, apiKey, nextEmail, code, session, password, failedAuthentications);
     }
 }

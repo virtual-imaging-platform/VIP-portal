@@ -38,6 +38,11 @@ public class PublicationController {
         this.userProvider = userProvider;
     }
 
+    @GetMapping("/public")
+    public List<Publication> listPublic() throws VipException {
+        return publicationBusiness.getPublicPublications();
+    }
+
     @GetMapping
     public List<Publication> list() throws VipException {
         return publicationBusiness.getPublications();

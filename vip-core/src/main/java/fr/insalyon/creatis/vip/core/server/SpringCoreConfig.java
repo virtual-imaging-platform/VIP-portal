@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.grida.client.GRIDACacheClient;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
@@ -128,8 +129,15 @@ public class SpringCoreConfig {
     }
 
     @Bean
+    @Primary
     public ObjectMapper objectMapper() {
-        return Jackson2ObjectMapperBuilder.json().build();
+        return Jackson2ObjectMapperBuilder.json()
+                .featuresToEnable(
+                        DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                        DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES,
+                        DeserializationFeature.FAIL_ON_UNEXPECTED_VIEW_PROPERTIES,
+                        DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+                .build();
     }
 
     // to verify the @Value injection existence

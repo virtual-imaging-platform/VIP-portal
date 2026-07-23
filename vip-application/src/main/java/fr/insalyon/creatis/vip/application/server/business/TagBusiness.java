@@ -27,6 +27,13 @@ public class TagBusiness extends CommonBusiness {
         this.tagDAO = tagDAO;
     }
 
+    @VIPExternalSafe
+    public PrecisePage<Tag> get(int offset, int quantity) throws VipException {
+        permissions.filter(PermissionChain::admin);
+
+        return pageBuilder.doPrecise(offset, quantity, getAll());
+    }
+
     public void add(Tag tag) throws VipException {
         try {
             tagDAO.add(tag);
@@ -83,10 +90,4 @@ public class TagBusiness extends CommonBusiness {
         }
     }
 
-    @VIPExternalSafe
-    public PrecisePage<Tag> get(int offset, int quantity) throws VipException {
-        permissions.filter(PermissionChain::admin);
-
-        return pageBuilder.doPrecise(offset, quantity, getAll());
-    }
 }

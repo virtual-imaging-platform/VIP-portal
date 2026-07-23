@@ -29,14 +29,11 @@ public class ApiUserBusiness {
         this.authenticationBusiness = authenticationBusiness;
     }
 
-    public void signup(User user, String comments) throws VipException {
-        authenticationBusiness.signup(
-                user,
-                comments,
-                false,
-                true,
-                new HashSet<>());
+    public User signup(User user, String comments) throws VipException {
         logger.info("Signing up with the " + user.getEmail());
+        return authenticationBusiness.signup(
+                user,
+                comments);
     }
 
     public void sendResetCode(String email) throws VipException {

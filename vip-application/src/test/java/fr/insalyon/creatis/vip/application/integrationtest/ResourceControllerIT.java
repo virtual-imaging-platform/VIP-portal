@@ -91,7 +91,7 @@ public class ResourceControllerIT extends BaseInternalApiSpringIT {
 
         resource.setConfiguration("ma super configuration");
 
-        // wrong permissions
+        // forbidden for users and developers
         mockMvc.perform(put("/internal/resources/" + resource.getName())
                 .with(getUserSecurityMock(basicUser))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -142,7 +142,7 @@ public class ResourceControllerIT extends BaseInternalApiSpringIT {
 
         resource.setConfiguration("ma super configuration");
 
-        // wrong permissions (= NotFound)
+        // wrong permissions (= NotFound) for users and devs
         mockMvc.perform(delete("/internal/resources/" + resource.getName())
                 .with(getUserSecurityMock(basicUser))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())

@@ -53,6 +53,10 @@ abstract public class BaseWebSpringIT extends BaseSpringIT {
         return MockMvcBuilders
                 .webAppContextSetup(wac)
                 .defaultRequest(MockMvcRequestBuilders.get("/").servletPath("/" + servletPath))
+                .addFilter(((request, response, chain) -> {
+                    request.setCharacterEncoding("UTF-8");
+                    chain.doFilter(request, response);
+                }))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
     }
@@ -80,14 +84,6 @@ abstract public class BaseWebSpringIT extends BaseSpringIT {
 
     public UserDAO getUserDAO() {
         return userDAO;
-    }
-
-    protected static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

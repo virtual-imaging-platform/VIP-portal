@@ -2,8 +2,10 @@ package fr.insalyon.creatis.vip.core.client;
 
 public enum DefaultError implements VipError {
 
-    // generic / auth stuff should be 9000
+    // generic / auth stuff should be 9xxxx
     GENERIC_ERROR_WITH_MESSAGE(9000, "Error : {}", 1),
+    BAD_INPUT(9001, "Failed to read request, probably wrong format: {}", 1),
+    // REST API specific are 8xxxx
     GENERIC_ERROR(8000, "An error has been encountered on the VIP API", 0),
     BAD_CREDENTIALS(8002, "Authentication failed (email or password incorrect, or user is locked).", 0, 401),
     // mean that Spring do not consider the request enough authenticated (like a token missing or something else)

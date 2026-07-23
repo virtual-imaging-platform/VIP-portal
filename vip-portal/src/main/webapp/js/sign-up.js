@@ -18,11 +18,12 @@ async function get_fetch_authenticate(form_email, form_password){
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ "username": form_email, "password" : form_password})
-        })
-        if (data.ok == true){
-            return data.json();
-        }
+    })
+    if (data.ok === true){
+        window.location.href="index.html";
+    } else {
         throw new Error("Unable to contact the server")
+    }
 
 }
 

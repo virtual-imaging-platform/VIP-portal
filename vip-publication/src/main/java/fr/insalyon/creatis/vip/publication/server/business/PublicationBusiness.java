@@ -2,8 +2,11 @@ package fr.insalyon.creatis.vip.publication.server.business;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -107,6 +110,31 @@ public class PublicationBusiness extends CommonBusiness {
             return publicationDAO.getList();
         } catch (DAOException ex) {
             throw new VipException(ex);
+        }
+    }
+
+    public List<Publication> getPublicPublications() throws VipException {
+        try {
+            return publicationDAO.getList().stream()
+                    .sorted(Comparator.comparing((Publication p) -> parseDate(p.getDate())).reversed())
+                    .toList();
+        } catch (DAOException ex) {
+            throw new VipException(ex);
+        }
+    }
+
+    private Date parseDate(String dateStr) {
+        if (dateStr == null || dateStr.isBlank()) return new Date(0);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        sdf.setLenient(false);
+        try {
+            return sdf.parse(dateStr.trim());
+        } catch (java.text.ParseException e) {
+            try {
+                return new SimpleDateFormat("yyyy").parse(dateStr.trim());
+            } catch (java.text.ParseException e2) {
+                return new Date(0);
+            }
         }
     }
 

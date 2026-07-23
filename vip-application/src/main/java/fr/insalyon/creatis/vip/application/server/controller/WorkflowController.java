@@ -16,6 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Permissions:
+ * - To be defined
+ */
 @RestController()
 @RequestMapping("/workflows")
 public class WorkflowController {

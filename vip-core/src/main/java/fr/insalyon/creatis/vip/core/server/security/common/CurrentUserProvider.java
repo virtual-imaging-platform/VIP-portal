@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ public class CurrentUserProvider implements Supplier<User> {
                 return ((SpringPrincipalUser) principal).getVipUser();
             } else if (principal instanceof User) { // OIDC authentication
                 return (User) principal;
+            } else if (authentication instanceof AnonymousAuthenticationToken) {
+                return null;
             } else { // no resolvable user found (shouldn't happen)
                 logger.error("CurrentUserProvider: unknown principal class {}", principal.getClass());
                 return null;

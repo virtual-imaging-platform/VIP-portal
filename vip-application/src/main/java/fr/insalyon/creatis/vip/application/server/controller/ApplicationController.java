@@ -25,6 +25,14 @@ import fr.insalyon.creatis.vip.core.server.model.PrecisePage;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
+/**
+ * Permissions:
+ * - Users and Devs can see the applications of the groups they belong to
+ * - Users can NOT create/edit/delete
+ * - Devs can create/edit/delete applications of the private groups they belong to but...
+ * - Devs can only associate groups at creation (not when editing)
+ * - Admin can do everything
+ */
 @RestController()
 @RequestMapping("/applications")
 public class ApplicationController {

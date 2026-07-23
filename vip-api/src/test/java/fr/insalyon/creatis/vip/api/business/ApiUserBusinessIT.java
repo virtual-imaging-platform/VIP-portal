@@ -22,7 +22,6 @@ public class ApiUserBusinessIT extends BaseSpringIT {
 
     private Group group1;
     private User user1;
-    private final Timestamp now = new Timestamp(System.currentTimeMillis());
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -35,10 +34,8 @@ public class ApiUserBusinessIT extends BaseSpringIT {
         });
 
         // Create test users
-        user1 = new User(CoreUtil.createUUID(), "firstName", "lastName", emailUser1, "institution", UserLevel.Beginner, CountryCode.fr);
-        user1.setRegistration(now);
-        user1.setLastLogin(now);
-        apiUserBusiness.signup(user1, "comment");
+        user1 = new User("firstName", "lastName", emailUser1, "institution", CountryCode.fr);
+        user1 = apiUserBusiness.signup(user1, "comment");
 
     }
 
@@ -49,9 +46,7 @@ public class ApiUserBusinessIT extends BaseSpringIT {
 
     @Test
     public void testSignup() throws VipException {
-        User user2 = new User(CoreUtil.createUUID(), "firstName2", "lastName2", emailUser2, "institution", UserLevel.Beginner, CountryCode.fr);
-        user2.setRegistration(now);
-        user2.setLastLogin(now);
+        User user2 = new User("firstName2", "lastName2", emailUser2, "institution", CountryCode.fr);
         apiUserBusiness.signup(user2, "comment");
 
         Assertions.assertEquals(3, userBusiness.getUsers().size(), "Incorrect number of users");

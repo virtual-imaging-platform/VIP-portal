@@ -23,6 +23,12 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
+/**
+ * Permissions:
+ * - Users can see the public groups (even the one the do not belong to) + the private groups they belong to
+ * - Admins can see all the groups
+ * - Only admins can create/edit/delete groups
+ */
 @RestController
 @RequestMapping("/groups")
 public class GroupController {

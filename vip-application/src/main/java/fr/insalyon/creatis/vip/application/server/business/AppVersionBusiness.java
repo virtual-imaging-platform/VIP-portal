@@ -1,9 +1,12 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -11,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.application.models.AppVersion;
 import fr.insalyon.creatis.vip.application.models.Application;
 import fr.insalyon.creatis.vip.application.models.Resource;
@@ -34,14 +39,16 @@ public class AppVersionBusiness extends CommonBusiness {
     private final ApplicationBusiness applicationBusiness;
     private final ApplicationDAO applicationDAO;
     private final GroupBusiness groupBusiness;
+    private final WorkflowDAO workflowDAO;
 
     @Autowired
-    public AppVersionBusiness(TagBusiness tagBusiness, ResourceBusiness resourceBusiness, ApplicationDAO applicationDAO, ApplicationBusiness applicationBusiness, GroupBusiness groupBusiness) {
+    public AppVersionBusiness(TagBusiness tagBusiness, ResourceBusiness resourceBusiness, ApplicationDAO applicationDAO, ApplicationBusiness applicationBusiness, GroupBusiness groupBusiness, WorkflowDAO workflowDAO) {
         this.tagBusiness = tagBusiness;
         this.resourceBusiness = resourceBusiness;
         this.applicationBusiness = applicationBusiness;
         this.applicationDAO = applicationDAO;
         this.groupBusiness = groupBusiness;
+        this.workflowDAO = workflowDAO;
     }
 
     @VIPExternalSafe
@@ -178,9 +185,37 @@ public class AppVersionBusiness extends CommonBusiness {
             }
         }
 
-        // remove doublons + sort
+        Map<String, Long> popularity = getApplicationsPopularity();
+
+        // remove doublons + sort by popularity desc and then name asc
         return apps.stream().collect(Collectors.toMap(Application::getName, a -> a, (a1, a2) -> a1)).values()
-                .stream().sorted(Comparator.comparing(Application::getName)).collect(Collectors.toList());
+                .stream().sorted(Comparator.comparingLong((Application a) -> popularity.getOrDefault(a.getName(), 0L)).reversed()
+                        .thenComparing(Application::getName)).collect(Collectors.toList());
+    }
+
+    private Map<String, Long> getApplicationsPopularity() throws VipException {
+        try {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.YEAR, -1);
+            Date oneYearAgo = cal.getTime();
+
+            List<fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow> workflows =
+                    workflowDAO.get(null, null, null, null, oneYearAgo, new Date(), null);
+
+            // group by application name and count distinct users to produce a popularity score for each application
+            return workflows.stream()
+                    .collect(Collectors.groupingBy(
+                            fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow::getApplication,
+                            Collectors.mapping(
+                                    fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow::getUsername,
+                                    Collectors.toSet())))
+                    .entrySet().stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            e -> (long) e.getValue().size()));
+        } catch (WorkflowsDBDAOException ex) {
+            throw new VipException(ex);
+        }
     }
 
     public AppVersion getVersion(String applicationName, String applicationVersion) throws VipException {

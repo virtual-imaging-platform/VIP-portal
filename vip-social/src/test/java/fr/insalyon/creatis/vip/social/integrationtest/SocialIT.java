@@ -569,10 +569,10 @@ public class SocialIT extends BaseSpringIT {
 
     @Test
     public void testCatchNonExistentUsersSendGroupMessage() throws VipException {
-        Group emptyGroup = new Group("empty-group", true, GroupType.APPLICATION);
-        groupBusiness.add(emptyGroup);
         try {
             setAdminContext();
+            Group emptyGroup = new Group("empty-group", true, GroupType.APPLICATION);
+            groupBusiness.add(emptyGroup);
             HashMap<String, CoreConstants.GROUP_ROLE> adminGroupRole = new HashMap<>();
             adminGroupRole.put("empty-group", CoreConstants.GROUP_ROLE.Admin);
             userBusiness.setUserGroups(emailUser1, adminGroupRole);
@@ -713,11 +713,6 @@ public class SocialIT extends BaseSpringIT {
         // SELECT + nonExistent foreign key receiver  => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be selected
         messageBusiness.verifyMessages("nonExistent user");
-    }
-
-    private void setCurrentUser(User user) {
-        userBusiness.setUserSupplier(() -> user);
-        messageBusiness.setUserSupplier(() -> user);
     }
 
     private List<Message> getMessagesByUser(User user, Date startDate) throws VipException {

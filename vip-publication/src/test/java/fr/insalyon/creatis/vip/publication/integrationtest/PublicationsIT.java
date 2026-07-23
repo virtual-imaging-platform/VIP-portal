@@ -127,7 +127,7 @@ public class PublicationsIT extends BaseSpringIT {
 
         publicationBusiness.setUserSupplier(() -> admin);
         asAdminContext(() -> {
-            authenticationBusiness.getOrCreateUser("test1@test.fr", "institution", null);
+            authenticationBusiness.getOrCreateUser("test1@test.fr", "institution");
         });
         publication.setAuthors("author2, author3");
         publication.setId(idPublicationCreated);

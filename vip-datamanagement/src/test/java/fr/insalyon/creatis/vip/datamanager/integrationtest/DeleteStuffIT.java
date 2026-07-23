@@ -137,8 +137,9 @@ public class DeleteStuffIT extends BaseInternalApiSpringIT {
     @Test
     public void testDeleteOkInGroupForAdvanced() throws Exception {
         asAdminContext(() -> {
+            basicUser = new User(basicUser);
             basicUser.setLevel(UserLevel.Advanced);
-            userBusiness.update(basicUser);
+            basicUser = userBusiness.update(basicUser);
         });
 
         utils.configureFolderInGroup(groupTest1, "someFolder", "file.txt");

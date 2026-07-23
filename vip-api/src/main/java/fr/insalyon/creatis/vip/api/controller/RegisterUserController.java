@@ -45,19 +45,13 @@ public class RegisterUserController extends ApiController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> signup(@RequestBody @Valid SignUpUserDTO signUpUser) throws VipException {
         logMethodInvocation(logger,"signup", signUpUser.getEmail());
-        User user = new User(CoreUtil.createUUID(), 
+        User user = new User(
                 signUpUser.getFirstName(),
                 signUpUser.getLastName(),
                 signUpUser.getEmail(),
                 signUpUser.getInstitution(),
-                signUpUser.getCountryCode(),
-                null
-                );
+                signUpUser.getCountryCode());
         user.setPassword(signUpUser.getPassword());
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-
-        user.setRegistration(now);
-        user.setLastLogin(now);
         this.apiUserBusiness.signup(user, signUpUser.getComments());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

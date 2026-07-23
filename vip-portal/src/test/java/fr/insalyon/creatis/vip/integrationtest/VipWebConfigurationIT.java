@@ -71,12 +71,12 @@ public class VipWebConfigurationIT {
     @Test
     public void testGetPipelines() throws Exception {
         Mockito.doReturn(new String[]{"test@admin.test"}).when(emailBusiness).getAdministratorsEmails();
-        User newUser = new User(CoreUtil.createUUID(), "firstName",
+        User newUser = new User("firstName",
                 "LastName", "testEmail@test.tst", "Test institution",
-                CountryCode.fr, null);
+                CountryCode.fr);
         newUser.setPassword("testPassword");
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
-        authenticationBusiness.signup(newUser, "", (Group) null);
+        newUser = authenticationBusiness.signup(newUser, "");
         mockMvc.perform(get("/rest/pipelines")
             .with(SecurityMockMvcRequestPostProcessors.user(new SpringPrincipalUser(newUser))))
             .andDo(print())

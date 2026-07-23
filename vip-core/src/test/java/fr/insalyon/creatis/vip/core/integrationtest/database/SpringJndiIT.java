@@ -223,13 +223,12 @@ public class SpringJndiIT {
     }
 
     private User createUser(String testEmail) throws GRIDAClientException, VipException {
-        User newUser = new User(CoreUtil.createUUID(), "firstName", "LastName",
+        User newUser = new User("firstName", "LastName",
                 testEmail, "Test institution",
-                CountryCode.fr, null);
+                CountryCode.fr);
         newUser.setPassword("testPassword");
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
-        authenticationBusiness.signup(newUser, "", (Group) null);
-        return newUser;
+        return authenticationBusiness.signup(newUser, "");
     }
 
     @Test

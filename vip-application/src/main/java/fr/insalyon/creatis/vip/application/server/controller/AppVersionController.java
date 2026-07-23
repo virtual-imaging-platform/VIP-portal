@@ -21,6 +21,12 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
+/**
+ * Permissions:
+ * - same as with Application. If someone can do something on an Application, he can do the same thing on its AppVersion
+ * - Devs can only associate resources on creation, not on edition
+ * - TODO : Tags permissions to be improved
+ */
 @RestController
 @RequestMapping("/applications")
 public class AppVersionController {

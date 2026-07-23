@@ -12,6 +12,8 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import fr.insalyon.creatis.boutiques.model.Input;
+import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
+import fr.insalyon.creatis.vip.core.server.business.base.PermissionChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 
 @Service
 @Transactional
-public class BoutiquesBusiness {
+public class BoutiquesBusiness extends CommonBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -48,6 +50,10 @@ public class BoutiquesBusiness {
 
     public String publishVersion(User user, String applicationName, String version)
             throws VipException {
+        permissions.filter((chain) -> {
+            chain.developer();
+            chain.admin();
+        });
         AppVersion appVersion = appVersionBusiness.getVersion(applicationName, version);
 
         // verify that the descriptor has an author
@@ -100,7 +106,12 @@ public class BoutiquesBusiness {
     }
 
     public void validateBoutiquesFile(String localPath) throws VipException {
+        permissions.filter((chain) -> {
+            chain.developer();
+            chain.admin();
+        });
         // check file size, 100 kiB max
+
         try {
             if (Files.size(Paths.get(localPath)) >= 100 * 1024) {
                 throw new VipException("Boutiques file too large");
@@ -123,6 +134,10 @@ public class BoutiquesBusiness {
     }
 
     public void validateBoutiquesString(String descriptorJson) throws VipException {
+        permissions.filter((chain) -> {
+            chain.developer();
+            chain.admin();
+        });
         try {
             // Write in a temp file to validate with the descriptor
             Path tempFile = Files.createTempFile("boutiques", ".json");

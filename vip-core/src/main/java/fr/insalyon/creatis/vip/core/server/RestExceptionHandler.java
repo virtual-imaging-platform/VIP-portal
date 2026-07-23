@@ -15,7 +15,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.validation.FieldError;
@@ -114,6 +116,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler impleme
             ), headers, status);
         }
         return super.handleMethodArgumentNotValid(ex, headers, status, request);
+    }
+
+    @Nullable
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
+        logger.error("Spring/Jackson serialization error caught", ex);
+
+        return new ResponseEntity<>(getErrorCodeAndMessage(
+                new VipException(DefaultError.BAD_INPUT,ex.getMessage())
+        ), headers, status);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

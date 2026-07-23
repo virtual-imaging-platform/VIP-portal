@@ -140,8 +140,9 @@ public class CreateDirectoryIT extends BaseInternalApiSpringIT {
     @Test
     public void testDirectoryCreationOkInGroupForAdvandced() throws Exception {
         asAdminContext(() -> {
+            basicUser = new User(basicUser);
             basicUser.setLevel(UserLevel.Advanced);
-            userBusiness.update(basicUser);
+            basicUser = userBusiness.update(basicUser);
         });
         utils.configureFolderInGroup(groupTest1, "", (String) null);
         utils.configureNonExistingElementForGroup(groupTest1, "newDir");

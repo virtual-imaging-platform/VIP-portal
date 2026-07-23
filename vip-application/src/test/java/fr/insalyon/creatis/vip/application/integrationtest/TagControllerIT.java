@@ -47,8 +47,12 @@ public class TagControllerIT extends BaseInternalApiSpringIT {
         basicUser = createUser(emailUser3, UserLevel.Beginner);
     }
 
+
+    /**
+     * Test permissions + behavior
+     */
     @Test
-    public void list() throws Exception {
+    public void testPermissionsAndList() throws Exception {
         Application app = new Application("appA", "bla");
         AppVersion version = new AppVersion("appA", "0.1", "{}", true);
         Tag a = new Tag("test", "test", ValueType.STRING, "appA", "0.1", true, true);
@@ -62,7 +66,7 @@ public class TagControllerIT extends BaseInternalApiSpringIT {
 
         });
 
-        // not the rights
+        // Basic user can NOT use tags
         mockMvc.perform(get("/internal/tags")
             .with(getUserSecurityMock(basicUser))
             .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -70,7 +74,7 @@ public class TagControllerIT extends BaseInternalApiSpringIT {
                     .andExpect(jsonPath("$.errorCode").value(DefaultError.ACCESS_DENIED.getCode()))
                     .andExpect(status().is4xxClientError());
 
-        // not the rights
+        // Developer also can NOT
         mockMvc.perform(get("/internal/tags")
             .with(getUserSecurityMock(developperUser))
             .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -78,7 +82,7 @@ public class TagControllerIT extends BaseInternalApiSpringIT {
                     .andExpect(jsonPath("$.errorCode").value(DefaultError.ACCESS_DENIED.getCode()))
                     .andExpect(status().is4xxClientError());
 
-        // ok
+        // Only admin can
         MvcResult result = mockMvc.perform(get("/internal/tags")
             .with(getUserSecurityMock(adminUser))
             .with(SecurityMockMvcRequestPostProcessors.csrf())

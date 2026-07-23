@@ -29,16 +29,16 @@ public class UserTestUtils {
     }
 
     static public void reset() {
-        baseUser1 = new User(CoreUtil.createUUID(), "base1", "User1", "baseuser1@test.tst", null,
+        baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null,
                 UserLevel.Beginner, CountryCode.fr);
         baseUser1.setFolder("user1");
-        baseUser2 = new User(CoreUtil.createUUID(),"base2", "User2", "baseuser2@test.tst", null,
+        baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null,
                 UserLevel.Advanced, null);
         baseUser2.setFolder("user2");
-        baseUser3 = new User(CoreUtil.createUUID(), "base3", "User3", "baseuser3@test.tst", null,
+        baseUser3 = new User("base3", "User3", "baseuser3@test.tst", null,
                 UserLevel.Beginner, null);
         baseUser3.setFolder("user3");
-        baseUser4 = new User(CoreUtil.createUUID(), "base4", "User4", "baseuser4@test.tst", null,
+        baseUser4 = new User("base4", "User4", "baseuser4@test.tst", null,
                 UserLevel.Beginner, null);
         baseUser4.setFolder("user4");
 

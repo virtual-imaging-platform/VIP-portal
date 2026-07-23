@@ -14,6 +14,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
+/**
+ * Tag permission :
+ * - only admin can access them
+ */
 @RestController()
 @RequestMapping("/tags")
 public class TagController {

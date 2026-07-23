@@ -112,9 +112,9 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     public void testCreateUser() throws VipException, GRIDAClientException {
         clearContext();
         // try all the constructors
-        User user6 = new User(CoreUtil.createUUID(), "firstName", "lastName", "email9@test.fr", "institution", CountryCode.fr, new Timestamp(System.currentTimeMillis()));
+        User user6 = new User("firstName", "lastName", "email9@test.fr", "institution", CountryCode.fr);
         user6.setPassword("password");
-        authenticationBusiness.signup(user6, "", false, true, group2);
+        user6 = authenticationBusiness.signup(user6, "");
 
         // Check users number
         assertRowsNbInTable("VIPUsers", 7);
@@ -339,7 +339,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testGetOrCreateExistingUser() throws VipException, DAOException {
-        User user = authenticationBusiness.getOrCreateUser(emailUser2, "test institution", "group1");
+        User user = authenticationBusiness.getOrCreateUser(emailUser2, "test institution");
 
         Assertions.assertEquals("test firstName suffix2", user.getFirstName(), "incorrect user firstname");
         Assertions.assertEquals("test lastName suffix2", user.getLastName(), "incorrect user firstname");
@@ -348,7 +348,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testGetOrCreateNonExistentUser() throws VipException, DAOException {
-        authenticationBusiness.getOrCreateUser("nonExistentUser@test.fr", "institution", "group1");
+        authenticationBusiness.getOrCreateUser("nonExistentUser@test.fr", "institution");
 
         // verify entry numbers in VIPUsers table
         assertRowsNbInTable("VIPUsers", 7);
@@ -358,7 +358,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     public void testGetOrCreateIncorrectEmailUser() throws VipException {
         Exception exception = assertThrows(
                 VipException.class, () ->
-                        authenticationBusiness.getOrCreateUser("nonExistent_user", "institution", "group1")
+                        authenticationBusiness.getOrCreateUser("nonExistent_user", "institution")
         );
         // exception added because before the exception java.lang.StringIndexOutOfBoundsException was raised
         assertTrue(StringUtils.contains(exception.getMessage(), "The email nonExistent_user is invalid"));
@@ -679,6 +679,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testUpdateUser() throws VipException {
         User user = userBusiness.getUser(emailUser1);
+        user = new User(user.getId(), user.getFirstName(), user.getLastName());
         user.setFolder("folder_updated");
         userBusiness.update(user);
         User userUpdated = userBusiness.getUser(emailUser1);
@@ -719,9 +720,8 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         passwordBusiness.update(userBusiness.getUser(emailUser1), "testPassword", "testPassword updated");
 
         // because getPassword() returns empty, try to signin
+        Assertions.assertNull(userBusiness.getUser(emailUser1).getPassword(), "incorrect password update user");
         authenticationBusiness.signin(emailUser1, "testPassword updated");
-
-        Assertions.assertEquals("", userBusiness.getUser(emailUser1).getPassword(), "incorrect password update user");
     }
 
     @Test

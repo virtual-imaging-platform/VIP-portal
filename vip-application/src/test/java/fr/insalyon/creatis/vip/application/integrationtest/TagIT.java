@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import fr.insalyon.creatis.vip.core.integrationtest.WithMockAdmin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,9 +15,12 @@ import fr.insalyon.creatis.vip.application.models.AppVersion;
 import fr.insalyon.creatis.vip.application.models.Application;
 import fr.insalyon.creatis.vip.application.models.Tag;
 import fr.insalyon.creatis.vip.core.client.VipException;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithSecurityContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 public class TagIT extends BaseApplicationSpringIT {
-
 
     private Tag tag;
     private Application app;
@@ -24,15 +28,15 @@ public class TagIT extends BaseApplicationSpringIT {
 
     @BeforeEach
     public void setUp() throws Exception {
-        setAdminContext();
         super.setUp();
         app = new Application("applicationA", "super citation");
         appVersion = new AppVersion("applicationA", "0.1","{}", false);
         tag = new Tag("bla", "blou", Tag.ValueType.STRING, "applicationA", "0.1", true, true);
-
-        appBusiness.add(app);
-        appVersionBusiness.add(appVersion);
-        tagBusiness.add(tag);
+        asAdminContext(() -> {
+            appBusiness.add(app);
+            appVersionBusiness.add(appVersion);
+            tagBusiness.add(tag);
+        });
     }
 
     @Test
@@ -80,6 +84,7 @@ public class TagIT extends BaseApplicationSpringIT {
     }
 
     @Test
+    @WithMockAdmin
     public void getTags() throws VipException {
         Application app1 = new Application("test", "super citation");
         AppVersion appVersion1 = new AppVersion("test", "0.1", "{}", false);

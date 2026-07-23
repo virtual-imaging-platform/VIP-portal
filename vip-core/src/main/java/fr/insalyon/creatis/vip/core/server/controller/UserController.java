@@ -34,6 +34,34 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
+/**
+ * Permissions:
+ * - An user can only see/edit/delete himself
+ * - Admins can do everything (on the updatable field)
+ *
+ * User can see:
+ * - id, first name, last name, email, level, institution, country code, registration time, last login time, ...
+ * - max running simulation number, terms of use validation date, last publication update date, confirmed, groups, apikey
+ *
+ * Admin can see in addition:
+ * - locked, folder
+ *
+ * On creation:
+ * - first name, last name, email, institution, country code, groups (only public ones)
+ * - password
+ * - MUST BE ABSENT : id, level, dates, max running simulation number, confirmed
+ *
+ * Users can only edit:
+ * - institution, country code
+ * - groups : can join public group, and leave any group
+ * - terms of use validation date, last publication update date set to NOW() through dedicated endpoints
+ *
+ * Admin can also edit :
+ * - folder, accountLocked, first name, last name, email, confirmed, level, max running simulation
+ *
+ * About password and api key management:
+ * - done through specific endpoints
+ */
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -119,7 +147,7 @@ public class UserController {
         // Set password on user object from the separate password field
         form.user.setPassword(form.password);
         // the returned data may be partial, but enough for the frontend to do it own stuff!
-        User createdUser = authenticationBusiness.signup(form.user, form.comment, false, false, form.user.getGroups());
+        User createdUser = authenticationBusiness.signup(form.user, form.comment);
         logger.info("Signup completed: email='{}', generatedId='{}'", createdUser.getEmail(), createdUser.getId());
         return createdUser;
     }

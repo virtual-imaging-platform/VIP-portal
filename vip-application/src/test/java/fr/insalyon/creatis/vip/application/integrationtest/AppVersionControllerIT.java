@@ -26,6 +26,7 @@ import fr.insalyon.creatis.vip.core.models.Group;
 import fr.insalyon.creatis.vip.core.models.GroupType;
 import fr.insalyon.creatis.vip.core.models.User;
 
+
 public class AppVersionControllerIT extends BaseInternalApiSpringIT {
 
     @Autowired

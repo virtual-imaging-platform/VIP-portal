@@ -3,11 +3,10 @@ package fr.insalyon.creatis.vip.core.server.business;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,55 +50,25 @@ public class AuthenticationBusiness extends CommonBusiness {
         this.emailTemplateUtils = emailTemplateUtils;
     }
 
-    public void signup(User user, String comments, Group group) throws VipException {
-        signup(user, comments, false, false, group);
-    }
-
-    public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, Group group)
-            throws VipException {
-        this.signup(user, comments, automaticCreation, mapPrivateGroups,
-                group == null ? new HashSet<>() : new HashSet<>(Collections.singleton(group)));
+    @VIPExternalSafe
+    public User signup(User user, String comments) throws VipException {
+        return signup(user, comments, false);
     }
 
     @VIPExternalSafe
-    public User signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, Set<Group> groups)
+    public User signup(User user, String comments, boolean automaticCreation)
             throws VipException {
-        logger.info("Starting signup flow for email='{}' (automaticCreation={}, mapPrivateGroups={})",
-                user != null ? user.getEmail() : null, automaticCreation, mapPrivateGroups);
+        logger.info("Starting signup flow for email='{}' (automaticCreation={})",
+                user != null ? user.getEmail() : null, automaticCreation);
 
         // should be unauthentified or admin (related to internal methods with asAdminContext)
         if (getUser() != null && ! getUserLevel().equals(UserLevel.Administrator)) { 
             throw new VipException(DefaultError.UNAUTHENTICATED_ONLY);
         }
-        if ( ! user.getGroups().stream().allMatch(Group::isPublicGroup)) {
-            throw new VipException(DefaultError.ACCESS_DENIED);
-        }
+        userBusiness.assertPublicNonAutoGroups(user.getGroups());
         emailBusiness.verifyEmail(user.getEmail());
-
-        // Build log message
-        StringBuilder message = new StringBuilder("Signing up ");
-        message.append(". List of undesired countries: ");
-        for (String s : server.getUndesiredCountries()) {
-            if (!s.trim().isEmpty()) {
-                message.append(" ");
-                message.append(s);
-            }
-        }
-        message.append(".");
-        logger.info(message.toString());
-
-        // Check if country is undesired
-        for (String udc : server.getUndesiredCountries()) {
-            if (udc.trim().isEmpty()) {
-                // An empty config file entry gets here as an empty or
-                // whitespace-only string, skip it
-                continue;
-            }
-            if (user.getCountryCode().toString().equals(udc)) {
-                logger.error("Undesired country for " + user.getEmail());
-                throw new VipException("Error");
-            }
-        }
+        verifyCountryCode(user);
+        verifyUserFields(user);
 
         try {
             Timestamp ts = new Timestamp(System.currentTimeMillis());
@@ -130,38 +99,31 @@ public class AuthenticationBusiness extends CommonBusiness {
 
             user.setFolder(folder);
             user.setLevel(UserLevel.Beginner);
+            user.setMaxRunningSimulations(1);
             user.setId(CoreUtil.createUUID());
             userDAO.add(user);
             userDAO.definePassword(user.getEmail(), user.getPassword());
 
             // Adding user to groups
-            if (groups == null) {
-                groups = new HashSet<>();
+            for (Group group : user.getGroups()) {
+                usersGroupsDAO.add(user.getEmail(), group.getName(), GROUP_ROLE.User);
             }
-            StringBuilder groupsString = new StringBuilder();
-            for (Group group : groups) {
-                if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
-                    usersGroupsDAO.add(user.getEmail(), group.getName(), GROUP_ROLE.User);
-                } else {
-                    logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
-                }
-                groupsString.append(group.getName()).append(", ");
-            }
+            String groupsString = user.getGroups().stream().map(Group::getName).collect(Collectors.joining(","));
 
             logger.info("Signup persistence succeeded for email='{}' with generatedId='{}'",
                 user.getEmail(), user.getId());
 
             if (!automaticCreation) {
                 String emailContent = emailTemplateUtils.registrationUserEmail(user);
-                logger.info("Sending confirmation email to '" + user.getEmail() + "'.");
+                logger.info("Sending confirmation email to '{}'.", user.getEmail());
                 emailBusiness.sendEmail("VIP account details", emailContent,
                         new String[] { user.getEmail() }, true, user.getEmail());
 
-                String adminsEmailContents = emailTemplateUtils.registrationAdminEmail(user, groupsString.toString(), comments);
+                String adminsEmailContents = emailTemplateUtils.registrationAdminEmail(user, groupsString, comments);
                 emailBusiness.sendEmailToAdmins("[VIP Admin] Account Requested", adminsEmailContents,
                         true, user.getEmail());
             } else {
-                String adminsEmailContents = emailTemplateUtils.registrationAdminEmailAutomatic(user, groupsString.toString(), comments);
+                String adminsEmailContents = emailTemplateUtils.registrationAdminEmailAutomatic(user, groupsString, comments);
 
                 emailBusiness.sendEmailToAdmins("[VIP Admin] Automatic Account Creation", adminsEmailContents,
                         false, user.getEmail());
@@ -174,6 +136,59 @@ public class AuthenticationBusiness extends CommonBusiness {
             throw new VipException(ex);
         } catch (DAOException ex) {
             throw new VipException(ex);
+        }
+    }
+
+    private void verifyUserFields(User user) throws VipException {
+        // most of the fields must be absent at creation
+        verifyUserField(user::getId, "id");
+        verifyUserField(user::getRegistration, "registration");
+        verifyUserField(user::getLevel, "level");
+        verifyUserField(user::getLastLogin, "lastLogin");
+        verifyUserField(user::getMaxRunningSimulations, "maxRunningSimulations");
+        verifyUserField(user::getTermsOfUse, "termsOfUse");
+        verifyUserField(user::getLastUpdatePublications, "lastUpdatePublication");
+        verifyUserField(user::getNextEmail, "nextEmail");
+        verifyUserField(user::getCode, "code");
+        verifyUserField(user::getFolder, "folder");
+        verifyUserField(user::getSession, "session");
+        verifyUserField(user::getFailedAuthentications, "failedAuthentication");
+        verifyUserField(user::isConfirmed, "confirmed");
+        verifyUserField(user::isAccountLocked, "locked");
+        verifyUserField(user::getApiKey, "apikey");
+    }
+
+    private void verifyUserField(Supplier<Object> f, String field) throws VipException {
+        if (f.get() != null) {
+            logger.error("{} must be absent in User on creation", field);
+            throw new VipException(DefaultError.BAD_INPUT_FIELD, field, "Must be absent");
+        }
+    }
+
+    private void verifyCountryCode(User user) throws VipException {
+        // Build log message
+        StringBuilder message = new StringBuilder("Signing up ");
+        message.append(". List of undesired countries: ");
+        for (String s : server.getUndesiredCountries()) {
+            if (!s.trim().isEmpty()) {
+                message.append(" ");
+                message.append(s);
+            }
+        }
+        message.append(".");
+        logger.info(message.toString());
+
+        // Check if country is undesired
+        for (String udc : server.getUndesiredCountries()) {
+            if (udc.trim().isEmpty()) {
+                // An empty config file entry gets here as an empty or
+                // whitespace-only string, skip it
+                continue;
+            }
+            if (user.getCountryCode().toString().equals(udc)) {
+                logger.error("Undesired country for {}", user.getEmail());
+                throw new VipException("Error");
+            }
         }
     }
 
@@ -262,7 +277,7 @@ public class AuthenticationBusiness extends CommonBusiness {
     }
 
 
-    public User getOrCreateUser(String email, String institution, String groupName)
+    public User getOrCreateUser(String email, String institution)
             throws VipException {
 
         emailBusiness.verifyEmail(email);
@@ -286,15 +301,13 @@ public class AuthenticationBusiness extends CommonBusiness {
 
             user = userBusiness.getNewUser(email, firstName, lastName, institution);
             try {
-                signup(user, "Generated automatically", true, true,
-                        groupBusiness.get(groupName));
+                signup(user, "Generated automatically", true);
             } catch (VipException ex2) {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
                     user = userBusiness.getNewUser(email, firstName, lastName, institution);
-                    signup(user, "Generated automatically", true,
-                            true, groupBusiness.get(groupName));
+                    signup(user, "Generated automatically", true);
                 }
             }
             activateUser(user.getEmail());

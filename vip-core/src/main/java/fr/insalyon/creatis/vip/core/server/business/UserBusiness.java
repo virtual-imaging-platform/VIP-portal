@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
+import com.google.gwt.thirdparty.guava.common.base.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,6 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.models.Group;
 import fr.insalyon.creatis.vip.core.models.User;
-import fr.insalyon.creatis.vip.core.models.UserAndPassword;
 import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
@@ -40,11 +40,12 @@ public class UserBusiness extends CommonBusiness {
     private final Server server;
     private final EmailTemplateUtils emailTemplateUtils;
     private final PasswordBusiness passwordBusiness;
+    private final GroupBusiness groupBusiness;
 
     @Autowired
     public UserBusiness(UserDAO userDAO, UsersGroupsDAO usersGroupsDAO, EmailBusiness emailBusiness,
-            GRIDAPoolClient gridaPoolClient, Server server, EmailTemplateUtils emailTemplateUtils,
-            PasswordBusiness passwordBusiness) {
+                        GRIDAPoolClient gridaPoolClient, Server server, EmailTemplateUtils emailTemplateUtils,
+                        PasswordBusiness passwordBusiness, GroupBusiness groupBusiness) {
         this.userDAO = userDAO;
         this.usersGroupsDAO = usersGroupsDAO;
         this.emailBusiness = emailBusiness;
@@ -52,6 +53,7 @@ public class UserBusiness extends CommonBusiness {
         this.server = server;
         this.emailTemplateUtils = emailTemplateUtils;
         this.passwordBusiness = passwordBusiness;
+        this.groupBusiness = groupBusiness;
     }
 
     public void updateUserEmail(String oldEmail, String newEmail)
@@ -75,38 +77,15 @@ public class UserBusiness extends CommonBusiness {
         }
     }
 
-    private void loadMissingFields(User user, User existingUser) {
-        // Fields never sent via JSON (no @JsonView, not in ProfileUpdatePayload)
-        user.setNextEmail(existingUser.getNextEmail());
-        user.setCode(existingUser.getCode());
-        user.setSession(existingUser.getSession());
-        user.setApiKey(existingUser.getApiKey());
-        user.setFailedAuthentications(existingUser.getFailedAuthentications());
-        user.setRegistration(existingUser.getRegistration());
-        user.setLastLogin(existingUser.getLastLogin());
-
-        // folder is absent from ProfileUpdatePayload but settable via admin API
-        if (user.getFolder() == null) {
-            user.setFolder(existingUser.getFolder());
-        }
-
-        // @JsonView(Admin.class) never sent by non admin callers
-        if (user.isConfirmed() == null) user.setConfirmed(existingUser.isConfirmed());
-        if (user.isAccountLocked() == null) user.setAccountLocked(existingUser.isAccountLocked());
-    }
-
     @VIPExternalSafe
     public User update(User user) throws VipException {
-        User existingUser = getUserWithGroups(user.getEmail());
+        User existingUser = getUserWithGroupsById(user.getId());
         Set<Group> groupsToJoin = new HashSet<>(user.getGroups());
         Set<Group> groupsToLeave = new HashSet<>(existingUser.getGroups());
 
         groupsToJoin.removeAll(existingUser.getGroups());
         groupsToLeave.removeAll(user.getGroups());
-    
-        // we use JsonView to protect "sensitive"
-        // fields from being edited (see @User.class)
-        // not all can be handled like that, especially for groups
+
         if ( ! getUserLevel().equals(UserLevel.Administrator)) {
             if ( ! user.getId().equals(getUser().getId())) {
                 // only admin can edit others accounts
@@ -115,14 +94,16 @@ public class UserBusiness extends CommonBusiness {
 
             // here user try to join private group (forbidden)
             // but it's okay if the user try to leave a private group
-            if ( ! groupsToJoin.stream().allMatch(Group::isPublicGroup)) {
-                throw new VipException(DefaultError.ACCESS_DENIED);
-            }
+            assertPublicNonAutoGroups(groupsToJoin);
+        } else {
+            // verify groups exist
+            assertGroupsExist(groupsToJoin);
         }
 
-        // Preserve fields not sent in the JSON payload (hidden by @JsonView or absent).
-        // Non-null values from the request are kept; null fields fall back to the existing record.
-        loadMissingFields(user, existingUser);
+        // most fields can be null, then they will be filled with the existing values
+        // That is especially the case with JsonViews, but not only
+        // also most fields are not editable, some only by admins
+        loadAndVerifyFields(user, existingUser);
         try {
             userDAO.update(user);
 
@@ -135,6 +116,105 @@ public class UserBusiness extends CommonBusiness {
             return user;
         } catch (DAOException ex) {
             throw new VipException(ex);
+        }
+    }
+
+    private void loadAndVerifyFields(User user, User existingUser) throws VipException {
+        // These fields can never be changed. Some can be present if the same, other must never be present
+        // id, registration time, last login time, terms of use time, last publication update time, api key
+        // next email, code, session, failed auth
+        assertFieldUnchanged(User::getId, user, existingUser, "id");
+        user.setId(existingUser.getId());
+        assertFieldUnchanged(User::getRegistration, user, existingUser, "registration");
+        user.setRegistration(existingUser.getRegistration());
+        assertFieldUnchanged(User::getLastLogin, user, existingUser, "lastLogin");
+        user.setLastLogin(existingUser.getLastLogin());
+        assertFieldUnchanged(User::getTermsOfUse, user, existingUser, "termsOfUse");
+        user.setTermsOfUse(existingUser.getTermsOfUse());
+        assertFieldUnchanged(User::getLastUpdatePublications, user, existingUser, "lastUpdatePublication");
+        user.setLastUpdatePublications(existingUser.getLastUpdatePublications());
+        assertFieldUnchanged(User::getApiKey, user, existingUser, "apikey");
+        user.setApiKey(existingUser.getApiKey());
+        assertFieldAbsent(User::getNextEmail, user, "nextEmail");
+        user.setNextEmail(existingUser.getNextEmail());
+        assertFieldAbsent(User::getCode, user, "code");
+        user.setCode(existingUser.getCode());
+        assertFieldAbsent(User::getSession, user, "session");
+        user.setSession(existingUser.getSession());
+        assertFieldAbsent(User::getFailedAuthentications, user, "failedAuthentication");
+        user.setFailedAuthentications(existingUser.getFailedAuthentications());
+
+        // These fields are always editable, fill them if they are null
+        // institution, country code
+        if (user.getInstitution() == null) user.setInstitution(existingUser.getInstitution());
+        if (user.getCountryCode() == null) user.setCountryCode(existingUser.getCountryCode());
+
+
+        // These fields can only be modified by admin
+        // folder, accountLocked, first name, last name, email, confirmed, level, max running simulation
+        if ( ! getCurrentUser().isSystemAdministrator()) {
+            assertFieldAbsent(User::getFolder, user, "folder");
+            user.setFolder(existingUser.getFolder());
+            assertFieldAbsent(User::isAccountLocked, user, "locked");
+            user.setAccountLocked(existingUser.isAccountLocked());
+            assertFieldUnchanged(User::getFirstName, user, existingUser, "firstName");
+            user.setFirstName(existingUser.getFirstName());
+            assertFieldUnchanged(User::getLastName, user, existingUser, "lastName");
+            user.setLastName(existingUser.getLastName());
+            assertFieldUnchanged(User::getEmail, user, existingUser, "email");
+            user.setEmail(existingUser.getEmail());
+            assertFieldUnchanged(User::isConfirmed, user, existingUser, "confirmed");
+            user.setConfirmed(existingUser.isConfirmed());
+            assertFieldUnchanged(User::getLevel, user, existingUser, "level");
+            user.setLevel(existingUser.getLevel());
+            assertFieldUnchanged(User::getMaxRunningSimulations, user, existingUser, "maxRunningSimulations");
+            user.setMaxRunningSimulations(existingUser.getMaxRunningSimulations());
+        } else {
+            if (user.getFolder() == null) user.setFolder(existingUser.getFolder());
+            if (user.isAccountLocked() == null) user.setAccountLocked(existingUser.isAccountLocked());
+            if (user.getFirstName() == null) user.setFirstName(existingUser.getFirstName());
+            if (user.getLastName() == null) user.setLastName(existingUser.getLastName());
+            if (user.getEmail() == null) user.setEmail(existingUser.getEmail());
+            if (user.isConfirmed() == null) user.setConfirmed(existingUser.isConfirmed());
+            if (user.getLevel() == null) user.setLevel(existingUser.getLevel());
+            if (user.getMaxRunningSimulations() == null) user.setMaxRunningSimulations(existingUser.getMaxRunningSimulations());
+        }
+    }
+
+    private void assertFieldUnchanged(Function<User, Object> getter, User user, User existingUser, String fieldName) throws VipException {
+        Object oldValue = getter.apply(existingUser);
+        Object newValue = getter.apply(user);
+        if (newValue == null) {
+            return;
+        }
+        if ( ! Objects.equals(newValue, oldValue)) {
+            logger.error("Forbidden Field {} changed from [{}] to [{}]", fieldName, oldValue, newValue);
+            throw new VipException(DefaultError.BAD_INPUT_FIELD, fieldName, "Cannot be updated");
+        }
+    }
+
+    private void assertFieldAbsent(Function<User, Object> getter, User user, String fieldName) throws VipException {
+        Object value = getter.apply(user);
+        if (value != null) {
+            logger.error("Forbidden Field {} present with [{}]", fieldName, value);
+            throw new VipException(DefaultError.BAD_INPUT_FIELD, fieldName, "Cannot be present");
+        }
+    }
+
+    public void assertPublicNonAutoGroups(Set<Group> groups) throws VipException {
+        Set<Group> publicNonAutoGroups =
+                groupBusiness.getPublic().stream().filter(group -> ! group.isAuto()).collect(Collectors.toSet());
+        if ( ! publicNonAutoGroups.containsAll(groups)) {
+            logger.error("Cannot join these groups [{}], one of them does not exist or is not public or is auto", groups);
+            throw new VipException(DefaultError.BAD_INPUT_FIELD, "groups", "Must only contains public non-auto groups");
+        }
+    }
+
+    public void assertGroupsExist(Set<Group> groups) throws VipException {
+        Set<Group> allGroups = new HashSet<>(groupBusiness.get());
+        if ( ! allGroups.containsAll(groups)) {
+            logger.error("Cannot join these groups [{}], one of them does not exist ", groups);
+            throw new VipException(DefaultError.BAD_INPUT_FIELD, "groups", "Contains a not existing group");
         }
     }
 
@@ -278,12 +358,11 @@ public class UserBusiness extends CommonBusiness {
         }
 
         return new User(
-                CoreUtil.createUUID(),
                 firstName.trim(),
                 lastName.trim(),
                 email.trim(),
                 institution.trim(),
-                cc, new Timestamp(System.currentTimeMillis()));
+                cc);
     }
 
     public User getUser(String email) throws VipException {
@@ -298,6 +377,18 @@ public class UserBusiness extends CommonBusiness {
         try {
             User user = userDAO.get(email);
             user.setGroups(usersGroupsDAO.getUserGroups(email));
+            return user;
+        } catch (DAOException ex) {
+            throw new VipException(ex);
+        }
+    }
+
+    public User getUserWithGroupsById(String id) throws VipException {
+        try {
+            User user = userDAO.getById(id);
+            if (user != null) {
+                user.setGroups(usersGroupsDAO.getUserGroups(user.getEmail()));
+            }
             return user;
         } catch (DAOException ex) {
             throw new VipException(ex);
@@ -458,13 +549,7 @@ public class UserBusiness extends CommonBusiness {
         if ( ! getUserLevel().equals(UserLevel.Administrator) && ! getUser().getId().equals(id)) {
             throw new VipException(DefaultError.ACCESS_DENIED);
         } else {
-            User user = userDAO.getById(id);
-
-            if (user != null) {
-                user.setGroups(usersGroupsDAO.getUserGroups(user.getEmail()));
-            }
-
-            return user;
+            return getUserWithGroupsById(id);
         }
     }
 

@@ -67,14 +67,13 @@ public class PersonalLayout extends AbstractFormLayout {
                         if (institutionField.validate() & countryField.validate()) {
 
                             User user = new User(
-                                    CoreModule.user.getId(),
                                     CoreModule.user.getFirstName(),
                                     CoreModule.user.getLastName(),
                                     CoreModule.user.getEmail(),
                                     institutionField.getValueAsString().trim(),
                                     UserLevel.valueOf(levelLabel.getContents()),
                                     CountryCode.valueOf(countryField.getValueAsString()));
-                            user.setFolder(CoreModule.user.getFolder());
+                            user.setId(CoreModule.user.getId());
 
                             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                             final AsyncCallback<User> callback = new AsyncCallback<User>() {

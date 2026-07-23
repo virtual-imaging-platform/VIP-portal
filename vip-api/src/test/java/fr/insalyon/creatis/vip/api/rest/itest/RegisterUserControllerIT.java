@@ -29,7 +29,7 @@ class RegisterUserControllerIT extends BaseRestApiSpringIT {
     public void registerEndpointOk() throws Exception {
         mockMvc.perform(
                         post("/rest/register").
-                                content(asJsonString(UserTestUtils.restUser1))
+                                content(mapper.writeValueAsString(UserTestUtils.restUser1))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -49,7 +49,7 @@ class RegisterUserControllerIT extends BaseRestApiSpringIT {
         UserTestUtils.restUser1.setCountryCode(null);
         mockMvc.perform(
                 post("/rest/register") .
-                        content(asJsonString(UserTestUtils.restUser1))
+                        content(mapper.writeValueAsString(UserTestUtils.restUser1))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())

@@ -66,7 +66,7 @@ public class OidcLoginController {
         }
 
         try {
-            User vipUser = authenticationBusiness.getOrCreateUser((String) userAttributes.get("email"), domainName, null);
+            User vipUser = authenticationBusiness.getOrCreateUser((String) userAttributes.get("email"), domainName);
             Session session = new Session();
 
             session.id = vipUser.getSession();
