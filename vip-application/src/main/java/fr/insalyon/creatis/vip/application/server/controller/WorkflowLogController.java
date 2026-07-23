@@ -11,6 +11,7 @@ import fr.insalyon.creatis.vip.application.server.business.WorkflowLogBusiness.J
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,13 +28,13 @@ public class WorkflowLogController {
         this.workflowLogBusiness = workflowLogBusiness;
     }
 
-    @GetMapping("{wid}/stdout")
+    @GetMapping(value = "{wid}/stdout", produces = MediaType.TEXT_PLAIN_VALUE)
     public String readStdout(@PathVariable String wid) throws VipException {
         requireWorkflowExists(wid);
         return workflowLogBusiness.readExecutionStdout(wid);
     }
 
-    @GetMapping("{wid}/stderr")
+    @GetMapping(value = "{wid}/stderr", produces = MediaType.TEXT_PLAIN_VALUE)
     public String readStderr(@PathVariable String wid) throws VipException {
         requireWorkflowExists(wid);
         return workflowLogBusiness.readExecutionStderr(wid);
@@ -45,7 +46,7 @@ public class WorkflowLogController {
         return workflowLogBusiness.listJobs(wid);
     }
 
-    @GetMapping("{wid}/jobs/{invocationId}/logs/{type}")
+    @GetMapping(value = "{wid}/jobs/{invocationId}/logs/{type}", produces = MediaType.TEXT_PLAIN_VALUE)
     public String readJobLog(
             @PathVariable String wid,
             @PathVariable Integer invocationId,
