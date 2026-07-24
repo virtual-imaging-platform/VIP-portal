@@ -11,4 +11,22 @@ export const enginesApi = {
       .get<PrecisePage<BackendEngine>>('/internal/engines', { params })
       .then((r) => r.data)
   },
+
+  create: (e: Engine) => {
+    return backendClient
+      .post<BackendEngine>(`/internal/engines`, e)
+      .then((r) => r.data)
+  },
+
+  update: (e: Engine) => {
+    return backendClient
+      .put<BackendEngine>(`/internal/engines/${e.name}`, e)
+      .then((r) => r.data)
+  },
+
+  delete: (e: Engine) => {
+    return backendClient
+      .delete<void>(`/internal/engines/${e.name}`)
+      .then((r) => r.data)
+  },
 }

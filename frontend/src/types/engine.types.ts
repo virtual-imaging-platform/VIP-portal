@@ -3,9 +3,10 @@ export type EngineStatus = 'enabled' | 'disabled'
 export interface EngineListParams {
   offset?: number
   quantity?: number
-  resource?: string
+  name?: string
   status?: string
   endpoint?: string
+  resource?: string
 }
 
 export interface Engine {
