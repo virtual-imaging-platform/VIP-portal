@@ -293,11 +293,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         return engineBusiness.getAll();
     }
 
-    @Override
-    public Engine getEngine(String engineName) throws VipException {
-        authenticateSystemAdministrator(logger);
-        return engineBusiness.get(engineName);
-    }
 
     @Override
     public AppVersion getVersion(String applicationName, String applicationVersion) throws VipException {

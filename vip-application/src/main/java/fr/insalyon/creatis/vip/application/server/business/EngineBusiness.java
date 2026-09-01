@@ -95,11 +95,6 @@ public class EngineBusiness extends CommonBusiness {
     public List<Engine> getUsableEngines(Resource resource) throws VipException {
         List<Engine> engines = getByResource(resource);
 
-        engines = getByResource(resource);
-
-        if (engines.isEmpty()) {
-            engines = getAll();
-        }
         return engines
                 .stream()
                 .filter((e) -> e.getStatus().equals("enabled"))
