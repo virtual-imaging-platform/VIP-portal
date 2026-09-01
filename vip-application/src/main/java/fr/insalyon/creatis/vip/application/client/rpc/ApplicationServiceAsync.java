@@ -54,8 +54,6 @@ public interface ApplicationServiceAsync {
     public void removeEngine(String engineName, AsyncCallback<Void> asyncCallback);
     
     public void getEngines(AsyncCallback<List<Engine>> asyncCallback);
-
-    public void getEngine(String engineName, AsyncCallback<Engine> asyncCallback);
     
     public void addResource(Resource resource, AsyncCallback<String> asyncCallback);
 
