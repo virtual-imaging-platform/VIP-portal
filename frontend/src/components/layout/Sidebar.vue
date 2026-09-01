@@ -32,6 +32,7 @@ const emit = defineEmits<{
 
 const route = useRoute()
 const auth = useAuthStore()
+const isAdmin = computed(() => auth.user?.level === 'Administrator')
 
 interface NavItem {
   name: string
@@ -117,30 +118,32 @@ function isActive(path: string) {
           {{ item.badge }}
         </span>
       </RouterLink>
-      <div class="divider border-b border-gray-300" role="separator" aria-hidden="true"></div>
-      <RouterLink
-        v-for="item in adminNav"
-        :key="item.to"
-        :to="item.to"
-        :class="[
-          'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
-          isActive(item.to)
-            ? 'bg-primary-50 text-primary-700'
-            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-        ]"
-      >
-        <component
-          :is="item.icon"
-          :class="['h-5 w-5 shrink-0', isActive(item.to) ? 'text-primary-600' : 'text-gray-400']"
-        />
-        <span class="flex-1">{{ item.name }}</span>
-        <span
-          v-if="item.badge"
-          class="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1.5 text-xs font-medium text-white"
+      <template v-if="isAdmin">
+        <div class="divider border-b border-gray-300" role="separator" aria-hidden="true"></div>
+        <RouterLink
+          v-for="item in adminNav"
+          :key="item.to"
+          :to="item.to"
+          :class="[
+            'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
+            isActive(item.to)
+              ? 'bg-primary-50 text-primary-700'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+          ]"
         >
-          {{ item.badge }}
-        </span>
-      </RouterLink>
+          <component
+            :is="item.icon"
+            :class="['h-5 w-5 shrink-0', isActive(item.to) ? 'text-primary-600' : 'text-gray-400']"
+          />
+          <span class="flex-1">{{ item.name }}</span>
+          <span
+            v-if="item.badge"
+            class="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1.5 text-xs font-medium text-white"
+          >
+            {{ item.badge }}
+          </span>
+        </RouterLink>
+      </template>
     </nav>
 
     <div class="border-t border-gray-100 px-3 py-4 space-y-1">

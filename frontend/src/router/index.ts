@@ -81,7 +81,7 @@ const router = createRouter({
       path: '/engines',
       name: 'engines',
       component: () => import('@/views/EnginesView.vue'),
-      meta: { requiresAuth: true, title: 'Engines' },
+      meta: { requiresAuth: true, requiredRoles: ['Administrator'], title: 'Engines' },
     },
     {
       path: '/workflows/:id',
@@ -106,6 +106,7 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
+  const requiredRoles = to.meta.requiredRoles as string[]
 
   if (!auth.initialized) {
     await auth.initialize()
@@ -124,6 +125,16 @@ router.beforeEach(async (to) => {
     auth.isAuthenticated &&
     ['login', 'register', 'activate'].includes(to.name as string)
   ) {
+    return { name: 'dashboard' }
+  }
+
+  if (
+    to.meta.requiresAuth &&
+    auth.isAuthenticated &&
+    requiredRoles?.length &&
+    !requiredRoles.some(role =>
+      auth.user?.level.includes(role)
+    )) {
     return { name: 'dashboard' }
   }
 })
