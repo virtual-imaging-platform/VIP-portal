@@ -1,7 +1,9 @@
 package fr.insalyon.creatis.vip.application.models;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
+import fr.insalyon.creatis.vip.core.server.inter.DataViews;
 
 import java.util.Date;
 
@@ -9,6 +11,7 @@ import java.util.Date;
  *
  * @author Rafael Ferreira da Silva
  */
+@JsonView(DataViews.User.class)
 public class Task implements IsSerializable {
 
     private String id;
@@ -23,6 +26,7 @@ public class Task implements IsSerializable {
     private String[] parameters;
     private int minorStatus;
     private int jobID;
+    private String executionTimeSlurm;
 
     public Task() {
     }
@@ -205,4 +209,10 @@ public class Task implements IsSerializable {
         this.creationDate = creationDate;
     }
     public String getExitMessage() { return GaswExitCode.fromCode(this.exitCode).getMessage(); }
+    
+    public String getExecutionTimeSlurm() {return executionTimeSlurm;}
+
+    public void setExecutionTimeSlurm(String executionTimeSlurm) {
+        this.executionTimeSlurm = executionTimeSlurm;
+    }
 }
