@@ -213,11 +213,19 @@ public class ExecutionBusiness {
             // Build the data structure 
             Map<String, Object> jobData = new HashMap<>();
             
+            logger.info("SLURM TEST | execution={} | invocation={} | task={} | executionTimeSlurm={}",
+                            s.getID(),
+                            invocationId,
+                            t.getId(),
+                            t.getExecutionTimeSlurm()
+                        );
+
             jobData.put("status", t.getStatus().name());
             jobData.put("exitCode", t.getExitCode());
             jobData.put("exitMessage", t.getExitMessage());
             jobData.put("inputs", jobInputs);   
             jobData.put("outputs", jobOutputs);
+            jobData.put("executionTimeSlurm", t.getExecutionTimeSlurm());
             jobsMap.put(invocationId, jobData);
         }
         // Attach the compiled jobs map to the Execution object

@@ -1,3 +1,4 @@
+
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
@@ -35,7 +36,6 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
     public SimulationData(String dbPath) {
         super(dbPath);
     }
-
     @Override
     public List<Task> getTasks() throws DAOException {
 
@@ -44,14 +44,17 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         try {
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
-                    + "invocation_id, status, command "
+                    + "invocation_id, status, command, execution_time_slurm "
                     + "FROM Jobs "
                     + "ORDER BY creation");
 
             while (rs.next()) {
-                list.add(new Task(rs.getInt("invocation_id"),
+                Task task = new Task(rs.getInt("invocation_id"),
                         TaskStatus.valueOf(rs.getString("status")),
-                        rs.getString("command")));
+                        rs.getString("command"));
+
+                task.setExecutionTimeSlurm(rs.getString("execution_time_slurm"));
+                list.add(task);
             }
             stat.close();
 
@@ -65,7 +68,6 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         }
         return list;
     }
-
     @Override
     public List<Task> getTasks(int jobID) throws DAOException {
 
@@ -208,7 +210,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery(
                     "SELECT j.id, j.invocation_id, creation, status, command, file_name, exit_code, " +
-                            "node_site, node_name, parameters, ms " +
+                            "node_site, node_name, parameters, ms , execution_time_slurm " +
                             "FROM Jobs AS j " +
                             "LEFT JOIN ( " +
                             "  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm " +
@@ -226,12 +228,16 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     minorStatus = parseMinorStatus(rs.getString("ms"));
                 }
 
-                list.add(new Task( rs.getString("id"), rs.getInt("invocation_id"),
-                        rs.getTimestamp("creation"), status,
-                        rs.getString("command"), rs.getString("file_name"),
-                        rs.getInt("exit_code"), rs.getString("node_site"),
-                        rs.getString("node_name"), minorStatus,
-                        rs.getString("parameters").split(" ")));
+                Task task = new Task(rs.getString("id"), rs.getInt("invocation_id"),
+                    rs.getTimestamp("creation"), status,
+                    rs.getString("command"), rs.getString("file_name"),
+                    rs.getInt("exit_code"), rs.getString("node_site"),
+                    rs.getString("node_name"), minorStatus,
+                    rs.getString("parameters").split(" "));
+
+            task.setExecutionTimeSlurm(rs.getString("execution_time_slurm"));
+
+           list.add(task);
             }
             stat.close();
 
