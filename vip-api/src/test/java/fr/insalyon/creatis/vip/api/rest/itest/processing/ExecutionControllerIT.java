@@ -407,6 +407,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
             put("status", "COMPLETED");
             put("inputs", new ArrayList<>());
             put("outputs", new ArrayList<>());
+            put("executionTimeSlurm", null);
         }});
 
         setUpResourceAndEngine(appName, versionName, engineEndpoint);
