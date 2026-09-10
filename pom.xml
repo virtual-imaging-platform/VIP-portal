@@ -26,7 +26,7 @@
 
         <!-- 3rd party dependencies version -->
         <junit.version>5.11.3</junit.version>
-        <spring-framework.version>6.2.10</spring-framework.version>
+        <spring-framework.version>6.2.19</spring-framework.version>
         <springsecurity.version>6.3.4</springsecurity.version>
         <springoauth.version>6.3.4</springoauth.version>
         <jackson.version>2.18.0</jackson.version>
