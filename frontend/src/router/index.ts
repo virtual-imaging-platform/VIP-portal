@@ -84,6 +84,12 @@ const router = createRouter({
       meta: { requiresAuth: true, requiredRoles: ['Administrator'], title: 'Engines' },
     },
     {
+      path: '/resources',
+      name: 'resources',
+      component: () => import('@/views/ResourcesView.vue'),
+      meta: { requiresAuth: true, requiredRoles: ['Administrator'], title: 'Resources' },
+    },
+    {
       path: '/workflows/:id',
       name: 'workflow-detail',
       component: () => import('@/views/WorkflowDetailView.vue'),

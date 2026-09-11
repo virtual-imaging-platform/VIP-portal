@@ -15,4 +15,15 @@ export const resourcesApi = {
       .get<PrecisePage<BackendResource>>('/internal/resources', { params })
       .then((r) => r.data)
   },
+  create: (e: Resource) => {
+    return backendClient.post<BackendResource>(`/internal/resources`, e).then((r) => r.data)
+  },
+
+  update: (e: Resource) => {
+    return backendClient.put<BackendResource>(`/internal/resources/${e.name}`, e).then((r) => r.data)
+  },
+
+  delete: (e: Resource) => {
+    return backendClient.delete<void>(`/internal/resources/${e.name}`).then((r) => r.data)
+  },
 }
