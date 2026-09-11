@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.core.server.security;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,6 +50,7 @@ public class InternalSecurityConfig {
                         .requestMatchers(antMatcher(HttpMethod.PUT, "/internal/users/*/activate")).permitAll()
                         .requestMatchers(antMatcher(HttpMethod.GET, "/internal/applications/public")).permitAll()
                         .requestMatchers(antMatcher(HttpMethod.GET, "/internal/publications/public")).permitAll()
+                        .requestMatchers(antMatcher("/internal/engines")).hasRole(UserLevel.Administrator.name().toUpperCase())
                         .requestMatchers(antMatcher("/internal/**")).authenticated())
                 // default CORS : no configuration, so block preflight and let the rest
                 .cors(Customizer.withDefaults())

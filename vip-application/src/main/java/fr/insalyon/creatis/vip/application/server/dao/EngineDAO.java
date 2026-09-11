@@ -13,7 +13,9 @@ public interface EngineDAO {
 
     public void remove(String name) throws DAOException;
     
-    public List<Engine> get() throws DAOException;
+    public List<Engine> getAll() throws DAOException;
+
+    public Engine get(String name) throws DAOException;
     
     public List<Engine> getByResource(Resource resource) throws DAOException;
 }

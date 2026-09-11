@@ -1,11 +1,13 @@
 package fr.insalyon.creatis.vip.core.server.security.common;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import fr.insalyon.creatis.vip.core.models.User;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -26,7 +28,11 @@ public class SpringPrincipalUser implements UserDetails, Principal {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new ArrayList<>(); // not used at the moment
+        if (vipUser.getLevel() != null) {
+            return List.of(new SimpleGrantedAuthority("ROLE_" + vipUser.getLevel().name().toUpperCase()));
+        }
+        // level should not be null
+        return new ArrayList<>();
     }
 
     @Override
