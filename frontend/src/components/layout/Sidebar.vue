@@ -11,6 +11,7 @@ import {
   BookOpen,
   Mail,
   ServerCog,
+  Server,
   User,
   Shield,
   Users,
@@ -64,6 +65,11 @@ const adminNav = computed<NavItem[]>(() => [
     name: 'Engines',
     to: '/engines',
     icon: ServerCog,
+  },
+  {
+    name: 'Resources',
+    to: '/resources',
+    icon: Server,
   }
 ])
 
