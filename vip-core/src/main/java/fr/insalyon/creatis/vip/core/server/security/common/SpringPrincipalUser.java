@@ -8,6 +8,7 @@ import fr.insalyon.creatis.vip.core.models.User;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -27,7 +28,11 @@ public class SpringPrincipalUser implements UserDetails, Principal {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + vipUser.getLevel().name().toUpperCase()));
+        if (vipUser.getLevel() != null) {
+            return List.of(new SimpleGrantedAuthority("ROLE_" + vipUser.getLevel().name().toUpperCase()));
+        }
+        // level should not be null
+        return new ArrayList<>();
     }
 
     @Override

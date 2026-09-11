@@ -67,8 +67,9 @@ public class EngineBusiness extends CommonBusiness {
         return pageBuilder.doPrecise(offset, quantity, getAll());
     }
 
+    @VIPExternalSafe
     public List<Engine> getAll() throws VipException {
-
+        permissions.filter(PermissionChain::admin);
         try {
             return engineDAO.getAll();
         } catch (DAOException ex) {
@@ -76,7 +77,9 @@ public class EngineBusiness extends CommonBusiness {
         }
     }
 
+    @VIPExternalSafe
     public Engine get(String name) throws VipException {
+        permissions.filter(PermissionChain::admin);
         try {
             return engineDAO.get(name);
         } catch (DAOException ex) {

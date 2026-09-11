@@ -114,7 +114,7 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
 
     @Override
     public Engine get(String name) throws DAOException {
-        String query = "SELECT name, endpoint, status FROM VIPEngines WHERE name = ? ORDER BY name";
+        String query = "SELECT name, endpoint, status FROM VIPEngines WHERE name = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, name);
