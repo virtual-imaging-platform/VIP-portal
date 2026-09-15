@@ -4,7 +4,6 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 
 public class SessionAuthenticationToken extends AbstractAuthenticationToken {
 
@@ -12,7 +11,7 @@ public class SessionAuthenticationToken extends AbstractAuthenticationToken {
     private String session;
 
     public SessionAuthenticationToken(UserDetails details, String session, boolean connected) {
-        super(details != null ? details.getAuthorities() : new ArrayList<>());
+        super(details != null ? details.getAuthorities() : AuthorityUtils.NO_AUTHORITIES);
         principal = details;
         this.session = session;
         setAuthenticated(connected);
