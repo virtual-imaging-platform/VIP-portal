@@ -242,6 +242,15 @@ public class SimulationBusiness extends CommonBusiness {
             throw new VipException(ex);
         }
     }
+    public Map<String, String> getJobMetrics(String simulationID, String jobID) throws VipException {
+
+    try {
+        return getSimulationDAO(simulationID).getJobMetrics(jobID);
+
+    } catch (DAOException ex) {
+        throw new VipException(ex);
+    }
+}
 
     public String readFile(
             String simulationID, String folder, String fileName, String extension)

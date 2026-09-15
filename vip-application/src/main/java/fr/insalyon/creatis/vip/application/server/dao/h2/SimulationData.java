@@ -1,3 +1,4 @@
+
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
@@ -35,7 +36,6 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
     public SimulationData(String dbPath) {
         super(dbPath);
     }
-
     @Override
     public List<Task> getTasks() throws DAOException {
 
@@ -49,9 +49,11 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + "ORDER BY creation");
 
             while (rs.next()) {
-                list.add(new Task(rs.getInt("invocation_id"),
+                Task task = new Task(rs.getInt("invocation_id"),
                         TaskStatus.valueOf(rs.getString("status")),
-                        rs.getString("command")));
+                        rs.getString("command"));
+
+                list.add(task);
             }
             stat.close();
 
@@ -65,7 +67,6 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         }
         return list;
     }
-
     @Override
     public List<Task> getTasks(int jobID) throws DAOException {
 
@@ -226,12 +227,15 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     minorStatus = parseMinorStatus(rs.getString("ms"));
                 }
 
-                list.add(new Task( rs.getString("id"), rs.getInt("invocation_id"),
-                        rs.getTimestamp("creation"), status,
-                        rs.getString("command"), rs.getString("file_name"),
-                        rs.getInt("exit_code"), rs.getString("node_site"),
-                        rs.getString("node_name"), minorStatus,
-                        rs.getString("parameters").split(" ")));
+                Task task = new Task(rs.getString("id"), rs.getInt("invocation_id"),
+                    rs.getTimestamp("creation"), status,
+                    rs.getString("command"), rs.getString("file_name"),
+                    rs.getInt("exit_code"), rs.getString("node_site"),
+                    rs.getString("node_name"), minorStatus,
+                    rs.getString("parameters").split(" "));
+
+
+           list.add(task);
             }
             stat.close();
 
@@ -245,6 +249,29 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             close(logger);
         }
         return list;
+    }
+    
+    @Override
+    public Map<String, String> getJobMetrics(String jobId) throws DAOException {
+        Map<String, String> metrics = new HashMap<>();
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "SELECT metric_name, metric_value FROM Job_Metrics WHERE job_id = ?");
+            ps.setString(1, jobId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                metrics.put(rs.getString("metric_name"), rs.getString("metric_value"));
+            }
+            ps.close();
+        } catch (SQLException ex) {
+            if (!ex.getMessage().contains("Table \"JOB_METRICS\" not found")) {
+                logger.error("Error getting metrics for job {}", jobId, ex);
+                throw new DAOException(ex);
+            }
+        } finally {
+            close(logger);
+        }
+        return metrics;
     }
 
     @Override

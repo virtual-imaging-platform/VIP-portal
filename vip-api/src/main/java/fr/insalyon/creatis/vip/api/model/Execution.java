@@ -115,7 +115,7 @@ public class Execution {
     public void setStatus(ExecutionStatus status) {
         this.status = status;
     }
-
+   
     @JsonIgnore
     // allow to fetch the inputValues list deserialized by jackson
     // only used on execution init

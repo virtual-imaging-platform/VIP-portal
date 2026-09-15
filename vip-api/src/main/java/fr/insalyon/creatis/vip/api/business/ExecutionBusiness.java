@@ -116,7 +116,29 @@ public class ExecutionBusiness {
             throw new VipException("no file name for job " + invocationId + " in execution " + executionId);
         }
     }
+    public Map<String, String> getJobMetrics(String executionId, Integer invocationId) throws VipException {
+        List<Task> tasks = simulationBusiness.getJobsList(executionId);
 
+        Task targetTask;
+        if (invocationId == null) {
+            if (tasks.size() == 1) {
+                targetTask = tasks.get(0);
+            } else {
+                throw new VipException("invocationId is required when multiple jobs exist");
+            }
+        } else {
+            targetTask = tasks.stream()
+                    .filter(t -> invocationId.equals(t.getInvocationID()))
+                    .max(Comparator.comparing(Task::getCreationDate))
+                    .orElse(null);
+        }
+
+        if (targetTask == null) {
+            throw new VipException("no job found for execution " + executionId);
+        }
+
+        return simulationBusiness.getJobMetrics(executionId, targetTask.getId());
+    }
     public Execution getExample(String executionId) throws VipException {
         Workflow workflow = listWorkflowsBusiness.getExample(executionId);
         return getExecutionFromWorkflow(workflow, false);
@@ -213,6 +235,12 @@ public class ExecutionBusiness {
             // Build the data structure 
             Map<String, Object> jobData = new HashMap<>();
             
+            logger.info("SLURM TEST | execution={} | invocation={} | task={}",
+                            s.getID(),
+                            invocationId,
+                            t.getId()
+                        );
+
             jobData.put("status", t.getStatus().name());
             jobData.put("exitCode", t.getExitCode());
             jobData.put("exitMessage", t.getExitMessage());

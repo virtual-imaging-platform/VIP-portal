@@ -39,4 +39,6 @@ public interface SimulationDAO {
     public int[] getNumberOfActiveTasks() throws DAOException;
 
     public Map<String, Integer> getNodeCountriesMap() throws DAOException;
+
+    public Map<String, String> getJobMetrics(String jobId) throws DAOException;
 }
