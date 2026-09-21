@@ -1,48 +1,41 @@
-<script setup lang="ts" generic="T extends Record<string, unknown>">
+<script setup lang="ts" generic="TOption, TValue">
 import { computed, ref } from 'vue'
 
-type Key = string | number
-
 const props = defineProps<{
-  options: T[]
-  modelValue: T[]
-  optionValue?: keyof T
-  optionLabel?: keyof T
-  placeholder?: string
+  options: TOption[]
+  modelValue: TValue[]
+  isSame: (model: TValue, option: TOption) => boolean
+  getValue: (option: TOption) => TValue
+  getLabel: (option: TOption) => string
 }>()
-
-const optionValue = computed(() => props.optionValue ?? 'id')
-const optionLabel = computed(() => props.optionLabel ?? 'label')
 
 const emit = defineEmits<{
-  'update:modelValue': [value: T[]]
+  'update:modelValue': [value: TValue[]]
 }>()
+
 const isOpen = ref(false)
 
 const selectedLabels = computed(() =>
-  props.modelValue
-    .map(option => String(option[optionLabel.value]))
+  props.options
+    .filter(isSelected)
+    .map(props.getLabel)
     .join(', '),
 )
 
-function isSelected(option: T): boolean {
-  return props.modelValue.some(
-    selected =>
-      selected[optionValue.value] === option[optionValue.value],
+function isSelected(option: TOption): boolean {
+  return props.modelValue.some(selected =>
+    props.isSame(selected, option),
   )
 }
 
-function toggleOption(option: T) {
+function toggleOption(option: TOption) {
   const selected = isSelected(option)
 
-  const updatedValue = selected
-    ? props.modelValue.filter(
-        item =>
-          item[optionValue.value] !== option[optionValue.value],
-      )
-    : [...props.modelValue, option]
+  const updated = selected
+    ? props.modelValue.filter(item => !props.isSame(item, option))
+    : [...props.modelValue, props.getValue(option)]
 
-  emit('update:modelValue', updatedValue)
+  emit('update:modelValue', updated)
 }
 
 function closeDropdown() {
@@ -55,23 +48,22 @@ function closeDropdown() {
       @click.self="closeDropdown">
     <button
       type="button"
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:opacity-60"
+      class="flex w-full rounded-lg text-sm disabled:opacity-60"
       :aria-expanded="isOpen"
       @click="isOpen = !isOpen"
     >
-    <span>{{ selectedLabels || placeholder || 'Select items' }}</span>
-    <!-- TODO align right at the border -->
-      <span aria-hidden="true">⌄</span>
+      <span>{{ selectedLabels || 'Select items' }}</span>
+      <span aria-hidden="true" class="ml-auto">⌄</span>
     </button>
 
-    <div v-if="isOpen" class="flex-col border border-gray-300 px-3 max-h-16 overflow-y-scroll text-sm disabled:opacity-60">
-      <label v-for="option in options" :key="String(option[optionValue])">
+    <div v-if="isOpen" class="absolute left-0 top-full z-50 mt-2 w-full max-h-48 overflow-y-auto rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-lg">
+      <label v-for="option in options" :key="props.getLabel(option)" class="block">
         <input
             type="checkbox"
             :checked="isSelected(option)"
             @change="toggleOption(option)"
         />
-        {{ option[optionLabel] }}
+        {{ props.getLabel(option) }}
       </label>
     </div>
   </div>

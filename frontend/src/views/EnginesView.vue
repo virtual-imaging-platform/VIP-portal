@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref, computed, watch } from 'vue'
 import { Search, Plus } from 'lucide-vue-next'
-import AppBadge from '@/components/ui/AppBadge.vue'
+import AppBadge, { type BadgeVariant } from '@/components/ui/AppBadge.vue'
 import AppCard from '@/components/ui/AppCard.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import { useEnginesStore } from '@/stores/engines.store'
-import type { Engine, EngineStatus, EngineListParams } from '@/types/engine.types'
+import {type Engine,type EngineStatus,type EngineListParams, EngineStatusList } from '@/types/engine.types'
 
 const enginesStore = useEnginesStore()
 
@@ -18,13 +18,10 @@ const isUpdating = ref(false)
 const defaultEngineForm: Engine = { name: '', endpoint: '', status: 'disabled' as EngineStatus }
 const editForm = ref<Engine>({ ...defaultEngineForm })
 
-const statusColors = {
-  enabled: 'primary',
-  disabled: 'gray'
+const engineStatusColors: Record<EngineStatus, BadgeVariant> = {
+  "enabled": 'primary',
+  "disabled": 'gray'
 } as const
-
-//TODO use enum and Object.values(EngineStatus) instead, actully cannot as status styling use type match
-const statusList: string[] = ['enabled', 'disabled']
 
 
 function buildParams(): EngineListParams {
@@ -108,7 +105,7 @@ onMounted(loadEngines)
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Engines</h1>
       <p class="mt-1 text-sm text-gray-500">
-        Browse (and manage, SOON!) your engine.
+        Browse and manage your engines.
       </p>
     </div>
 
@@ -126,7 +123,7 @@ onMounted(loadEngines)
             class="mt-1 block rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="all">All</option>
-            <option v-for="s in statusList" :key="s" :value="s">{{ s }}</option>
+            <option v-for="s in EngineStatusList" :key="s" :value="s">{{ s }}</option>
           </select>
         </div>
         <div>
@@ -169,7 +166,7 @@ onMounted(loadEngines)
               <td class="px-4 py-3 font-medium text-gray-900">{{ eg.name }}</td>
               <td class="px-4 py-3 text-gray-600">{{ eg.endpoint }}</td>
               <td class="px-4 py-3">
-                <AppBadge :variant="statusColors[eg.status] || 'gray'">{{ eg.status }}</AppBadge>
+                <AppBadge :variant="engineStatusColors[eg.status] || 'gray'">{{ eg.status }}</AppBadge>
               </td>
             </tr>
           </tbody>
@@ -217,7 +214,7 @@ onMounted(loadEngines)
           <input v-model="editForm.name" :disabled="isUpdating" type="text" placeholder="Name *" class="rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:opacity-60" />
           <input v-model="editForm.endpoint" type="text" placeholder="Endpoint *" class="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
           <select v-model="editForm.status" class="rounded-lg border border-gray-300 px-3 py-2 text-sm" >
-            <option v-for="s in statusList" :key="s" :value="s" :selected="s === editForm.status">{{ s }}</option>
+            <option v-for="s in EngineStatusList" :key="s" :value="s" :selected="s === editForm.status">{{ s }}</option>
           </select>
         </div>
 
