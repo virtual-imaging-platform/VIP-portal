@@ -6,15 +6,16 @@ import AppCard from '@/components/ui/AppCard.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import MultiSelect from '@/components/ui/MultiSelect.vue'
 import { useResourcesStore } from '@/stores/resources.store'
-import { type Resource, type ResourceType, ResourceTypeList } from '@/types/resource.types'
+import { type Resource, type ResourceType, ResourceTypeList, ResourceStatusList } from '@/types/resource.types'
 import type { Group } from '@/types/group.types'
 import { useGroupsStore } from '@/stores/groups.store'
+import { useEnginesStore } from '@/stores/engines.store'
 
 const resourcesStore = useResourcesStore()
 const groupsStore = useGroupsStore()
+const enginesStore = useEnginesStore()
 
 const searchFilter = ref('')
-const resourceTypeFilter = ref('')
 const page = ref(0)
 const pageSize = 20
 const modalOpened = ref(false)
@@ -29,10 +30,7 @@ const defaultResourceForm: Resource = {
 }
 const editForm = ref<Resource>({ ...defaultResourceForm })
 const selectedResource = ref<Resource>()
-const resourceStatusList = {
-  "activated": true,
-  "deactivated": false
-}
+const resourceStatus = (status: boolean) => status === true ? "enabled" : "disabled"
   
   //TODO add type + status filter with string value like engine, so I can add an undefined to prevent filtering
 const filteredResources = computed(() => {
@@ -59,7 +57,7 @@ function openCreateModal() {
 
 function openUpdateModal(r: Resource) {
   isUpdating.value = true
-  selectedResource.value = { ...r, groups: [...r.groups] }
+  selectedResource.value = { ...r, groups: [...r.groups], engines: [...r.engines] }
   openModal(r)
 }
 
@@ -95,6 +93,7 @@ function clearForm() {
 async function loadResources() {
   page.value = 0
   await resourcesStore.fetchResources(page.value * pageSize, pageSize)
+  await enginesStore.fetchEngines()
   await groupsStore.fetchResourceGroups()
 }
 
@@ -111,7 +110,7 @@ onMounted(loadResources)
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Resources</h1>
       <p class="mt-1 text-sm text-gray-500">
-        Browse (and manage, SOON!) your resource.
+        Browse and manage your resources.
       </p>
     </div>
 
@@ -120,20 +119,17 @@ onMounted(loadResources)
         Add resource
     </AppButton>
 
-    <!-- TODO add by groups + engine filter ? => need to fetch them beforehand -->
-    <AppCard padding class="space-y-4">
-      <div class="flex flex-wrap items-end gap-3">
-        <div>
-          <label class="block text-xs font-medium text-gray-600">Search</label>
-          <input
-            v-model="searchFilter"
-            type="search"
-            placeholder="Search by name"
-            class="block w-full rounded-lg border border-gray-300 py-2 pl-4 pr-4 text-sm placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-0"
-          />
-        </div>
-      </div>
-    </AppCard>
+    <div class="relative">
+      <Search
+        class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+      />
+      <input
+        v-model="searchFilter"
+        type="search"
+        placeholder="Search by name..."
+        class="block w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-4 text-sm placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-0"
+      />
+    </div>
 
     <AppCard :padding="false">
       <div v-if="resourcesStore.isLoading" class="flex justify-center py-16 text-sm text-gray-500">
@@ -152,21 +148,43 @@ onMounted(loadResources)
               <th class="px-4 py-3 text-left font-semibold text-gray-700">Status</th>
               <th class="px-4 py-3 text-left font-semibold text-gray-700">Type</th>
               <th class="px-4 py-3 text-left font-semibold text-gray-700">Configuration</th>
+              <th class="px-4 py-3 text-left font-semibold text-gray-700">Groups</th>
+              <th class="px-4 py-3 text-left font-semibold text-gray-700">Engines</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
             <tr
-              v-for="eg in filteredResources"
-              :key="eg.name"
+              v-for="r in filteredResources"
+              :key="r.name"
               class="transition hover:bg-gray-50"
-              @click="openUpdateModal(eg)"
+              @click="openUpdateModal(r)"
             >
-              <td class="px-4 py-3 font-medium text-gray-900">{{ eg.name }}</td>
+              <td class="px-4 py-3 font-medium text-gray-900">{{ r.name }}</td>
               <td class="px-4 py-3">
-                <AppBadge :variant="eg.status ? 'primary' : 'gray'">{{ eg.status }}</AppBadge>
+                <AppBadge :variant="r.status ? 'primary' : 'gray'">{{ resourceStatus(r.status) }}</AppBadge>
               </td>
-              <td class="px-4 py-3 text-gray-600">{{ eg.type }}</td>
-              <td class="px-4 py-3 text-gray-600">{{ eg.configuration }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ r.type }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ r.configuration }}</td>
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap gap-1.5">
+                  <AppBadge
+                  v-for="g in r.groups.map(grp => grp.name)"
+                  :key="`${r.name}-${g}`"
+                  >
+                    {{ g }}
+                  </AppBadge>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap gap-1.5">
+                  <AppBadge
+                  v-for="e in r.engines"
+                  :key="`${r.name}-${e}`"
+                  >
+                    {{ e }}
+                  </AppBadge>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -212,9 +230,9 @@ onMounted(loadResources)
         <form id="submit-form" @submit.prevent="submitForm">
           <div class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
             <input v-model="editForm.name" required :disabled="isUpdating" type="text" placeholder="Name *" class="rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:opacity-60" />
-            <!-- <select v-model="editForm.status" class="rounded-lg border border-gray-300 px-3 py-2 text-sm" >
-              <option v-for="s in Object.keys(resourceStatusList)" :key="s" :value="s" :selected="s === editForm.status">{{ s }}</option>
-            </select> -->
+            <select v-model="editForm.status" class="rounded-lg border border-gray-300 px-3 py-2 text-sm" >
+              <option v-for="s in ResourceStatusList" :key="resourceStatus(s)" :value="s" :selected="s === editForm.status">{{ resourceStatus(s) }}</option>
+            </select>
             <select v-model="editForm.type" class="rounded-lg border border-gray-300 px-3 py-2 text-sm" >
               <option v-for="s in ResourceTypeList" :key="s" :value="s" :selected="s === editForm.type">{{ s }}</option>
             </select>
@@ -222,20 +240,17 @@ onMounted(loadResources)
             <MultiSelect
               v-model="editForm.groups"
               :options="groupsStore.groups"
-              :option-value="'name'"
-              :option-label="'name'"
-              placeholder="Resource group"
+              :is-same="(model, option) => model.name === option.name"
+              :get-value="group => group"
+              :get-label="group => group.name"
             />
-            <!-- <div class="relative flex flex-col overflow-y-scroll max-h-16 rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:opacity-60">
-              <label v-for="group in groupsStore.groups" :key="group.name">
-                <input
-                  v-model="editForm.groups"
-                  type="checkbox"
-                  :value="group"
-                />
-                {{ group.name }}
-              </label>
-            </div> -->
+            <MultiSelect
+              v-model="editForm.engines"
+              :options="enginesStore.engines"
+              :is-same="(model, option) => model === option.name"
+              :get-value="engine => engine.name"
+              :get-label="engine => engine.name"
+            />
           </div>
         </form>
 

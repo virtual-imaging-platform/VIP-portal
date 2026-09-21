@@ -1,4 +1,6 @@
-export type EngineStatus = 'enabled' | 'disabled'
+export const EngineStatusList = ['enabled', 'disabled']
+
+export type EngineStatus = typeof EngineStatusList[number]
 
 export interface EngineListParams {
   offset?: number
