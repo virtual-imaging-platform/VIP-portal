@@ -182,7 +182,7 @@ public class AppVersionBusiness extends CommonBusiness {
             .stream()
             .filter((g) -> g.getType().equals(GroupType.APPLICATION))
             .collect(Collectors.toList());
-        List<Application> apps = new ArrayList<>();
+        Set<Application> apps = new HashSet<>();
 
         for (Group group : publicAppGroups) {
             for (Application app : applicationBusiness.getApplications(group)) {
@@ -195,9 +195,9 @@ public class AppVersionBusiness extends CommonBusiness {
 
         Map<String, Long> popularity = getApplicationsPopularity();
 
-        // remove doublons + sort by popularity desc and then name asc
-        return apps.stream().collect(Collectors.toMap(Application::getName, a -> a, (a1, a2) -> a1)).values()
-                .stream().sorted(Comparator.comparingLong((Application a) -> popularity.getOrDefault(a.getName(), 0L)).reversed()
+        // sort by popularity desc and then name asc
+        return apps.stream()
+                .sorted(Comparator.comparingLong((Application a) -> popularity.getOrDefault(a.getName(), 0L)).reversed()
                         .thenComparing(Application::getName)).collect(Collectors.toList());
     }
 

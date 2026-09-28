@@ -38,10 +38,16 @@ public class PipelineController extends ApiController {
         return pipelineBusiness.listPipelines(studyIdentifier);
     }
 
-    @RequestMapping(params = "public")
+    @RequestMapping(params = {"public", "!format"})
     public List<Pipeline> listPublicPipelines() throws VipException {
         logMethodInvocation(logger, "listPublicPipelines");
         return pipelineBusiness.listPublicPipelines();
+    }
+
+    @RequestMapping(params = {"public", "format=boutiques"})
+    public List<BoutiquesDescriptor> listPublicPipelinesBoutiquesDescriptors() throws VipException {
+        logMethodInvocation(logger, "listPublicPipelinesBoutiquesDescriptors");
+        return pipelineBusiness.listPublicPipelinesDescriptor();
     }
 
     @RequestMapping("{pipelineId}")

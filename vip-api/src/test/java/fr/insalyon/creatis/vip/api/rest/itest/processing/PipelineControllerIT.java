@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
+
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.fileParam;
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.flagParam;
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.getFullPipeline;
@@ -20,14 +21,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import fr.insalyon.creatis.vip.core.models.GroupType;
+import java.util.Date;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import fr.insalyon.creatis.vip.application.models.AppVersion;
+import fr.insalyon.creatis.vip.core.models.GroupType;
 
 public class PipelineControllerIT extends BaseRestApiSpringIT {
 
@@ -73,18 +77,58 @@ public class PipelineControllerIT extends BaseRestApiSpringIT {
         createGroup("group2", GroupType.APPLICATION, false);
         createAnApplication("app3", "group2");
         AppVersion app31 = createAVersion("app3", "v1", true);
-        clearContext();
+        //To test deduplication
+        createGroup("group3");
+        putApplicationInGroup(app12.getApplicationName(), "group3");
 
+        //To test popularity score
+        createUser(baseUser1);
+        Workflow w1 = new Workflow("w1", baseUser1.getFullName(), fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus.Completed, new Date(), new Date(), "description", app11.getApplicationName(), app11.getVersion(), "applicationClass", "engine", null);
+        Workflow w2 = new Workflow("w2", baseUser1.getFullName(), fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus.Completed, new Date(), new Date(), "description", app11.getApplicationName(), app11.getVersion(), "applicationClass", "engine", null);
+        clearContext();
         // public URL, not authenticated
         mockMvc.perform(get("/rest/pipelines?public"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$[*]", hasSize(3)))
+                .andExpect(jsonPath("$[0].identifier", equalTo(app11.getApplicationName() + "/" + app11.getVersion())))
                 .andExpect(jsonPath("$[*]", containsInAnyOrder(
                         jsonCorrespondsToPipeline(getPipeline(app11)),
                         jsonCorrespondsToPipeline(getPipeline(app12)),
                         jsonCorrespondsToPipeline(getPipeline(app21)))));
+    }
+
+    @Test
+    public void shouldReturnPublicAppsDescriptors() throws Exception {
+        setAdminContext();
+        createGroup("group1public", GroupType.APPLICATION, true);
+        createAnApplication("app1visible", "group1public");
+        AppVersion app1g1 = applicationTestConfigurer.createAVersion("app1visible", "v67",
+                getResourceAsString("boutiques/test-boutiques2.json"), true);
+        createGroup("group2public", GroupType.APPLICATION, true);
+        createAnApplication("app2hidden", "group2public");
+        AppVersion app2g2 = applicationTestConfigurer.createAVersion("app2hidden", "v42",
+                getResourceAsString("boutiques/test-boutiques.json"), false);
+        createAnApplication("app3visible", "group2public");
+        AppVersion app3g2 = applicationTestConfigurer.createAVersion("app3visible", "v42",
+                getResourceAsString("boutiques/test-boutiques.json"), true);
+        createGroup("group3private", GroupType.APPLICATION, false);
+        createAnApplication("app4visible", "group3private");
+        AppVersion app4g3 = applicationTestConfigurer.createAVersion("app4visible", "v67",
+                getResourceAsString("boutiques/test-boutiques2.json"), true);
+        clearContext();
+
+        // public URL, not authenticated
+        mockMvc.perform(get("/rest/pipelines?public&format=boutiques"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$[*]", hasSize(2)))
+                .andExpect(jsonPath("$[*].description", containsInAnyOrder(
+                        equalTo(boutiquesBusiness.parseBoutiquesString(app1g1.getDescriptor()).getDescription()),
+                        equalTo(boutiquesBusiness.parseBoutiquesString(app3g2.getDescriptor()).getDescription())
+                )));
     }
 
     @Test
