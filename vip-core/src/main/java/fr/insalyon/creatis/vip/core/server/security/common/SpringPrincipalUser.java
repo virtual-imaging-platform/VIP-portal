@@ -1,12 +1,16 @@
 package fr.insalyon.creatis.vip.core.server.security.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import fr.insalyon.creatis.vip.core.models.User;
 
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Collection;
 
 /**
@@ -15,6 +19,7 @@ import java.util.Collection;
 public class SpringPrincipalUser implements UserDetails, Principal {
 
     private final User vipUser;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public SpringPrincipalUser(User vipUser) {
         this.vipUser = vipUser;
@@ -26,7 +31,11 @@ public class SpringPrincipalUser implements UserDetails, Principal {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new ArrayList<>(); // not used at the moment
+        if (vipUser.getLevel() != null) {
+            return List.of(new SimpleGrantedAuthority("ROLE_" + vipUser.getLevel().name().toUpperCase()));
+        }
+        logger.debug("No level found for user id: " + vipUser.getId());
+        return AuthorityUtils.NO_AUTHORITIES;
     }
 
     @Override
