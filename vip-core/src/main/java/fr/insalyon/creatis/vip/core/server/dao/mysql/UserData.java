@@ -605,7 +605,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
-                    + "VIPUsers SET pass = ?, double_hashed = FALSE WHERE email = ?");
+                    + "VIPUsers SET pass = ? WHERE email = ?");
 
             ps.setString(1, newPassword);
             ps.setString(2, email);
@@ -950,77 +950,15 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     public String getPasswordHash(String email) throws DAOException {
         try (PreparedStatement ps = getConnection().prepareStatement(
                 "SELECT pass FROM VIPUsers WHERE email=?")) {
-
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
-
             if (rs.next()) {
                 return rs.getString("pass");
             }
             return null;
-
         } catch (SQLException ex) {
             logger.error("Error getting password hash for {}", email, ex);
             throw new DAOException(ex);
         }
     }
-
-    @Override
-    public boolean isDoubleHashed(String email) throws DAOException {
-        try (PreparedStatement ps = getConnection().prepareStatement(
-                "SELECT double_hashed FROM VIPUsers WHERE email=?")) {
-
-            ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getBoolean("double_hashed");
-            }
-            return false;
-
-        } catch (SQLException ex) {
-            logger.error("Error checking double_hashed flag for {}", email, ex);
-            throw new DAOException(ex);
-        }
-    }
-
-    @Override
-    public void markDoubleHashed(String email, String doubleHashedPassword) throws DAOException {
-        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE "
-                + "VIPUsers SET pass = ?, double_hashed = TRUE WHERE email = ?")) {
-
-            ps.setString(1, doubleHashedPassword);
-            ps.setString(2, email);
-            ps.executeUpdate();
-
-        } catch (SQLException ex) {
-            logger.error("Error marking password as double-hashed for {}", email, ex);
-            throw new DAOException(ex);
-        }
-    }
-
-    @Override
-    public List<String> getEmailsWithLegacyPassword(int offset, int limit) throws DAOException {
-        try (PreparedStatement ps = getConnection().prepareStatement(
-                "SELECT email FROM VIPUsers WHERE LENGTH(pass) = 32 AND double_hashed = FALSE "
-                        + "LIMIT ? OFFSET ?")) {
-
-            ps.setInt(1, limit);
-            ps.setInt(2, offset);
-            ResultSet rs = ps.executeQuery();
-
-            List<String> emails = new ArrayList<>();
-            while (rs.next()) {
-                emails.add(rs.getString("email"));
-            }
-            return emails;
-
-        } catch (SQLException ex) {
-            logger.error("Error listing accounts with legacy MD5 password (offset={}, limit={})", offset, limit, ex);
-            throw new DAOException(ex);
-        }
-    }
-
-
-
 }

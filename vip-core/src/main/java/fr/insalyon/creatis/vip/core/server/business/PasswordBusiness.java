@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import fr.insalyon.creatis.devtools.MD5;
@@ -18,51 +18,54 @@ import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 public class PasswordBusiness extends CommonBusiness {
 
     private final UserDAO userDAO;
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
     @Autowired
     public PasswordBusiness(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
+
     public boolean isModernFormat(String storedHash) {
-        return storedHash != null
-                && (storedHash.startsWith("$2a$")
-                || storedHash.startsWith("$2b$")
-                || storedHash.startsWith("$2y$"));
+        return storedHash != null && storedHash.startsWith("$argon2id$");
     }
 
     public String hash(String plainPassword) {
-        return encoder.encode(plainPassword);
+        return encoder.encode(md5(plainPassword));
     }
 
     public boolean verify(String plainPassword, String storedHash) {
-        return encoder.matches(plainPassword, storedHash);
+        return encoder.matches(md5(plainPassword), storedHash);
+    }
+
+    public String upgradeLegacyMd5Hash(String existingMd5Hash) {
+        return encoder.encode(existingMd5Hash);
+    }
+
+    private String md5(String plainPassword) {
+        try {
+            return MD5.get(plainPassword);
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+            logger.error("Error computing MD5 step for password hashing", ex);
+            throw new RuntimeException(ex);
+        }
     }
 
     public void update(User user, String currentPassword, String newPassword) throws VipException {
         try {
             String storedHash = userDAO.getPasswordHash(user.getEmail());
-            boolean currentPasswordCorrect;
-
-            if (storedHash != null && isModernFormat(storedHash)) {
-                currentPasswordCorrect = verify(currentPassword, storedHash);
-            } else {
-                String md5Attempt = MD5.get(currentPassword);
-                currentPasswordCorrect = storedHash != null && md5Attempt.equals(storedHash);
-            }
+            boolean currentPasswordCorrect = storedHash != null
+                    && isModernFormat(storedHash)
+                    && verify(currentPassword, storedHash);
 
             if (!currentPasswordCorrect) {
-                logger.error("Wrong current password for {}", user.getEmail());
+                logger.error("The current password mismatch for {}", user.getEmail());
                 throw new VipException("The current password mismatch.");
             }
 
-            String newPasswordHash = hash(newPassword);
-            userDAO.resetPassword(user.getEmail(), newPasswordHash);
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
-            logger.error("Error updating password for {}", user.getEmail(), ex);
+            userDAO.resetPassword(user.getEmail(), hash(newPassword));
+        } catch (DAOException ex) {
             throw new VipException(ex);
-        } catch (DAOException ex) 
-            {throw new VipException(ex);}
+        }
     }
 
     public void setPassword(String email, String newPassword) throws VipException {

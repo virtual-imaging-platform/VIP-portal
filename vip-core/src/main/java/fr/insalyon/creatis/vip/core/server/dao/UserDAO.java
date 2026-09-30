@@ -101,12 +101,5 @@ public interface UserDAO {
 
     List<User> getByFullNames(List<String> fullNames) throws DAOException;
 
-    String getPasswordHash(String email) throws DAOException;
-
-    boolean isDoubleHashed(String email) throws DAOException;
-
-    void markDoubleHashed(String email, String doubleHashedPassword) throws DAOException;
-    
-    List<String> getEmailsWithLegacyPassword(int offset, int limit) throws DAOException;
-
+    public String getPasswordHash(String email) throws DAOException;
 }
