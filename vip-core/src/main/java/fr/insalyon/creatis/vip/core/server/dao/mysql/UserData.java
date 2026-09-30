@@ -946,4 +946,19 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                 rs.getBoolean("account_locked"),
                 rs.getString("apikey"));
     }
+    @Override
+    public String getPasswordHash(String email) throws DAOException {
+        try (PreparedStatement ps = getConnection().prepareStatement(
+                "SELECT pass FROM VIPUsers WHERE email=?")) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("pass");
+            }
+            return null;
+        } catch (SQLException ex) {
+            logger.error("Error getting password hash for {}", email, ex);
+            throw new DAOException(ex);
+        }
+    }
 }
