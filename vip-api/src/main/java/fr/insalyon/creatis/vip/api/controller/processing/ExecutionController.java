@@ -1,6 +1,7 @@
 package fr.insalyon.creatis.vip.api.controller.processing;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,6 +155,12 @@ public class ExecutionController extends ApiController {
         logMethodInvocation(logger, "getJobStderr", executionId, invocationId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         return executionBusiness.getLog(executionId, invocationId, "err");
+    }
+  @RequestMapping(value = "/{executionId}/metrics", produces = "application/json")
+    public Map<String, String> getExecutionMetrics(@PathVariable String executionId) throws VipException {
+        logMethodInvocation(logger, "getExecutionMetrics", executionId);
+        executionBusiness.checkIfUserCanAccessExecution(executionId);
+        return executionBusiness.getJobMetrics(executionId, null);
     }
 
     @RequestMapping(value = "/{executionId}/play", method = RequestMethod.PUT)
