@@ -23,6 +23,7 @@ import fr.insalyon.creatis.vip.core.server.business.ProxyBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.business.PasswordBusiness;
+import fr.insalyon.creatis.vip.core.server.business.SessionBusiness;
 import fr.insalyon.creatis.vip.core.server.business.TermsOfUseBusiness;
 import fr.insalyon.creatis.vip.core.server.business.UserBusiness;
 import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
@@ -45,6 +46,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     private PasswordBusiness passwordBusiness;
     private EmailBusiness emailBusiness;
     private AuthenticationBusiness authenticationBusiness;
+    private SessionBusiness sessionBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -59,6 +61,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         passwordBusiness = getBean(PasswordBusiness.class);
         emailBusiness = getBean(EmailBusiness.class);
         authenticationBusiness = getBean(AuthenticationBusiness.class);
+        sessionBusiness = getBean(SessionBusiness.class);
     }
     
     @Override
@@ -86,15 +89,12 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public void signout() throws CoreException {
         try {
-            authenticationBusiness.signout(getSessionUser().getEmail());
             trace(logger, "Signed out.");
-            getSession().removeAttribute(CoreConstants.SESSION_USER);
-            getSession().removeAttribute(CoreConstants.SESSION_GROUPS);
+            sessionBusiness.signout(getThreadLocalRequest(), getThreadLocalResponse());
         } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
-
     @Override
     public User activate(String code) throws CoreException {
         try {
@@ -399,6 +399,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             userBusiness.resetNextEmail(newEmail);
 
             currentUser = userBusiness.getUserData(newEmail);
+            sessionBusiness.createLoginCookies(getThreadLocalRequest(), getThreadLocalResponse(),
+                    sessionBusiness.getSession(currentUser));
             return setUserInSession(currentUser);
         } catch (VipException ex) {
             throw new CoreException(ex);

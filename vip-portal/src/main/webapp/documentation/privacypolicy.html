@@ -57,6 +57,30 @@
   2. Data uploaded by users on the platform. VIP is not intended to be used as a long-term storage platform. Once their project has concluded, VIP users are responsible for the suppression
   of the data they may have uploaded on VIP. Data uploaded on VIP may be stored and transferred on machines distributed worldwide without warranty of any kind.
 
+   <h2>Cookies and local storage</h2>
+  <p>
+    VIP only uses cookies and browser storage that are strictly necessary to provide the service you explicitly request
+    (signing in, keeping your session open, protecting you against cross-site request forgery) or to remember interface
+    choices you made. In accordance with article 82 of the French Data Protection Act (<i>loi Informatique et Libertés</i>),
+    which transposes article 5(3) of the ePrivacy Directive 2002/58/EC, and with the CNIL guidelines on cookies and other
+    trackers, these trackers are exempt from consent; this is why VIP does not display a cookie banner.
+    VIP does not use any advertising, social-network or audience-measurement (analytics) cookie.
+  </p>
+  <table border="1" cellpadding="4" style="border-collapse: collapse;">
+    <tr><th>Name</th><th>Type</th><th>Purpose</th><th>Lifetime</th></tr>
+    <tr><td>vip-cookie-session</td><td>Cookie (HttpOnly, Secure, SameSite=Lax)</td><td>Authentication: identifier of your session</td><td>7 days, deleted at sign-out</td></tr>
+    <tr><td>vip-cookie-user</td><td>Cookie (HttpOnly, Secure, SameSite=Lax)</td><td>Authentication: email address of the signed-in account, checked together with the session identifier</td><td>7 days, deleted at sign-out</td></tr>
+    <tr><td>XSRF-TOKEN</td><td>Cookie (Secure, SameSite=Lax)</td><td>Security: protection against cross-site request forgery (CSRF)</td><td>7 days, deleted at sign-out</td></tr>
+    <tr><td>JSESSIONID</td><td>Cookie (set by the application server)</td><td>Technical server-side session</td><td>Browser session</td></tr>
+    <tr><td>vip.recentApplications</td><td>Browser local storage</td><td>Interface: list of the applications you recently opened</td><td>Until you clear your browser data</td></tr>
+    <tr><td>vip.lastLaunchPayload</td><td>Browser local storage</td><td>Interface: pre-fills the launch form with your last parameters</td><td>Until you clear your browser data</td></tr>
+  </table>
+  <p>
+    These data never leave your browser except to be sent to VIP itself. You can delete them at any time from your
+    browser settings; blocking the authentication cookies will however prevent you from signing in.
+    When you sign in with EGI Check-in, EGI may set its own cookies on its domain, under its own privacy policy.
+  </p>
+  
   <h2>Data Protection Code of Conduct</h2>
   General Data Protection Regulation (GDPR) provides a framework for the processing of personal data on the territory of the European Union.
 

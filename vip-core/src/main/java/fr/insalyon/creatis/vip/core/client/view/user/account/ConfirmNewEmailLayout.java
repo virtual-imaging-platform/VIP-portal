@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.core.client.view.user.account;
 
-import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -90,11 +89,7 @@ public class ConfirmNewEmailLayout extends AbstractFormLayout {
                                 Modules.getInstance().userUpdated(CoreModule.user, result);
                                 CoreModule.user = result;
 
-                                // the user mail has changed, need to update it in the cookie
-                                if (Cookies.isCookieEnabled()) {
-                                    Cookies.setCookie(CoreConstants.COOKIES_USER, result.getEmail(),
-                                            CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
-                                }
+
 
                                 WidgetUtil.resetIButton(validateButton, "Validate", CoreConstants.ICON_SAVED);
                                 validateButton.setDisabled(true);
