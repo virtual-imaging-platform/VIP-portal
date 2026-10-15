@@ -10,7 +10,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.RestClientAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
@@ -56,7 +56,7 @@ public class GeneralSecurityConfig {
                             .baseUri("/oauth2/authorize-client")
                             .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository()))
                     .tokenEndpoint((token)->token
-                            .accessTokenResponseClient(new DefaultAuthorizationCodeTokenResponseClient()))
+                            .accessTokenResponseClient(new RestClientAuthorizationCodeTokenResponseClient()))
                     .defaultSuccessUrl("/rest/loginOIDC", true)
                     .failureUrl("/loginFailure"));
         }

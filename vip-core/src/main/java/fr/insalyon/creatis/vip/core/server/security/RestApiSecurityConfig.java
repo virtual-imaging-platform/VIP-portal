@@ -1,7 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.security;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -37,6 +36,8 @@ import fr.insalyon.creatis.vip.core.server.security.oidc.OidcResolver;
 @Configuration
 @EnableWebSecurity
 public class RestApiSecurityConfig {
+
+    private static final PathPatternRequestMatcher.Builder PATH = PathPatternRequestMatcher.withDefaults();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -78,22 +79,22 @@ public class RestApiSecurityConfig {
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         // Spring Security configuration for /rest API endpoints, common to both API key and OIDC authentications.
-        // Note that it is required to used AntPathRequestMatcher.antMatcher() everywhere below,
-        // otherwise Spring uses MvcRequestMatcher as the default requestMatchers implementation.
+        // Explicit PathPatternRequestMatcher is used everywhere below (AntPathRequestMatcher is deprecated
+        // for removal since Spring Security 6.5).
         http
-                .securityMatcher(antMatcher("/rest/**"))
+                .securityMatcher(pathMatcher("/rest/**"))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(antMatcher("/rest/platform")).permitAll()
-                        .requestMatchers(antMatcher("/rest/authenticate")).permitAll()
-                        .requestMatchers(antMatcher("/rest/session")).permitAll()
+                        .requestMatchers(pathMatcher("/rest/platform")).permitAll()
+                        .requestMatchers(pathMatcher("/rest/authenticate")).permitAll()
+                        .requestMatchers(pathMatcher("/rest/session")).permitAll()
                         .requestMatchers(new RegexRequestMatcher("/rest/pipelines\\?public(?:&format=boutiques)?$", "GET")).permitAll()
-                        .requestMatchers(antMatcher("/rest/publications")).permitAll()
-                        .requestMatchers(antMatcher("/rest/reset-password")).permitAll()
-                        .requestMatchers(antMatcher("/rest/register")).permitAll()
-                        .requestMatchers(antMatcher("/rest/executions/{executionId}/summary")).hasAnyRole("SERVICE")
-                        .requestMatchers(antMatcher("/rest/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
-                        .requestMatchers(antMatcher("/rest/admin/**")).hasAnyRole("ADMINISTRATOR")
-                        .requestMatchers(antMatcher("/rest/**")).authenticated()
+                        .requestMatchers(pathMatcher("/rest/publications")).permitAll()
+                        .requestMatchers(pathMatcher("/rest/reset-password")).permitAll()
+                        .requestMatchers(pathMatcher("/rest/register")).permitAll()
+                        .requestMatchers(pathMatcher("/rest/executions/{executionId}/summary")).hasAnyRole("SERVICE")
+                        .requestMatchers(pathMatcher("/rest/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
+                        .requestMatchers(pathMatcher("/rest/admin/**")).hasAnyRole("ADMINISTRATOR")
+                        .requestMatchers(pathMatcher("/rest/**")).authenticated()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling((exceptionHandling) ->
@@ -140,5 +141,9 @@ public class RestApiSecurityConfig {
         DefaultHttpFirewall firewall = new DefaultHttpFirewall();
         firewall.setAllowUrlEncodedSlash(true);
         return firewall;
+    }
+
+    private static PathPatternRequestMatcher pathMatcher(String pattern) {
+        return PATH.matcher(pattern);
     }
 }

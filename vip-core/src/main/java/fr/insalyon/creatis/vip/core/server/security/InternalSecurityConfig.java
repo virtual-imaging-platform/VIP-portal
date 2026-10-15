@@ -1,7 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.security;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationFilter;
 import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationProvider;
@@ -22,6 +21,7 @@ import org.springframework.security.web.firewall.RequestRejectedHandler;
 @Configuration
 @EnableWebSecurity
 public class InternalSecurityConfig {
+    private static final PathPatternRequestMatcher.Builder PATH = PathPatternRequestMatcher.withDefaults();
 
     private final SessionAuthenticationProvider sessionAuthenticationProvider;
     private final VipAuthenticationEntryPoint vipAuthenticationEntryPoint;
@@ -42,14 +42,14 @@ public class InternalSecurityConfig {
     public SecurityFilterChain getFilterChain(HttpSecurity http) throws Exception {
         http
                 .addFilterBefore(getSessionAuthenticationFilter(), BasicAuthenticationFilter.class)
-                .securityMatcher(antMatcher("/internal/**"))
+                .securityMatcher(pathMatcher("/internal/**"))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(antMatcher(HttpMethod.POST, "/internal/session")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.POST, "/internal/users")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.PUT, "/internal/users/*/activate")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.GET, "/internal/applications/public")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.GET, "/internal/publications/public")).permitAll()
-                        .requestMatchers(antMatcher("/internal/**")).authenticated())
+                        .requestMatchers(pathMatcher(HttpMethod.POST, "/internal/session")).permitAll()
+                        .requestMatchers(pathMatcher(HttpMethod.POST, "/internal/users")).permitAll()
+                        .requestMatchers(pathMatcher(HttpMethod.PUT, "/internal/users/*/activate")).permitAll()
+                        .requestMatchers(pathMatcher(HttpMethod.GET, "/internal/applications/public")).permitAll()
+                        .requestMatchers(pathMatcher(HttpMethod.GET, "/internal/publications/public")).permitAll()
+                        .requestMatchers(pathMatcher("/internal/**")).authenticated())
                 // default CORS : no configuration, so block preflight and let the rest
                 .cors(Customizer.withDefaults())
                 .csrf((csrf) -> csrf
@@ -59,9 +59,9 @@ public class InternalSecurityConfig {
                         // we could active CSRF protection on whole endpoint but we will need a
                         // /internal/csrf GET endpoint
                         .ignoringRequestMatchers(
-                            antMatcher(HttpMethod.POST, "/internal/session"),
-                            antMatcher(HttpMethod.POST, "/internal/users"),
-                            antMatcher(HttpMethod.PUT, "/internal/users/*/activate")
+                            pathMatcher(HttpMethod.POST, "/internal/session"),
+                            pathMatcher(HttpMethod.POST, "/internal/users"),
+                            pathMatcher(HttpMethod.PUT, "/internal/users/*/activate")
                         ))
                 .exceptionHandling((handler) -> handler.authenticationEntryPoint(vipAuthenticationEntryPoint));
         return http.build();
@@ -74,5 +74,13 @@ public class InternalSecurityConfig {
 
     private SessionAuthenticationFilter getSessionAuthenticationFilter() {
         return new SessionAuthenticationFilter(sessionAuthenticationProvider, vipAuthenticationEntryPoint);
+    }
+
+    private static PathPatternRequestMatcher pathMatcher(String pattern) {
+        return PATH.matcher(pattern);
+    }
+
+    private static PathPatternRequestMatcher pathMatcher(HttpMethod method, String pattern) {
+        return PATH.matcher(method, pattern);
     }
 }
