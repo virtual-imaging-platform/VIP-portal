@@ -1,6 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.security;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.withDefaults;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationFilter;
 import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationProvider;
@@ -40,16 +41,17 @@ public class InternalSecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain getFilterChain(HttpSecurity http) throws Exception {
+        PathPatternRequestMatcher.Builder internal = withDefaults().basePath("/internal");
         http
                 .addFilterBefore(getSessionAuthenticationFilter(), BasicAuthenticationFilter.class)
-                .securityMatcher(antMatcher("/internal/**"))
+                .securityMatcher(internal.matcher("/**"))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(antMatcher(HttpMethod.POST, "/internal/session")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.POST, "/internal/users")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.PUT, "/internal/users/*/activate")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.GET, "/internal/applications/public")).permitAll()
-                        .requestMatchers(antMatcher(HttpMethod.GET, "/internal/publications/public")).permitAll()
-                        .requestMatchers(antMatcher("/internal/**")).authenticated())
+                        .requestMatchers(internal.matcher(HttpMethod.POST, "/session")).permitAll()
+                        .requestMatchers(internal.matcher(HttpMethod.POST, "/users")).permitAll()
+                        .requestMatchers(internal.matcher(HttpMethod.PUT, "/users/*/activate")).permitAll()
+                        .requestMatchers(internal.matcher(HttpMethod.GET, "/applications/public")).permitAll()
+                        .requestMatchers(internal.matcher(HttpMethod.GET, "/publications/public")).permitAll()
+                        .requestMatchers(internal.matcher("/**")).authenticated())
                 // default CORS : no configuration, so block preflight and let the rest
                 .cors(Customizer.withDefaults())
                 .csrf((csrf) -> csrf
@@ -59,9 +61,9 @@ public class InternalSecurityConfig {
                         // we could active CSRF protection on whole endpoint but we will need a
                         // /internal/csrf GET endpoint
                         .ignoringRequestMatchers(
-                            antMatcher(HttpMethod.POST, "/internal/session"),
-                            antMatcher(HttpMethod.POST, "/internal/users"),
-                            antMatcher(HttpMethod.PUT, "/internal/users/*/activate")
+                            internal.matcher(HttpMethod.POST, "/session"),
+                            internal.matcher(HttpMethod.POST, "/users"),
+                            internal.matcher(HttpMethod.PUT, "/users/*/activate")
                         ))
                 .exceptionHandling((handler) -> handler.authenticationEntryPoint(vipAuthenticationEntryPoint));
         return http.build();
