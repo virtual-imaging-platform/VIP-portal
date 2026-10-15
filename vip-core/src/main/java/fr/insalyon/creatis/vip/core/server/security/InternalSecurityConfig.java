@@ -1,5 +1,7 @@
 package fr.insalyon.creatis.vip.core.server.security;
 
+import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.withDefaults;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +23,6 @@ import org.springframework.security.web.firewall.RequestRejectedHandler;
 @Configuration
 @EnableWebSecurity
 public class InternalSecurityConfig {
-    private static final PathPatternRequestMatcher.Builder PATH = PathPatternRequestMatcher.withDefaults();
 
     private final SessionAuthenticationProvider sessionAuthenticationProvider;
     private final VipAuthenticationEntryPoint vipAuthenticationEntryPoint;
@@ -40,16 +41,17 @@ public class InternalSecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain getFilterChain(HttpSecurity http) throws Exception {
+        PathPatternRequestMatcher.Builder internal = withDefaults().basePath("/internal");
         http
                 .addFilterBefore(getSessionAuthenticationFilter(), BasicAuthenticationFilter.class)
-                .securityMatcher(pathMatcher("/internal/**"))
+                .securityMatcher(internal.matcher("/**"))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(pathMatcher(HttpMethod.POST, "/internal/session")).permitAll()
-                        .requestMatchers(pathMatcher(HttpMethod.POST, "/internal/users")).permitAll()
-                        .requestMatchers(pathMatcher(HttpMethod.PUT, "/internal/users/*/activate")).permitAll()
-                        .requestMatchers(pathMatcher(HttpMethod.GET, "/internal/applications/public")).permitAll()
-                        .requestMatchers(pathMatcher(HttpMethod.GET, "/internal/publications/public")).permitAll()
-                        .requestMatchers(pathMatcher("/internal/**")).authenticated())
+                        .requestMatchers(internal.matcher(HttpMethod.POST, "/session")).permitAll()
+                        .requestMatchers(internal.matcher(HttpMethod.POST, "/users")).permitAll()
+                        .requestMatchers(internal.matcher(HttpMethod.PUT, "/users/*/activate")).permitAll()
+                        .requestMatchers(internal.matcher(HttpMethod.GET, "/applications/public")).permitAll()
+                        .requestMatchers(internal.matcher(HttpMethod.GET, "/publications/public")).permitAll()
+                        .requestMatchers(internal.matcher("/**")).authenticated())
                 // default CORS : no configuration, so block preflight and let the rest
                 .cors(Customizer.withDefaults())
                 .csrf((csrf) -> csrf
@@ -59,9 +61,9 @@ public class InternalSecurityConfig {
                         // we could active CSRF protection on whole endpoint but we will need a
                         // /internal/csrf GET endpoint
                         .ignoringRequestMatchers(
-                            pathMatcher(HttpMethod.POST, "/internal/session"),
-                            pathMatcher(HttpMethod.POST, "/internal/users"),
-                            pathMatcher(HttpMethod.PUT, "/internal/users/*/activate")
+                            internal.matcher(HttpMethod.POST, "/session"),
+                            internal.matcher(HttpMethod.POST, "/users"),
+                            internal.matcher(HttpMethod.PUT, "/users/*/activate")
                         ))
                 .exceptionHandling((handler) -> handler.authenticationEntryPoint(vipAuthenticationEntryPoint));
         return http.build();
@@ -74,13 +76,5 @@ public class InternalSecurityConfig {
 
     private SessionAuthenticationFilter getSessionAuthenticationFilter() {
         return new SessionAuthenticationFilter(sessionAuthenticationProvider, vipAuthenticationEntryPoint);
-    }
-
-    private static PathPatternRequestMatcher pathMatcher(String pattern) {
-        return PATH.matcher(pattern);
-    }
-
-    private static PathPatternRequestMatcher pathMatcher(HttpMethod method, String pattern) {
-        return PATH.matcher(method, pattern);
     }
 }

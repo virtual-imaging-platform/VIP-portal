@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.withDefaults;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
@@ -36,8 +37,6 @@ import fr.insalyon.creatis.vip.core.server.security.oidc.OidcResolver;
 @Configuration
 @EnableWebSecurity
 public class RestApiSecurityConfig {
-
-    private static final PathPatternRequestMatcher.Builder PATH = PathPatternRequestMatcher.withDefaults();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -81,20 +80,21 @@ public class RestApiSecurityConfig {
         // Spring Security configuration for /rest API endpoints, common to both API key and OIDC authentications.
         // Explicit PathPatternRequestMatcher is used everywhere below (AntPathRequestMatcher is deprecated
         // for removal since Spring Security 6.5).
+        PathPatternRequestMatcher.Builder rest = withDefaults().basePath("/rest");
         http
-                .securityMatcher(pathMatcher("/rest/**"))
+                .securityMatcher(rest.matcher("/**"))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(pathMatcher("/rest/platform")).permitAll()
-                        .requestMatchers(pathMatcher("/rest/authenticate")).permitAll()
-                        .requestMatchers(pathMatcher("/rest/session")).permitAll()
+                        .requestMatchers(rest.matcher("/platform")).permitAll()
+                        .requestMatchers(rest.matcher("/authenticate")).permitAll()
+                        .requestMatchers(rest.matcher("/session")).permitAll()
                         .requestMatchers(new RegexRequestMatcher("/rest/pipelines\\?public(?:&format=boutiques)?$", "GET")).permitAll()
-                        .requestMatchers(pathMatcher("/rest/publications")).permitAll()
-                        .requestMatchers(pathMatcher("/rest/reset-password")).permitAll()
-                        .requestMatchers(pathMatcher("/rest/register")).permitAll()
-                        .requestMatchers(pathMatcher("/rest/executions/{executionId}/summary")).hasAnyRole("SERVICE")
-                        .requestMatchers(pathMatcher("/rest/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
-                        .requestMatchers(pathMatcher("/rest/admin/**")).hasAnyRole("ADMINISTRATOR")
-                        .requestMatchers(pathMatcher("/rest/**")).authenticated()
+                        .requestMatchers(rest.matcher("/publications")).permitAll()
+                        .requestMatchers(rest.matcher("/reset-password")).permitAll()
+                        .requestMatchers(rest.matcher("/register")).permitAll()
+                        .requestMatchers(rest.matcher("/executions/{executionId}/summary")).hasAnyRole("SERVICE")
+                        .requestMatchers(rest.matcher("/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
+                        .requestMatchers(rest.matcher("/admin/**")).hasAnyRole("ADMINISTRATOR")
+                        .requestMatchers(rest.matcher("/**")).authenticated()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling((exceptionHandling) ->
@@ -143,7 +143,4 @@ public class RestApiSecurityConfig {
         return firewall;
     }
 
-    private static PathPatternRequestMatcher pathMatcher(String pattern) {
-        return PATH.matcher(pattern);
-    }
 }
