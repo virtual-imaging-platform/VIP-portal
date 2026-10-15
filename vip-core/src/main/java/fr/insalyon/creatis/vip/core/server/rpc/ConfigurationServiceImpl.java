@@ -89,16 +89,12 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public void signout() throws CoreException {
         try {
-            authenticationBusiness.signout(getSessionUser().getEmail());
             trace(logger, "Signed out.");
-            getSession().removeAttribute(CoreConstants.SESSION_USER);
-            getSession().removeAttribute(CoreConstants.SESSION_GROUPS);
-            sessionBusiness.clearLoginCookies(getThreadLocalResponse()); 
+            sessionBusiness.signout(getThreadLocalRequest(), getThreadLocalResponse());
         } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
-
     @Override
     public User activate(String code) throws CoreException {
         try {
@@ -406,8 +402,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             sessionBusiness.createLoginCookies(getThreadLocalRequest(), getThreadLocalResponse(),
                     sessionBusiness.getSession(currentUser));
             return setUserInSession(currentUser);
-        } catch (java.io.UnsupportedEncodingException ex) {
-            throw new CoreException(ex);
         } catch (VipException ex) {
             throw new CoreException(ex);
         }

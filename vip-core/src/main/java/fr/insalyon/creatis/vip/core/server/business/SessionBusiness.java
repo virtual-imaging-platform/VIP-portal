@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.function.Supplier;
 
@@ -22,6 +21,9 @@ import fr.insalyon.creatis.vip.core.server.model.Session;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class SessionBusiness {
@@ -49,11 +51,17 @@ public class SessionBusiness {
         return getSession(user);
     }
 
-    public void signout() throws VipException {
+    public void signout(HttpServletRequest request, HttpServletResponse response) throws VipException {
         authenticationBusiness.signout(userProvider.get().getEmail());
-
+        // remove current user from the HTTP session
+        HttpSession httpSession = request.getSession(false);
+        if (httpSession != null) {
+            httpSession.removeAttribute(CoreConstants.SESSION_USER);
+            httpSession.removeAttribute(CoreConstants.SESSION_GROUPS);
+        }
         // remove current user from Spring context
         SecurityContextHolder.clearContext();
+        clearLoginCookies(response);
     }
 
     public Session getSession(User user) {
@@ -66,13 +74,11 @@ public class SessionBusiness {
         return session;
     }
 
-    public void createLoginCookies(HttpServletRequest request, HttpServletResponse response, Session session) throws UnsupportedEncodingException {
+    public void createLoginCookies(HttpServletRequest request, HttpServletResponse response, Session session) {       
         CsrfToken token = new CookieCsrfTokenRepository().generateToken(request);
-
         response.addCookie(createCookie(CoreConstants.COOKIES_SESSION, session.id,
                 CoreConstants.COOKIES_DURATION, true));
-        response.addCookie(createCookie(CoreConstants.COOKIES_USER, URLEncoder.encode(session.email, "UTF-8"),
-                CoreConstants.COOKIES_DURATION, true));
+        response.addCookie(createCookie(CoreConstants.COOKIES_USER, URLEncoder.encode(session.email, StandardCharsets.UTF_8),                CoreConstants.COOKIES_DURATION, true));
         response.addCookie(createCookie(
                 CoreConstants.COOKIES_CSRF_TOKEN, token.getToken(), CoreConstants.COOKIES_DURATION, false));
     }

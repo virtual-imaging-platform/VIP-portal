@@ -3,7 +3,6 @@ package fr.insalyon.creatis.vip.core.server.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,15 +157,12 @@ public class UserController {
     @PutMapping(value = "{id}/activate")
     public Session activate(@PathVariable String id, @RequestBody @Valid ActivationCode activationCode,
             HttpServletRequest request, HttpServletResponse response) throws VipException {
-        try {
             User user = authenticationBusiness.activate(id, activationCode.getCode());
             Session session = sessionBusiness.getSession(user);
             sessionBusiness.createLoginCookies(request, response, session);
             userBusiness.updateUserLastLogin(user.getEmail());
             return session;
-        } catch (UnsupportedEncodingException e) {
-            throw new VipException("Failed to create session after activation", e);
-        }
+
     }
 
     @GetMapping(value = "{userId}/apikey")

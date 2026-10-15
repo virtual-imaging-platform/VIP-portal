@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.api.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Map;
 
@@ -74,7 +73,7 @@ public class OidcLoginController {
             
             SecurityContextHolder.clearContext(); // destroy spring session and use VIP own session mechanism
             sessionBusiness.createLoginCookies(request, response, session); // creates VIP cookies and session
-        } catch (VipException | UnsupportedEncodingException e) {
+        } catch (VipException e) {
             throw new VipException(ApiError.WRONG_OIDC_LOGIN, e);
         }
 
