@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
@@ -80,7 +81,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     @Override
-    public boolean authenticate(String email, String password) throws DAOException {
+    public boolean authenticate(String email, String password, PasswordEncoder passwordEncoder) throws DAOException { {
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "pass,account_locked FROM VIPUsers WHERE email=?");
@@ -92,7 +93,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                 String pass = rs.getString("pass");
                 boolean locked = rs.getBoolean("account_locked");
                 ps.close();
-                return !locked && pass != null && pass.equals(password);
+                return !locked && pass != null && passwordEncoder.matches(password, pass);
             }
             return false;
 
@@ -100,6 +101,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             logger.error("Error authenticating user {}", email, ex);
             throw new DAOException(ex);
         }
+    }
     }
 
     @Override
@@ -374,9 +376,9 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
 
     @Override
     public void updatePassword(String email, String currentPassword,
-                               String newPassword) throws DAOException {
+                String newPassword, PasswordEncoder passwordEncoder) throws DAOException {
 
-        if (authenticate(email, currentPassword)) {
+        if (authenticate(email, currentPassword, passwordEncoder)) {
             try {
                 PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                         + "VIPUsers SET pass = ? WHERE email = ?");
@@ -946,4 +948,19 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                 rs.getBoolean("account_locked"),
                 rs.getString("apikey"));
     }
+    // @Override
+    // public String getPasswordHash(String email) throws DAOException {
+    //     try (PreparedStatement ps = getConnection().prepareStatement(
+    //             "SELECT pass FROM VIPUsers WHERE email=?")) {
+    //         ps.setString(1, email);
+    //         ResultSet rs = ps.executeQuery();
+    //         if (rs.next()) {
+    //             return rs.getString("pass");
+    //         }
+    //         return null;
+    //     } catch (SQLException ex) {
+    //         logger.error("Error getting password hash for {}", email, ex);
+    //         throw new DAOException(ex);
+    //     }
+    // }
 }

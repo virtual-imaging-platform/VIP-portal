@@ -4,14 +4,14 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import fr.insalyon.creatis.devtools.MD5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
@@ -37,9 +37,12 @@ public class AuthenticationBusiness extends CommonBusiness {
     private final UserBusiness userBusiness;
     private final GroupBusiness groupBusiness;
     private final EmailTemplateUtils emailTemplateUtils;
+    private final PasswordBusiness passwordBusiness;
 
     @Autowired
-    public AuthenticationBusiness(UserDAO userDAO, EmailBusiness emailBusiness, Server server, GRIDAClient gridaClient, UsersGroupsDAO usersGroupsDAO, UserBusiness userBusiness, GroupBusiness groupBusiness, EmailTemplateUtils emailTemplateUtils) {
+    public AuthenticationBusiness(UserDAO userDAO, EmailBusiness emailBusiness, Server server, GRIDAClient gridaClient,
+                                   UsersGroupsDAO usersGroupsDAO, UserBusiness userBusiness, GroupBusiness groupBusiness,
+                                   EmailTemplateUtils emailTemplateUtils, PasswordBusiness passwordBusiness) {
         this.userDAO = userDAO;
         this.emailBusiness = emailBusiness;
         this.server = server;
@@ -48,6 +51,7 @@ public class AuthenticationBusiness extends CommonBusiness {
         this.userBusiness = userBusiness;
         this.groupBusiness = groupBusiness;
         this.emailTemplateUtils = emailTemplateUtils;
+        this.passwordBusiness = passwordBusiness;
     }
 
     @VIPExternalSafe
@@ -60,9 +64,8 @@ public class AuthenticationBusiness extends CommonBusiness {
             throws VipException {
         logger.info("Starting signup flow for email='{}' (automaticCreation={})",
                 user != null ? user.getEmail() : null, automaticCreation);
-
         // should be unauthentified or admin (related to internal methods with asAdminContext)
-        if (getUser() != null && ! getUserLevel().equals(UserLevel.Administrator)) { 
+        if (getUser() != null && ! getUserLevel().equals(UserLevel.Administrator)) {
             throw new VipException(DefaultError.UNAUTHENTICATED_ONLY);
         }
         userBusiness.assertPublicNonAutoGroups(user.getGroups());
@@ -87,7 +90,7 @@ public class AuthenticationBusiness extends CommonBusiness {
             if (user.getPassword() == null) {
                 user.setPassword(null);
             } else {
-                user.setPassword(MD5.get(user.getPassword()));
+                user.setPassword(passwordBusiness.hash(user.getPassword()));
             }
             // normalise user folder : replace accents and non ascii characters by _
             String folder = CoreUtil.getCleanStringAlnum(user.getFirstName().toLowerCase() + "_"
@@ -111,7 +114,7 @@ public class AuthenticationBusiness extends CommonBusiness {
             String groupsString = user.getGroups().stream().map(Group::getName).collect(Collectors.joining(","));
 
             logger.info("Signup persistence succeeded for email='{}' with generatedId='{}'",
-                user.getEmail(), user.getId());
+                    user.getEmail(), user.getId());
 
             if (!automaticCreation) {
                 String emailContent = emailTemplateUtils.registrationUserEmail(user);
@@ -131,7 +134,7 @@ public class AuthenticationBusiness extends CommonBusiness {
 
             logger.info("Signup flow completed for email='{}'", user.getEmail());
             return user;
-        } catch (GRIDAClientException | UnsupportedEncodingException | NoSuchAlgorithmException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error("Error signing up user {}", user.getEmail(), ex);
             throw new VipException(ex);
         } catch (DAOException ex) {
@@ -180,9 +183,9 @@ public class AuthenticationBusiness extends CommonBusiness {
 
         // Check if country is undesired
         for (String udc : server.getUndesiredCountries()) {
+            // An empty config file entry gets here as an empty or
+            // whitespace-only string, skip it
             if (udc.trim().isEmpty()) {
-                // An empty config file entry gets here as an empty or
-                // whitespace-only string, skip it
                 continue;
             }
             if (user.getCountryCode().toString().equals(udc)) {
@@ -205,10 +208,12 @@ public class AuthenticationBusiness extends CommonBusiness {
             throws VipException {
 
         try {
+            if (userDAO.isLocked(email)) {
+                logger.error("Authentication failed to '" + email + "' (account is locked).");
+                throw new VipException(DefaultError.BAD_CREDENTIALS);
+            }
             password = MD5.get(password);
-
-            if (userDAO.authenticate(email, password)) {
-
+            if (userDAO.authenticate(email, password, passwordBusiness.getEncoder())) {
                 userDAO.resetNFailedAuthentications(email);
 
                 if (resetSession) {
@@ -226,10 +231,7 @@ public class AuthenticationBusiness extends CommonBusiness {
                         "Authentication failed to '" + email + "' (email or password incorrect, or user is locked).");
                 throw new VipException(DefaultError.BAD_CREDENTIALS);
             }
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
-            logger.error("Error signing in user {}", email, ex);
-            throw new VipException(ex);
-        } catch (DAOException ex) {
+        } catch (DAOException | UnsupportedEncodingException | NoSuchAlgorithmException ex) {
             throw new VipException(ex);
         }
     }
@@ -275,7 +277,6 @@ public class AuthenticationBusiness extends CommonBusiness {
             throw new VipException(ex);
         }
     }
-
 
     public User getOrCreateUser(String email, String institution)
             throws VipException {
