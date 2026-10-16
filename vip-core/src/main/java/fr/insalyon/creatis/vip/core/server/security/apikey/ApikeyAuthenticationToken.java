@@ -25,9 +25,9 @@ public class ApikeyAuthenticationToken extends AbstractAuthenticationToken {
         setAuthenticated(false);
     }
 
-    public ApikeyAuthenticationToken(UserDetails principal, String apikey, String role) {
-        super(AuthorityUtils.createAuthorityList("ROLE_" + role));
-        this.principal = principal;
+    public ApikeyAuthenticationToken(UserDetails details, String apikey) {
+        super(details != null ? details.getAuthorities() : AuthorityUtils.NO_AUTHORITIES);
+        this.principal = details;
         this.apikey = apikey;
         super.setAuthenticated(true);
     }

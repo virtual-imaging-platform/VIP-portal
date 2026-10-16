@@ -1,6 +1,10 @@
 import type { Group } from '@/types/group.types'
 
-export type ResourceType = 'LOCAL' | 'BATCH' | 'KUBERNETES' | 'DIRAC'
+export const ResourceTypeList = ['LOCAL', 'BATCH', 'KUBERNETES', 'DIRAC']
+
+export type ResourceType = typeof ResourceTypeList[number]
+
+export const ResourceStatusList = [true, false]
 
 export interface Resource {
   name: string

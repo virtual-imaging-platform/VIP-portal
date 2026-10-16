@@ -3,9 +3,15 @@ package fr.insalyon.creatis.vip.application.models;
 import java.util.Objects;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.constraints.NotBlank;
 
+import fr.insalyon.creatis.vip.core.server.inter.DataViews;
+
+@JsonView(DataViews.User.class)
 public class Engine implements IsSerializable {
 
+    @NotBlank
     private String name;
     private String endpoint;
     private String status;
