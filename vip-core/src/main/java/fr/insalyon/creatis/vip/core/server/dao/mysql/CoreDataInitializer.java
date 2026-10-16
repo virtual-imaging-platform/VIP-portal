@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.models.TermsOfUse;
@@ -56,7 +57,32 @@ public class CoreDataInitializer extends JdbcDaoSupport {
 
     private void initializeUserTables() {
 
-        if (this.tableInitializer.createTable("VIPUsers", "id VARCHAR(8), email VARCHAR(255), next_email VARCHAR(255), pass VARCHAR(120), first_name VARCHAR(255), last_name VARCHAR(255), institution VARCHAR(255), code VARCHAR(40), confirmed BOOLEAN, folder VARCHAR(100), session VARCHAR(255), registration TIMESTAMP, last_login TIMESTAMP, level VARCHAR(50), country_code VARCHAR(2), max_simulations INT, termsUse TIMESTAMP, lastUpdatePublications TIMESTAMP,failed_authentications INT,account_locked BOOLEAN,apikey VARCHAR(255),PRIMARY KEY(email),UNIQUE (id),UNIQUE (first_name,last_name),UNIQUE (apikey)")) {
+        if (tableInitializer.createTable("VIPUsers",
+                          "id VARCHAR(" + CoreConstants.UUID_SIZE + "), "
+                        + "email VARCHAR(255), "
+                        + "next_email VARCHAR(255), "
+                        + "pass VARCHAR(120), "
+                        + "first_name VARCHAR(255), "
+                        + "last_name VARCHAR(255), "
+                        + "institution VARCHAR(255), "
+                        + "code VARCHAR(40), "
+                        + "confirmed BOOLEAN, "
+                        + "folder VARCHAR(100), "
+                        + "session VARCHAR(255), "
+                        + "registration TIMESTAMP, "
+                        + "last_login TIMESTAMP, "
+                        + "level VARCHAR(50), "
+                        + "country_code VARCHAR(2), "
+                        + "max_simulations INT, "
+                        + "termsUse TIMESTAMP, "
+                        + "lastUpdatePublications TIMESTAMP,"
+                        + "failed_authentications INT,"
+                        + "account_locked BOOLEAN,"
+                        + "apikey VARCHAR(255),"
+                        + "PRIMARY KEY(email),"
+                        + "UNIQUE (id),"
+                        + "UNIQUE (first_name,last_name),"
+                        + "UNIQUE (apikey)")) {
             String var10000 = this.server.getAdminFirstName().toLowerCase();
             String folder = var10000 + "_" + this.server.getAdminLastName().toLowerCase();
 

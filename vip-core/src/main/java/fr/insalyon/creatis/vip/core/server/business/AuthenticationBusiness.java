@@ -1,10 +1,14 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import fr.insalyon.creatis.devtools.MD5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +64,7 @@ public class AuthenticationBusiness extends CommonBusiness {
             throws VipException {
         logger.info("Starting signup flow for email='{}' (automaticCreation={})",
                 user != null ? user.getEmail() : null, automaticCreation);
-
+        // should be unauthentified or admin (related to internal methods with asAdminContext)
         if (getUser() != null && ! getUserLevel().equals(UserLevel.Administrator)) {
             throw new VipException(DefaultError.UNAUTHENTICATED_ONLY);
         }
@@ -88,6 +92,7 @@ public class AuthenticationBusiness extends CommonBusiness {
             } else {
                 user.setPassword(passwordBusiness.hash(user.getPassword()));
             }
+            // normalise user folder : replace accents and non ascii characters by _
             String folder = CoreUtil.getCleanStringAlnum(user.getFirstName().toLowerCase() + "_"
                     + user.getLastName().toLowerCase(), "_");
 
@@ -102,6 +107,7 @@ public class AuthenticationBusiness extends CommonBusiness {
             userDAO.add(user);
             userDAO.definePassword(user.getEmail(), user.getPassword());
 
+            // Adding user to groups
             for (Group group : user.getGroups()) {
                 usersGroupsDAO.add(user.getEmail(), group.getName(), GROUP_ROLE.User);
             }
@@ -137,6 +143,7 @@ public class AuthenticationBusiness extends CommonBusiness {
     }
 
     private void verifyUserFields(User user) throws VipException {
+        // most of the fields must be absent at creation
         verifyUserField(user::getId, "id");
         verifyUserField(user::getRegistration, "registration");
         verifyUserField(user::getLevel, "level");
@@ -162,6 +169,7 @@ public class AuthenticationBusiness extends CommonBusiness {
     }
 
     private void verifyCountryCode(User user) throws VipException {
+        // Build log message
         StringBuilder message = new StringBuilder("Signing up ");
         message.append(". List of undesired countries: ");
         for (String s : server.getUndesiredCountries()) {
@@ -173,7 +181,10 @@ public class AuthenticationBusiness extends CommonBusiness {
         message.append(".");
         logger.info(message.toString());
 
+        // Check if country is undesired
         for (String udc : server.getUndesiredCountries()) {
+            // An empty config file entry gets here as an empty or
+            // whitespace-only string, skip it
             if (udc.trim().isEmpty()) {
                 continue;
             }
@@ -201,13 +212,8 @@ public class AuthenticationBusiness extends CommonBusiness {
                 logger.error("Authentication failed to '" + email + "' (account is locked).");
                 throw new VipException(DefaultError.BAD_CREDENTIALS);
             }
-
-            String storedHash = userDAO.getPasswordHash(email);
-            boolean authenticated = storedHash != null
-                    && passwordBusiness.isModernFormat(storedHash)
-                    && passwordBusiness.verify(password, storedHash);
-
-            if (authenticated) {
+            password = MD5.get(password);
+            if (userDAO.authenticate(email, password, passwordBusiness.getEncoder())) {
                 userDAO.resetNFailedAuthentications(email);
 
                 if (resetSession) {
@@ -225,7 +231,7 @@ public class AuthenticationBusiness extends CommonBusiness {
                         "Authentication failed to '" + email + "' (email or password incorrect, or user is locked).");
                 throw new VipException(DefaultError.BAD_CREDENTIALS);
             }
-        } catch (DAOException ex) {
+        } catch (DAOException | UnsupportedEncodingException | NoSuchAlgorithmException ex) {
             throw new VipException(ex);
         }
     }
@@ -281,6 +287,7 @@ public class AuthenticationBusiness extends CommonBusiness {
         try {
             user = userBusiness.getUserWithSession(email);
         } catch (DAOException ex) {
+            //User doesn't exist: let's create an account
             String name = email.substring(0, email.indexOf('@'));
             String firstName = name, lastName = name;
 
@@ -298,6 +305,7 @@ public class AuthenticationBusiness extends CommonBusiness {
                 signup(user, "Generated automatically", true);
             } catch (VipException ex2) {
                 if (ex2.getMessage().contains("existing")) {
+                    //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
                     user = userBusiness.getNewUser(email, firstName, lastName, institution);
                     signup(user, "Generated automatically", true);

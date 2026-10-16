@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import fr.insalyon.creatis.devtools.MD5;
@@ -13,13 +14,18 @@ import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-
 @Service
 public class PasswordBusiness extends CommonBusiness {
 
     private final UserDAO userDAO;
-    private final Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-
+    // private final Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+    private static final int SALT_LENGTH = 16;
+    private static final int HASH_LENGTH = 32;
+    private static final int PARALLELISM = 1;
+    private static final int MEMORY_KIB = 19 * 1024; //19 MiB
+    private static final int ITERATIONS = 2;
+    private final Argon2PasswordEncoder encoder =new Argon2PasswordEncoder(SALT_LENGTH, HASH_LENGTH, PARALLELISM, MEMORY_KIB, ITERATIONS);
+  
     @Autowired
     public PasswordBusiness(UserDAO userDAO) {
         this.userDAO = userDAO;
@@ -52,12 +58,7 @@ public class PasswordBusiness extends CommonBusiness {
 
     public void update(User user, String currentPassword, String newPassword) throws VipException {
         try {
-            String storedHash = userDAO.getPasswordHash(user.getEmail());
-            boolean currentPasswordCorrect = storedHash != null
-                    && isModernFormat(storedHash)
-                    && verify(currentPassword, storedHash);
-
-            if (!currentPasswordCorrect) {
+           if (!userDAO.authenticate(user.getEmail(), md5(currentPassword), encoder))  {
                 logger.error("The current password mismatch for {}", user.getEmail());
                 throw new VipException("The current password mismatch.");
             }
@@ -91,5 +92,8 @@ public class PasswordBusiness extends CommonBusiness {
             logger.error("Error resetting password for {}", email, ex);
             throw new VipException(ex);
         }
+    }
+    public PasswordEncoder getEncoder() {
+        return encoder;
     }
 }
