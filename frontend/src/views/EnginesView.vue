@@ -5,7 +5,7 @@ import AppBadge, { type BadgeVariant } from '@/components/ui/AppBadge.vue'
 import AppCard from '@/components/ui/AppCard.vue'
 import AppButton from '@/components/ui/AppButton.vue'
 import { useEnginesStore } from '@/stores/engines.store'
-import {type Engine,type EngineStatus,type EngineListParams, EngineStatusList } from '@/types/engine.types'
+import {type Engine, type EngineStatus, type EngineListParams, EngineStatusList } from '@/types/engine.types'
 
 const enginesStore = useEnginesStore()
 
@@ -21,7 +21,7 @@ const editForm = ref<Engine>({ ...defaultEngineForm })
 const engineStatusColors: Record<EngineStatus, BadgeVariant> = {
   "enabled": 'primary',
   "disabled": 'gray'
-} as const
+}
 
 
 function buildParams(): EngineListParams {

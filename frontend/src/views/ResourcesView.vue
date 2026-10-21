@@ -243,6 +243,7 @@ onMounted(loadResources)
               :is-same="(model, option) => model.name === option.name"
               :get-value="group => group"
               :get-label="group => group.name"
+              :placeholder="'Select groups'"
             />
             <MultiSelect
               v-model="editForm.engines"
@@ -250,6 +251,7 @@ onMounted(loadResources)
               :is-same="(model, option) => model === option.name"
               :get-value="engine => engine.name"
               :get-label="engine => engine.name"
+              :placeholder="'Select engines'"
             />
           </div>
         </form>

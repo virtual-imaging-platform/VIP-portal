@@ -40,6 +40,7 @@ export const useResourcesStore = defineStore('resources', () => {
       try {
         const added = await resourcesApi.create(resource)
         resources.value.push(added)
+        totalCount.value = totalCount.value + 1
         notifications.success(`Successfully created resource ${added.name}`)
       } catch (err: any) {
         notifications.error(err)
@@ -51,6 +52,7 @@ export const useResourcesStore = defineStore('resources', () => {
         const res = await resourcesApi.delete(resource)
         const idx = resources.value.findIndex((e) => e.name === resource.name)
         if (idx === -1) return //TODO better error
+        totalCount.value = totalCount.value - 1
         resources.value.splice(idx, 1)
         notifications.success(`Successfully removed resource ${resource.name}`)
       } catch (err: any) {
