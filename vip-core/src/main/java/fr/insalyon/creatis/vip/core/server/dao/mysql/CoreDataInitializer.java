@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.AbstractJdbcDao;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +31,7 @@ import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
 @Component
 @Transactional
-public class CoreDataInitializer extends JdbcDaoSupport {
+public class CoreDataInitializer extends AbstractJdbcDao {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

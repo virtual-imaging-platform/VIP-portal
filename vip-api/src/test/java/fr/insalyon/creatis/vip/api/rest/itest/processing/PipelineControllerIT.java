@@ -203,7 +203,7 @@ public class PipelineControllerIT extends BaseRestApiSpringIT {
         baseUser4 = createUserInGroups(baseUser4.getEmail(), "test4", "group1", "group2");
         clearContext();
 
-        // temp trailing slash for shanoir, see fr.insalyon.creatis.vip.api.SpringRestApiConfig::configurePathMatch
+        // temp trailing slash for shanoir, see fr.insalyon.creatis.vip.api.RestTrailingSlashFilter
         mockMvc.perform(get("/rest/pipelines/").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())

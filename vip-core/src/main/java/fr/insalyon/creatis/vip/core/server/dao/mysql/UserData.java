@@ -9,7 +9,7 @@ import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.AbstractJdbcDao;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Repository
 @Transactional
-public class UserData extends JdbcDaoSupport implements UserDAO {
+public class UserData extends AbstractJdbcDao implements UserDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String FIELDS = """

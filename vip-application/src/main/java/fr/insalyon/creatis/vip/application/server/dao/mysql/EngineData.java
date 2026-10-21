@@ -7,7 +7,7 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.AbstractJdbcDao;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Repository
 @Transactional
-public class EngineData extends JdbcDaoSupport implements EngineDAO {
+public class EngineData extends AbstractJdbcDao implements EngineDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

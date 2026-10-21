@@ -7,6 +7,7 @@ import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
 import org.apache.commons.io.IOUtils;
+import jakarta.servlet.Filter;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,11 +60,16 @@ abstract public class BaseWebSpringIT extends BaseSpringIT {
                     request.setCharacterEncoding("UTF-8");
                     chain.doFilter(request, response);
                 }))
+                .addFilters(getWebXmlFilters())
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
     }
 
-    protected RequestPostProcessor getUserSecurityMock(User user) {
+    protected Filter[] getWebXmlFilters() {
+        return new Filter[0];
+    }
+
+    protected RequestPostProcessor getUserSecurityMock(User user) {        
         return SecurityMockMvcRequestPostProcessors.user(new SpringPrincipalUser(user));
     }
 

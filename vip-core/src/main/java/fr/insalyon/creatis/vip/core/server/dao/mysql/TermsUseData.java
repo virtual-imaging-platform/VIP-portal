@@ -10,8 +10,8 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.AbstractJdbcDao;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.insalyon.creatis.vip.core.models.TermsOfUse;
@@ -20,7 +20,7 @@ import fr.insalyon.creatis.vip.core.server.dao.TermsUseDAO;
 
 @Repository
 @Transactional
-public class TermsUseData extends JdbcDaoSupport implements TermsUseDAO {
+public class TermsUseData extends AbstractJdbcDao implements TermsUseDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
