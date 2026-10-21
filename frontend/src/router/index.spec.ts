@@ -140,4 +140,25 @@ describe('router', () => {
 
     expect(unauthenticatedResult).toBeUndefined()
   })
+
+  it('redirects unknown routes to landing or dashboard if authenticated', async () => {
+    expect(mocked.guard).toBeTypeOf('function')
+
+    mocked.authStore.initialized = true
+    mocked.authStore.isAuthenticated = true
+
+    const authenticatedResult = await mocked.guard?.({
+      name: 'not-found',
+    })
+
+    expect(authenticatedResult).toEqual({ name: 'dashboard' })
+
+    mocked.authStore.isAuthenticated = false
+
+    const unauthenticatedResult = await mocked.guard?.({
+      name: 'not-found',
+    })
+
+    expect(unauthenticatedResult).toEqual({ name: 'home' })
+  })
 })

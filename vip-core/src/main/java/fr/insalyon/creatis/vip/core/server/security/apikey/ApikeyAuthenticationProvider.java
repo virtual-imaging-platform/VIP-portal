@@ -89,8 +89,6 @@ public class ApikeyAuthenticationProvider extends AbstractAuthenticationProvider
         }
         checkUserInfo(springUser);
         afterSuccess(springUser);
-        return new ApikeyAuthenticationToken(
-                    springUser, apikey,
-                    vipUser.getLevel().name().toUpperCase());
+        return new ApikeyAuthenticationToken(springUser, apikey);
     }
 }

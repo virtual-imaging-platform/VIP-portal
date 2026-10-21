@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.constraints.NotBlank;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import fr.insalyon.creatis.vip.core.models.Group;
@@ -15,6 +16,8 @@ import fr.insalyon.creatis.vip.core.server.inter.DataViews;
 
 @JsonView(DataViews.User.class)
 public class Resource implements IsSerializable {
+
+    @NotBlank
     private String name;
     private boolean status;
     private ResourceType type;
