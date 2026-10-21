@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 const props = defineProps<{
   options: TOption[]
   modelValue: TValue[]
+  placeholder?: string
   isSame: (model: TValue, option: TOption) => boolean
   getValue: (option: TOption) => TValue
   getLabel: (option: TOption) => string
@@ -52,7 +53,7 @@ function closeDropdown() {
       :aria-expanded="isOpen"
       @click="isOpen = !isOpen"
     >
-      <span>{{ selectedLabels || 'Select items' }}</span>
+      <span>{{ selectedLabels || placeholder || 'Select items' }}</span>
       <span aria-hidden="true" class="ml-auto">⌄</span>
     </button>
 

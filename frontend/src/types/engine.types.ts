@@ -1,4 +1,4 @@
-export const EngineStatusList = ['enabled', 'disabled']
+export const EngineStatusList = ['enabled', 'disabled'] as const
 
 export type EngineStatus = typeof EngineStatusList[number]
 

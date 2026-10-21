@@ -40,6 +40,7 @@ export const useEnginesStore = defineStore('engines', () => {
     try {
       const added = await enginesApi.create(engine)
       engines.value.push(added)
+      totalCount.value = totalCount.value + 1
       notifications.success(`Successfully created engine ${added.name}`)
     } catch (err: any) {
       notifications.error(err)
@@ -52,6 +53,7 @@ export const useEnginesStore = defineStore('engines', () => {
       const idx = engines.value.findIndex((e) => e.name === engine.name)
       if (idx === -1) return //TODO better error
       engines.value.splice(idx, 1)
+      totalCount.value = totalCount.value - 1
       notifications.success(`Successfully removed engine ${engine.name}`)
     } catch (err: any) {
       notifications.error(err)
