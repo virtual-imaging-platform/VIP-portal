@@ -202,7 +202,8 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // if the url does not begin with /rest, there should not be an exception for preflight
+    // if the url does not begin with /rest, there should not be an exception for preflight:
+    // no CORS header (since Spring 7 the status is 200, the browser rejects it because of the missing header)
     // must use the non-secured /platform endpoint, see previous test why
     @Test
     public void testCORSPreflightWithOriginOkButOnInternalApi() throws Exception {
@@ -211,7 +212,7 @@ public class CorsRestApiIT extends BaseRestApiSpringIT {
                         .header("Origin", ServerMockConfig.TEST_CORS_URL)
                         .header("Access-Control-Request-Method", "GET"))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
