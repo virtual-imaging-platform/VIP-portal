@@ -67,6 +67,13 @@ public class EngineControllerIT extends BaseInternalApiSpringIT {
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("name").value(e1.getName()));
+        
+        // fail if create the same
+        mockMvc.perform(post("/internal/engines")
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.BAD_INPUT_FIELD.getCode()))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -142,17 +149,25 @@ public class EngineControllerIT extends BaseInternalApiSpringIT {
     public void update() throws Exception {
         Engine e1 = new Engine("e1", "http://localhost:5000", "enabled");
 
-        // save
-        mockMvc.perform(post("/internal/engines")
+        // upsert
+        mockMvc.perform(put("/internal/engines/" + e1.getName())
                         .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
                 .andExpect(status().isOk());
+        // update
         e1.setStatus("disabled");
         mockMvc.perform(put("/internal/engines/" + e1.getName())
                         .with(getUserSecurityMock(adminUser)).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
                 .andExpect(jsonPath("status").value("disabled"))
                 .andExpect(status().isOk());
+
+        // fail id mismatch
+        mockMvc.perform(put("/internal/engines/" + "another_id")
+                        .with(getUserSecurityMock(adminUser)).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(e1)))
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.BAD_INPUT_FIELD.getCode()))
+                .andExpect(status().isBadRequest());
     }
 
 }

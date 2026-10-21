@@ -53,7 +53,7 @@ public class EngineController {
     }
 
     @PutMapping(value = "{name}")
-    public Engine createOrUpdate(@PathVariable String name, @RequestBody @Valid Engine engine) throws VipException {
+    public Engine upsert(@PathVariable String name, @RequestBody @Valid Engine engine) throws VipException {
         if (!name.equals(engine.getName())) {
             throw new VipException(DefaultError.BAD_INPUT_FIELD, name, "Engine name do not match!");
         } else {
@@ -69,7 +69,13 @@ public class EngineController {
 
     @PostMapping
     public Engine create(@RequestBody @Valid Engine engine) throws VipException {
-        return createOrUpdate(engine.getName(), engine);
+        Engine existing = engineBusiness.get(engine.getName());
+        if (existing == null) {
+            engineBusiness.add(engine);
+            return engineBusiness.get(engine.getName());
+        } else {
+            throw new VipException(DefaultError.BAD_INPUT_FIELD, engine.getName(), "Engine already exists!");
+        }
     }
 
     @DeleteMapping(value = "{name}")
