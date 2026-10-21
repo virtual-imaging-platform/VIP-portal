@@ -130,6 +130,7 @@ public class SpringCoreConfig {
 
     @Bean
     @Primary
+    @SuppressWarnings("removal") 
     public ObjectMapper objectMapper() {
         return Jackson2ObjectMapperBuilder.json()
                 .featuresToEnable(

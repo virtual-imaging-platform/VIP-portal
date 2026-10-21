@@ -17,8 +17,8 @@ import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.inter.DataViews;
 
 @RestControllerAdvice
+@SuppressWarnings("removal") 
 public class DataViewsRequestHandler extends RequestBodyAdviceAdapter {
-
     private final Supplier<User> supplier;
 
     @Autowired

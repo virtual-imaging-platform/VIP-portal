@@ -33,6 +33,20 @@ public class SpringAuthenticationIT extends BaseRestApiSpringIT {
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
+    
+    @Test
+    public void trailingSlashDoesNotBypassAdminRestriction() throws Exception {
+        createUserWithPassword(emailUser2, "coucou");
+        String apikey = userBusiness.generateNewUserApikey(emailUser2);
+        mockMvc.perform(get("/rest/admin/applications")
+                .with(ApikeyRequestPostProcessor.apikey("testapikey", apikey)))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/rest/admin/applications/")
+                .with(ApikeyRequestPostProcessor.apikey("testapikey", apikey)))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
 
     /**
      * Basic is not supported anymore

@@ -34,6 +34,7 @@ public class SpringInternalApiConfig implements WebMvcConfigurer {
      *
      */
     @Override
+    @SuppressWarnings("removal") 
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.stream()
                 .filter(MappingJackson2HttpMessageConverter.class::isInstance)

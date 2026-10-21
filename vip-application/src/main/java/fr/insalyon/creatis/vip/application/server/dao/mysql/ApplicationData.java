@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.AbstractJdbcDao;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +29,7 @@ import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
 @Repository
 @Transactional
-public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
+public class ApplicationData extends AbstractJdbcDao implements ApplicationDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

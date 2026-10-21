@@ -8,7 +8,6 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -25,15 +24,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 )
 public class SpringRestApiConfig implements WebMvcConfigurer {
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public void configurePathMatch(final PathMatchConfigurer configurer) {
-        // this is deprecated, but temporary necessary for shanoir
-        // that uses requests like /rest/pipelines/
-        // Shanoir should get rid of the trailing slash and we should
-        // be able to remove this method when spring removes its support
-        configurer.setUseTrailingSlashMatch(true);
-    }
+
 
     @Override
     public void configureContentNegotiation(final ContentNegotiationConfigurer configurer) {

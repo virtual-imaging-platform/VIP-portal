@@ -75,7 +75,7 @@ public class CorsInternalApiIT extends BaseInternalApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // with a bad origin, preflight OPTION should be forbidden
+        // with a bad origin, preflight OPTION must not get any CORS header (so the browser rejects it)
     @Test
     public void testCORSPreflightWithBadOrigin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -83,7 +83,7 @@ public class CorsInternalApiIT extends BaseInternalApiSpringIT {
                         .header("Origin", "https://bad-url.com")
                         .header("Access-Control-Request-Method", "GET"))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
@@ -99,7 +99,7 @@ public class CorsInternalApiIT extends BaseInternalApiSpringIT {
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 
-    // with an allowed origin for /rest, preflight OPTION should be ko for internal
+    // with an allowed origin for /rest, preflight OPTION must not get any CORS header for internal
     @Test
     public void testCORSPreflightWithOriginOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
@@ -107,7 +107,7 @@ public class CorsInternalApiIT extends BaseInternalApiSpringIT {
                         .header("Origin", ServerMockConfig.TEST_CORS_URL)
                         .header("Access-Control-Request-Method", "GET"))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.header().doesNotExist("Access-Control-Allow-Origin"));
     }
 

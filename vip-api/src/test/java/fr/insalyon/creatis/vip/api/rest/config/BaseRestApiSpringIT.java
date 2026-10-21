@@ -140,7 +140,13 @@ abstract public class BaseRestApiSpringIT extends BaseWebSpringIT {
         applicationTestConfigurer.putApplicationInGroup(appName, groupname);
     }
 
-    public AppVersion createAVersion(String appName, String versionName, boolean visible) throws VipException {
+       public AppVersion createAVersion(String appName, String versionName, boolean visible) throws VipException {
         return applicationTestConfigurer.createAVersion(appName, versionName, null, visible);
     }
+
+    @Override
+    protected jakarta.servlet.Filter[] getWebXmlFilters() {
+        return new jakarta.servlet.Filter[] { new fr.insalyon.creatis.vip.api.RestTrailingSlashFilter() };
+    }
+
 }

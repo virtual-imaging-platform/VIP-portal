@@ -19,7 +19,7 @@ public class ApikeyAuthenticationToken extends AbstractAuthenticationToken {
     private String apikey;
 
     public ApikeyAuthenticationToken(String apikey) {
-        super(null);
+        super(AuthorityUtils.NO_AUTHORITIES);
         this.principal = null;
         this.apikey = apikey;
         setAuthenticated(false);

@@ -25,9 +25,9 @@
         <boutiques-model.version>1.1</boutiques-model.version>
 
         <!-- 3rd party dependencies version -->
-        <junit.version>5.11.3</junit.version>
-        <spring-framework.version>6.2.10</spring-framework.version>
-        <springsecurity.version>6.5.11</springsecurity.version>
+        <junit.version>6.1.3</junit.version>
+        <spring-framework.version>7.0.9</spring-framework.version>
+        <springsecurity.version>7.1.1</springsecurity.version>
         <springoauth.version>6.5.11</springoauth.version>
         <jackson.version>2.18.0</jackson.version>
         <h2database.version>2.4.240</h2database.version>
@@ -77,19 +77,16 @@
                 <version>13.0p</version>
             </dependency>
 
-            <!-- empty jars to ensure commons logging and log4j is not
-              used in project and not present in final war.
+            <!-- empty jar to ensure log4j is not used in project and not present in final war.
               (see alternative 3 in https://www.slf4j.org/faq.html#excludingJCL)
 
                they used to be hosted on https://version99.qos.ch/ but this was
                decommissioned in 2023
                (see https://mailman.qos.ch/pipermail/slf4j-user/2022-October/001798.html).
-               So the jar's were migrated on the vip's nexus -->
-            <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>99-empty</version>
-            </dependency>
+               So the jar's were migrated on the vip's nexus.
+
+               commons-logging is NOT emptied anymore: since Spring 7 (removal of spring-jcl),
+               Spring depends on the real commons-logging 1.3+, which routes to SLF4J automatically. -->
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
