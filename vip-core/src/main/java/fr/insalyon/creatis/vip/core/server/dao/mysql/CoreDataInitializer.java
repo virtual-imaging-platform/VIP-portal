@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -48,14 +49,14 @@ public class CoreDataInitializer extends JdbcDaoSupport {
 
     @EventListener({ContextRefreshedEvent.class})
     @Order(10)
-    public void onStartup() {
+    public void onStartup() throws VipException {
         this.logger.info("Configuring VIP core database.");
         this.initializeUserTables();
         this.initializeGroupTables();
         this.initializeTermsOfUseTable();
     }
 
-    private void initializeUserTables() {
+    private void initializeUserTables() throws VipException {
 
         if (tableInitializer.createTable("VIPUsers",
                           "id VARCHAR(" + CoreConstants.UUID_SIZE + "), "

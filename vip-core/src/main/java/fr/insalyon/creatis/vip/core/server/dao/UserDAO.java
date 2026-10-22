@@ -39,8 +39,6 @@ public interface UserDAO {
 
     public void definePassword(String email, String password) throws DAOException;
 
-    public void updatePassword(String email, String currentPassword, String newPassword, PasswordEncoder passwordEncoder) throws DAOException;
-
     void updateEmail(String oldEmail, String newEmail) throws DAOException;
 
     void updateNextEmail(String currentEmail, String nextEmail) throws DAOException;
@@ -101,6 +99,4 @@ public interface UserDAO {
     User getById(String id) throws DAOException;
 
     List<User> getByFullNames(List<String> fullNames) throws DAOException;
-
-    // public String getPasswordHash(String email) throws DAOException;
 }

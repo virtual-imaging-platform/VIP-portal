@@ -1,14 +1,9 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import fr.insalyon.creatis.devtools.MD5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -208,12 +203,7 @@ public class AuthenticationBusiness extends CommonBusiness {
             throws VipException {
 
         try {
-            if (userDAO.isLocked(email)) {
-                logger.error("Authentication failed to '" + email + "' (account is locked).");
-                throw new VipException(DefaultError.BAD_CREDENTIALS);
-            }
-            password = MD5.get(password);
-            if (userDAO.authenticate(email, password, passwordBusiness.getEncoder())) {
+            if (passwordBusiness.authenticate(email, password)) {
                 userDAO.resetNFailedAuthentications(email);
 
                 if (resetSession) {
@@ -231,7 +221,7 @@ public class AuthenticationBusiness extends CommonBusiness {
                         "Authentication failed to '" + email + "' (email or password incorrect, or user is locked).");
                 throw new VipException(DefaultError.BAD_CREDENTIALS);
             }
-        } catch (DAOException | UnsupportedEncodingException | NoSuchAlgorithmException ex) {
+        } catch (DAOException ex) {
             throw new VipException(ex);
         }
     }

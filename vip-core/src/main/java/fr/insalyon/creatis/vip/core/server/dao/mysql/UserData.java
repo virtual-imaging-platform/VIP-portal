@@ -375,31 +375,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     @Override
-    public void updatePassword(String email, String currentPassword,
-                String newPassword, PasswordEncoder passwordEncoder) throws DAOException {
-
-        if (authenticate(email, currentPassword, passwordEncoder)) {
-            try {
-                PreparedStatement ps = getConnection().prepareStatement("UPDATE "
-                        + "VIPUsers SET pass = ? WHERE email = ?");
-
-                ps.setString(1, newPassword);
-                ps.setString(2, email);
-
-                ps.executeUpdate();
-                ps.close();
-
-            } catch (SQLException ex) {
-                logger.error("Error updating password for {}", email, ex);
-                throw new DAOException(ex);
-            }
-        } else {
-            logger.error("The current password mismatch for {}", email);
-            throw new DAOException("The current password mismatch.");
-        }
-    }
-
-    @Override
     public void updateEmail(String oldEmail, String newEmail) throws DAOException {
         try {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
@@ -948,19 +923,4 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                 rs.getBoolean("account_locked"),
                 rs.getString("apikey"));
     }
-    // @Override
-    // public String getPasswordHash(String email) throws DAOException {
-    //     try (PreparedStatement ps = getConnection().prepareStatement(
-    //             "SELECT pass FROM VIPUsers WHERE email=?")) {
-    //         ps.setString(1, email);
-    //         ResultSet rs = ps.executeQuery();
-    //         if (rs.next()) {
-    //             return rs.getString("pass");
-    //         }
-    //         return null;
-    //     } catch (SQLException ex) {
-    //         logger.error("Error getting password hash for {}", email, ex);
-    //         throw new DAOException(ex);
-    //     }
-    // }
 }

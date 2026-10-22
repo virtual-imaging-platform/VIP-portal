@@ -18,29 +18,20 @@ import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 public class PasswordBusiness extends CommonBusiness {
 
     private final UserDAO userDAO;
-    // private final Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     private static final int SALT_LENGTH = 16;
     private static final int HASH_LENGTH = 32;
     private static final int PARALLELISM = 1;
     private static final int MEMORY_KIB = 19 * 1024; //19 MiB
     private static final int ITERATIONS = 2;
-    private final Argon2PasswordEncoder encoder =new Argon2PasswordEncoder(SALT_LENGTH, HASH_LENGTH, PARALLELISM, MEMORY_KIB, ITERATIONS);
-  
+    private final PasswordEncoder encoder = new Argon2PasswordEncoder(SALT_LENGTH, HASH_LENGTH, PARALLELISM, MEMORY_KIB, ITERATIONS);  
+
     @Autowired
     public PasswordBusiness(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
-    public boolean isModernFormat(String storedHash) {
-        return storedHash != null && storedHash.startsWith("$argon2id$");
-    }
-
-    public String hash(String plainPassword) {
+    public String hash(String plainPassword) throws VipException {
         return encoder.encode(md5(plainPassword));
-    }
-
-    public boolean verify(String plainPassword, String storedHash) {
-        return encoder.matches(md5(plainPassword), storedHash);
     }
 
     public String upgradeLegacyMd5Hash(String existingMd5Hash) {
@@ -58,7 +49,7 @@ public class PasswordBusiness extends CommonBusiness {
 
     public void update(User user, String currentPassword, String newPassword) throws VipException {
         try {
-           if (!userDAO.authenticate(user.getEmail(), md5(currentPassword), encoder))  {
+                if (!authenticate(user.getEmail(), currentPassword)) {
                 logger.error("The current password mismatch for {}", user.getEmail());
                 throw new VipException("The current password mismatch.");
             }
@@ -93,7 +84,7 @@ public class PasswordBusiness extends CommonBusiness {
             throw new VipException(ex);
         }
     }
-    public PasswordEncoder getEncoder() {
-        return encoder;
-    }
+      public boolean authenticate(String email, String plainPassword) throws DAOException, VipException {
+      return userDAO.authenticate(email, md5(plainPassword), encoder);
+  }
 }

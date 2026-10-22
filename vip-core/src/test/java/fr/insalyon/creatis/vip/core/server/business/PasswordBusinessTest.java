@@ -2,77 +2,152 @@ package fr.insalyon.creatis.vip.core.server.business;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.models.User;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
 class PasswordBusinessTest {
-    private final PasswordBusiness passwordBusiness = new PasswordBusiness(null);
 
-    private boolean matches(String plainPassword, String storedHash) throws Exception {
-        return passwordBusiness.getEncoder().matches(MD5.get(plainPassword), storedHash);
+    private static final String EMAIL = "test@example.com";
+
+    private UserDAO userDAO;
+    private PasswordBusiness passwordBusiness;
+    private final AtomicReference<String> storedHash = new AtomicReference<>();
+
+    @BeforeEach
+    void setUp() throws Exception {
+        userDAO = mock(UserDAO.class);
+        passwordBusiness = new PasswordBusiness(userDAO);
+        storedHash.set(null);
+
+        when(userDAO.authenticate(eq(EMAIL), anyString(), any(PasswordEncoder.class)))
+                .thenAnswer(invocation -> {
+                    String password = invocation.getArgument(1);
+                    PasswordEncoder encoder = invocation.getArgument(2);
+                    return storedHash.get() != null && encoder.matches(password, storedHash.get());
+                });
+        doAnswer(invocation -> {
+            storedHash.set(invocation.getArgument(1));
+            return null;
+        }).when(userDAO).resetPassword(eq(EMAIL), anyString());
+    }
+
+    private boolean canAuthenticate(String plainPassword) throws Exception {
+        return passwordBusiness.authenticate(EMAIL, plainPassword);
+    }
+    private User user() {
+        return new User("firstName", "lastName", EMAIL, "institution", CountryCode.fr);
     }
 
     @Test
-    void hashThenMatch_withCorrectPassword_shouldSucceed() throws Exception {
-        String plain = "MySecret123!";
+    void hashThenAuthenticate_withCorrectPassword_shouldSucceed() throws Exception {
+        storedHash.set(passwordBusiness.hash("mdp123*"));
 
-        String stored = passwordBusiness.hash(plain);
-
-        assertTrue(matches(plain, stored));
+        assertTrue(canAuthenticate("mdp123*"));
     }
 
     @Test
-    void hashThenMatch_withWrongPassword_shouldFail() throws Exception {
-        String stored = passwordBusiness.hash("MySecret123!");
-
-        assertFalse(matches("SomethingElse", stored));
+    void hashThenAuthenticate_withWrongPassword_shouldFail() throws Exception {
+        storedHash.set(passwordBusiness.hash("mdp123*"));
+        assertFalse(canAuthenticate("SomethingElse"));
     }
-
     @Test
     void hash_calledTwiceWithSamePassword_shouldProduceDifferentHashes() throws Exception {
-        // Argon2 uses a random salt each time, so the two hash strings must
-        // be different, even though both are valid for the same password
-        String plain = "MySecret123!";
-
-        String stored1 = passwordBusiness.hash(plain);
-        String stored2 = passwordBusiness.hash(plain);
-
-        assertNotEquals(stored1, stored2);
-        assertTrue(matches(plain, stored1));
-        assertTrue(matches(plain, stored2));
+        String hash1 = passwordBusiness.hash("mdp123*");
+        String hash2 = passwordBusiness.hash("mdp123*");
+        assertNotEquals(hash1, hash2);
+        storedHash.set(hash1);
+        assertTrue(canAuthenticate("mdp123*"));
+        storedHash.set(hash2);
+        assertTrue(canAuthenticate("mdp123*"));
     }
 
     @Test
-    void hash_shouldUseOwaspParameters() {
-        // OWASP: Argon2id, 19 MiB (19456 KiB) of memory, 2 iterations, parallelism 1
-        String stored = passwordBusiness.hash("MySecret123!");
-
-        assertTrue(stored.startsWith("$argon2id$v=19$m=19456,t=2,p=1$"));
+    void hash_shouldUseOwaspParameters() throws VipException {
+        String hash = passwordBusiness.hash("mdp123*");
+        assertTrue(hash.startsWith("$argon2id$v=19$m=19456,t=2,p=1$"));
     }
 
     @Test
-    void matches_withLegacyRawMd5Hash_shouldFail() throws Exception {
-        // A raw MD5 hash (not migrated) must never be accepted
-        String plain = "MySecret123!";
-        String legacyMd5Hash = MD5.get(plain);
-
-        assertFalse(matches(plain, legacyMd5Hash));
+    void authenticate_withLegacyRawMd5Hash_shouldFail() throws Exception {
+        storedHash.set(MD5.get("mdp123*"));
+        assertFalse(canAuthenticate("mdp123*"));
     }
 
     @Test
-    void upgradeLegacyMd5Hash_thenMatch_shouldSucceedWithOriginalPassword() throws Exception {
-        // Simulates exactly what the standalone migration script does:
-        // take an existing MD5 hash (no plaintext needed) and re-encode it
-        String plain = "MySecret123!";
-        String existingMd5Hash = MD5.get(plain);
+    void upgradeLegacyMd5Hash_thenAuthenticate_shouldSucceedWithOriginalPassword() throws Exception {
+        storedHash.set(passwordBusiness.upgradeLegacyMd5Hash(MD5.get("mdp123*")));
+        assertTrue(storedHash.get().startsWith("$argon2id$"));
+        assertTrue(canAuthenticate("mdp123*"));
+        assertFalse(canAuthenticate("WrongPassword"));
+    }
 
-        String upgraded = passwordBusiness.upgradeLegacyMd5Hash(existingMd5Hash);
+    @Test
+    void update_withCorrectCurrentPassword_shouldChangePassword() throws Exception {
+        storedHash.set(passwordBusiness.hash("currentPassword"));
+        passwordBusiness.update(user(), "currentPassword", "newPassword");
+        assertTrue(canAuthenticate("newPassword"));
+        assertFalse(canAuthenticate("currentPassword"));
+    }
 
-        assertTrue(upgraded.startsWith("$argon2id$"));
-        assertTrue(matches(plain, upgraded));
-        assertFalse(matches("WrongPassword", upgraded));
+    @Test
+    void update_withWrongCurrentPassword_shouldThrowAndKeepPassword() throws Exception {
+        storedHash.set(passwordBusiness.hash("currentPassword"));
+        VipException exception = assertThrows(VipException.class,
+                () -> passwordBusiness.update(user(), "wrongPassword", "newPassword"));
+        assertTrue(exception.getMessage().contains("The current password mismatch"));
+        verify(userDAO, never()).resetPassword(anyString(), anyString());
+        assertTrue(canAuthenticate("currentPassword"));
+    }
+
+
+    @Test
+    void setPassword_shouldStoreAnArgon2idHashOfTheMd5() throws Exception {
+        passwordBusiness.setPassword(EMAIL, "newPassword");
+        assertTrue(storedHash.get().startsWith("$argon2id$"));
+        assertTrue(canAuthenticate("newPassword"));
+    }
+
+    @Test
+    void reset_withCorrectCode_shouldChangePassword() throws Exception {
+        User user = user();
+        user.setCode("the-code");
+        when(userDAO.get(EMAIL)).thenReturn(user);
+
+        passwordBusiness.reset(EMAIL, "the-code", "newPassword");
+
+        assertTrue(canAuthenticate("newPassword"));
+    }
+
+    @Test
+    void reset_withWrongCode_shouldThrowAndNotChangePassword() throws Exception {
+        User user = user();
+        user.setCode("the-code");
+        when(userDAO.get(EMAIL)).thenReturn(user);
+
+        VipException exception = assertThrows(VipException.class,
+                () -> passwordBusiness.reset(EMAIL, "wrong-code", "newPassword"));
+
+        assertTrue(exception.getMessage().contains("Wrong reset code"));
+        verify(userDAO, never()).resetPassword(anyString(), anyString());
     }
 }
