@@ -13,7 +13,6 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.TermsUseDAO;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.UUID;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
@@ -29,7 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional
 public class CoreDataInitializer extends JdbcDaoSupport {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private TableInitializer tableInitializer;
     private Server server;
     private UserDAO userDAO;
@@ -37,9 +37,11 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     private PasswordBusiness passwordBusiness;
 
     @Autowired
-    public CoreDataInitializer(DataSource dataSource, TableInitializer tableInitializer, Server server,
-                                UserDAO userDAO, TermsUseDAO termsUseDAO, PasswordBusiness passwordBusiness) {
-        this.setDataSource(dataSource);
+    public CoreDataInitializer(
+            DataSource dataSource, TableInitializer tableInitializer,
+            Server server, UserDAO userDAO, TermsUseDAO termsUseDAO,
+            PasswordBusiness passwordBusiness) {
+        setDataSource(dataSource);
         this.tableInitializer = tableInitializer;
         this.userDAO = userDAO;
         this.server = server;
@@ -47,17 +49,16 @@ public class CoreDataInitializer extends JdbcDaoSupport {
         this.passwordBusiness = passwordBusiness;
     }
 
-    @EventListener({ContextRefreshedEvent.class})
-    @Order(10)
-    public void onStartup() throws VipException {
-        this.logger.info("Configuring VIP core database.");
-        this.initializeUserTables();
-        this.initializeGroupTables();
-        this.initializeTermsOfUseTable();
+    @EventListener(ContextRefreshedEvent.class)
+    @Order(10) // higher priority to create the vip core tables before the ones that references them
+    public void onStartup() {
+        logger.info("Configuring VIP core database.");
+        initializeUserTables();
+        initializeGroupTables();
+        initializeTermsOfUseTable();
     }
 
-    private void initializeUserTables() throws VipException {
-
+    private void initializeUserTables() {
         if (tableInitializer.createTable("VIPUsers",
                           "id VARCHAR(" + CoreConstants.UUID_SIZE + "), "
                         + "email VARCHAR(255), "
@@ -84,31 +85,58 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                         + "UNIQUE (id),"
                         + "UNIQUE (first_name,last_name),"
                         + "UNIQUE (apikey)")) {
-            String var10000 = this.server.getAdminFirstName().toLowerCase();
-            String folder = var10000 + "_" + this.server.getAdminLastName().toLowerCase();
+            String folder = server.getAdminFirstName().toLowerCase() + "_"
+                    + server.getAdminLastName().toLowerCase();
 
             try {
-                Timestamp now = new Timestamp(System.currentTimeMillis());
-                this.userDAO.add(new User(CoreUtil.createUUID(), this.server.getAdminFirstName(), this.server.getAdminLastName(), this.server.getAdminEmail(), (String) null, this.server.getAdminInstitution(), true, UUID.randomUUID().toString(), folder, "", now, now, UserLevel.Administrator, CountryCode.fr, 100, (Timestamp) null, (Timestamp) null, 0, false, (String) null));
-                this.userDAO.definePassword(this.server.getAdminEmail(), this.passwordBusiness.hash(this.server.getAdminPassword()));
-            } catch (DAOException ex) {
-                this.logger.error("Error creating VIPUsers table", ex);
+                final Timestamp now = new Timestamp(System.currentTimeMillis());
+                userDAO.add(
+                        new User(CoreUtil.createUUID(),
+                                server.getAdminFirstName(),
+                                server.getAdminLastName(),
+                                server.getAdminEmail(),
+                                null,
+                                server.getAdminInstitution(),
+                                true,
+                                UUID.randomUUID().toString(), folder, "",
+                                now, now, UserLevel.Administrator,
+                                CountryCode.fr, 100, null,null,0,false, null));
+                userDAO.definePassword(server.getAdminEmail(), passwordBusiness.hash(server.getAdminPassword()));
+            } catch (VipException ex) {
+                logger.error("Error creating VIPUsers table", ex);
             }
         }
     }
 
     private void initializeGroupTables() {
-        this.tableInitializer.createTable("VIPGroups", "name VARCHAR(50), public BOOLEAN, type VARCHAR(30), auto BOOLEAN, PRIMARY KEY(name)");
-        this.tableInitializer.createTable("VIPUsersGroups", "email VARCHAR(255), groupname VARCHAR(50), role VARCHAR(30), PRIMARY KEY (email, groupname), FOREIGN KEY (email) REFERENCES VIPUsers(email) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY (groupname) REFERENCES VIPGroups(name) ON DELETE CASCADE ON UPDATE CASCADE");
+        tableInitializer.createTable("VIPGroups",
+                          "name VARCHAR(50), "
+                        + "public BOOLEAN, "
+                        + "type VARCHAR(30), "
+                        + "auto BOOLEAN, "
+                        + "PRIMARY KEY(name)");
+        tableInitializer.createTable("VIPUsersGroups",
+                "email VARCHAR(255), "
+                        + "groupname VARCHAR(50), "
+                        + "role VARCHAR(30), "
+                        + "PRIMARY KEY (email, groupname), "
+                        + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                        + "ON DELETE CASCADE ON UPDATE CASCADE, "
+                        + "FOREIGN KEY (groupname) REFERENCES VIPGroups(name) "
+                        + "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 
     private void initializeTermsOfUseTable() {
-        if (this.tableInitializer.createTable("VIPTermsOfUse", "id INT NOT NULL AUTO_INCREMENT, date TIMESTAMP NULL, PRIMARY KEY (id)")) {
+        if (tableInitializer.createTable("VIPTermsOfUse",
+                "id INT NOT NULL AUTO_INCREMENT, "
+                        + "date TIMESTAMP NULL, "
+                        + "PRIMARY KEY (id)")) {
             try {
-                Date today = new Date();
-                this.termsUseDAO.add(new TermsOfUse(new Timestamp(today.getTime())));
+                java.util.Date today = new java.util.Date();
+                termsUseDAO.add(
+                        new TermsOfUse(new java.sql.Timestamp(today.getTime())));
             } catch (DAOException ex) {
-                this.logger.error("Error creating VIPGroups table", ex);
+                logger.error("Error creating VIPTermsOfUse table", ex);
             }
         }
     }
