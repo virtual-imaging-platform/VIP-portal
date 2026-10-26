@@ -5,6 +5,8 @@ import { useAuthStore } from './auth.store'
 const mocked = vi.hoisted(() => ({
   getSession: vi.fn(),
   login: vi.fn(),
+  verifyCode: vi.fn(),
+  resendCode: vi.fn(),
   logout: vi.fn(),
   register: vi.fn(),
   me: vi.fn(),
@@ -14,6 +16,8 @@ vi.mock('@/api/session.api', () => ({
   sessionApi: {
     getSession: mocked.getSession,
     login: mocked.login,
+    verifyCode: mocked.verifyCode,
+    resendCode: mocked.resendCode,
     logout: mocked.logout,
   },
 }))
@@ -76,11 +80,25 @@ describe('useAuthStore', () => {
     expect(store.session).toBeNull()
   })
 
-  it('logs in and updates auth state', async () => {
-    mocked.login.mockResolvedValue({
+  it('logs in and waits for the verification code', async () => {
+    mocked.login.mockResolvedValue({ twoFactorRequired: true })
+
+    const store = useAuthStore()
+    await store.login({ username: 'login@example.com', password: 'secret' })
+
+    expect(mocked.login).toHaveBeenCalledWith({ username: 'login@example.com', password: 'secret' })
+    expect(store.isLoading).toBe(false)
+    expect(store.twoFactorPending).toBe(true)
+    expect(store.isAuthenticated).toBe(false)
+    expect(mocked.me).not.toHaveBeenCalled()
+  })
+
+  it('verifies the code and updates auth state', async () => {
+    mocked.verifyCode.mockResolvedValue({
       id: 'session-2',
       email: 'login@example.com',
       userlevel: 'User',
+      confirmed: true,
     })
     mocked.me.mockResolvedValue({
       id: 'user-2',
@@ -98,10 +116,12 @@ describe('useAuthStore', () => {
     })
 
     const store = useAuthStore()
-    await store.login({ username: 'login@example.com', password: 'secret' })
+    store.twoFactorPending = true
+    await store.verifyCode('123456')
 
-    expect(mocked.login).toHaveBeenCalledWith({ username: 'login@example.com', password: 'secret' })
+    expect(mocked.verifyCode).toHaveBeenCalledWith('123456')
     expect(store.isLoading).toBe(false)
+    expect(store.twoFactorPending).toBe(false)
     expect(store.isAuthenticated).toBe(true)
     expect(store.user).toEqual(expect.objectContaining({ email: 'login@example.com' }))
   })
@@ -121,6 +141,7 @@ describe('useAuthStore', () => {
     store.session = { id: 'session-3', email: 'x@y.z', userlevel: 'User' } as any
     store.user = { email: 'x@y.z' } as any
     store.initialized = true
+    store.twoFactorPending = true
 
     mocked.logout.mockRejectedValue(new Error('logout failed'))
 
@@ -130,6 +151,7 @@ describe('useAuthStore', () => {
     expect(store.session).toBeNull()
     expect(store.user).toBeNull()
     expect(store.initialized).toBe(false)
+    expect(store.twoFactorPending).toBe(false)
   })
 
   it('registers user through /internal/users and resets loading state', async () => {
