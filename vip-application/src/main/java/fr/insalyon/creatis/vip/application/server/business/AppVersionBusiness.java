@@ -80,7 +80,7 @@ public class AppVersionBusiness extends CommonBusiness {
                 tagBusiness.addOrUpdate(tag);
             }
             for (Resource resource : version.getResources()) {
-                resourceBusiness.associate(resource, version);
+                resourceBusiness.associate(resource, version, 0);
             }
         } catch (DAOException e) {
             throw new VipException(e);
@@ -114,7 +114,7 @@ public class AppVersionBusiness extends CommonBusiness {
             applicationDAO.updateVersion(version);
             for (Resource resource : version.getResources()) {
                 if ( ! beforeResourceNames.removeIf((s) -> s.equals(resource.getName()))) {
-                    resourceBusiness.associate(resource, version);
+                    resourceBusiness.associate(resource, version, 0);
                 }
             }
             for (Tag tag : editedTags) {

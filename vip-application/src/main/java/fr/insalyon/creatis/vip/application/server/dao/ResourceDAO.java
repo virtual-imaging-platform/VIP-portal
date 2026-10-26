@@ -33,7 +33,7 @@ public interface ResourceDAO {
 
     public void dissociate(Resource resource, Group group) throws DAOException;
 
-    public void associate(Resource resource, AppVersion appVersion) throws DAOException;
+    public void associate(Resource resource, AppVersion appVersion, int priority) throws DAOException;
 
     public void dissociate(Resource resource, AppVersion appVersion) throws DAOException;
 

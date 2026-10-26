@@ -183,7 +183,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
         String query = "SELECT * FROM VIPResources r "
         +              "JOIN VIPResourcesAppVersions rav ON r.name = rav.resourcename "
         +              "WHERE rav.application = ? AND rav.version = ? "
-        +              "ORDER BY name";
+        +              "ORDER BY rav.priority, name";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, appVersion.getApplicationName());
@@ -274,14 +274,15 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     }
 
     @Override
-    public void associate(Resource resource, AppVersion appVersion) throws DAOException {
-        String query = "INSERT INTO VIPResourcesAppVersions (resourcename, application, version) "
-        +              "VALUES (?,?,?)";
+    public void associate(Resource resource, AppVersion appVersion, int priority) throws DAOException {
+        String query = "INSERT INTO VIPResourcesAppVersions (resourcename, application, version, priority) "
+        +              "VALUES (?,?,?,?)";
         
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, resource.getName());
             ps.setString(2, appVersion.getApplicationName());
             ps.setString(3, appVersion.getVersion());
+            ps.setInt(4, priority);
             ps.executeUpdate();
 
         } catch (SQLException e) {

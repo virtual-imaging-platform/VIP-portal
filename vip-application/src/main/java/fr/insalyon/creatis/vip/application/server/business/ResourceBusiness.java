@@ -216,10 +216,10 @@ public class ResourceBusiness extends CommonBusiness {
         }
     }
 
-    public void associate(Resource resource, AppVersion appVersion) throws VipException {
+    public void associate(Resource resource, AppVersion appVersion, int priority) throws VipException {
         try {
             if ( ! resourceDAO.getByAppVersion(appVersion).stream().filter((e) -> e.getName().equals(resource.getName())).findFirst().isPresent()) {
-                resourceDAO.associate(resource, appVersion);
+                resourceDAO.associate(resource, appVersion, priority);
             }
         } catch (DAOException e) {
             throw new VipException(e);

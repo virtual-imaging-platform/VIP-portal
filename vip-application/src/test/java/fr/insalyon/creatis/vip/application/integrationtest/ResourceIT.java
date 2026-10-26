@@ -126,7 +126,7 @@ public class ResourceIT extends BaseSpringIT {
         appVersionBusiness.add(appVersion);
 
         resourceBusiness.add(bis);
-        resourceBusiness.associate(resource, appVersion);
+        resourceBusiness.associate(resource, appVersion, 0);
 
         assertEquals(resource.getName(), resourceBusiness.getByAppVersion(appVersion).get(0).getName());
         assertEquals(resource.getType(), resourceBusiness.getByAppVersion(appVersion).get(0).getType());
@@ -142,7 +142,7 @@ public class ResourceIT extends BaseSpringIT {
         appBusiness.add(app);
         appVersionBusiness.add(appVersion);
 
-        resourceBusiness.associate(resource, appVersion);
+        resourceBusiness.associate(resource, appVersion, 0);
 
         assertEquals(resource.getName(), resourceBusiness.getByAppVersion(appVersion).get(0).getName());
         assertEquals(resource.getType(), resourceBusiness.getByAppVersion(appVersion).get(0).getType());
