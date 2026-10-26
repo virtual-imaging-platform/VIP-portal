@@ -52,7 +52,8 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DEROutputStream;
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -376,8 +377,9 @@ public class ProxyClient {
         // build and return the actual key
         ASN1Sequence privKey  = (ASN1Sequence)innerType;
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        DEROutputStream der = new DEROutputStream(bout);
+        ASN1OutputStream der = ASN1OutputStream.create(bout, ASN1Encoding.DER);
         der.writeObject(privKey);
+        der.close();
         printB64(bout.toByteArray(), out);
         out.println("-----END RSA PRIVATE KEY-----");
     }
