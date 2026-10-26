@@ -59,6 +59,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
         initializeUserTables();
         initializeGroupTables();
         initializeTermsOfUseTable();
+        initializeTwoFactorTable();
     }
 
     private void initializeUserTables() {
@@ -149,4 +150,16 @@ public class CoreDataInitializer extends JdbcDaoSupport {
             }
         }
     }
+
+    private void initializeTwoFactorTable()
+        {tableInitializer.createTable("VIPTwoFactorCodes",
+                "email VARCHAR(255), "
+                        + "code_hash VARCHAR(64), "
+                        + "expires_at TIMESTAMP NULL, "
+                        + "attempts INT, "
+                        + "PRIMARY KEY (email), "
+                        + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                        + "ON DELETE CASCADE ON UPDATE CASCADE");
+        }
+
 }

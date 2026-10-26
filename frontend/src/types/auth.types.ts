@@ -25,3 +25,7 @@ export interface VipSession {
 export interface User {
   email: string
 }
+
+export interface TwoFactorCodeChallenge {
+  twoFactorRequired: boolean
+}

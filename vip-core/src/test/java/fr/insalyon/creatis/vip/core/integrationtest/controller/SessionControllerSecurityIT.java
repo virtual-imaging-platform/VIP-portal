@@ -3,12 +3,17 @@ package fr.insalyon.creatis.vip.core.integrationtest.controller;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.integrationtest.BaseInternalApiSpringIT;
+import fr.insalyon.creatis.vip.core.server.dao.TwoFactorCodeDAO;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpSession;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.hamcrest.Matchers.*;
@@ -16,10 +21,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.sql.Timestamp;
+import java.util.HexFormat;
+
 public class SessionControllerSecurityIT extends BaseInternalApiSpringIT {
 
     private static String VALID_SESSION = "super_session";
+    private static final String KNOWN_CODE = "123456";
 
+    @Autowired 
+    private TwoFactorCodeDAO twoFactorCodeDAO;
+
+    private static String sha256(String value) throws Exception {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        return HexFormat.of().formatHex(digest.digest(value.getBytes(StandardCharsets.UTF_8)));    }
+    
     @BeforeEach
     protected void setUpUser() throws Exception {
         createUser(emailUser1);
@@ -84,9 +102,24 @@ public class SessionControllerSecurityIT extends BaseInternalApiSpringIT {
                 new Cookie("unused", "unused") :
                 new Cookie(CoreConstants.COOKIES_SESSION, sessionCookieValue);
 
-        MvcResult result = mockMvc.perform(post("/internal/session")
+        MockHttpSession httpSession = new MockHttpSession();
+        mockMvc.perform(post("/internal/session")
+                        .session(httpSession)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(credentials))
+                        .cookie(cookie))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.twoFactorRequired").value(true))
+                .andExpect(cookie().doesNotExist(CoreConstants.COOKIES_SESSION));
+
+        twoFactorCodeDAO.save(emailUser1, sha256(KNOWN_CODE),
+                new Timestamp(System.currentTimeMillis() + 10 * 60 * 1000L));
+
+        MvcResult result = mockMvc.perform(post("/internal/session/code")
+                        .session(httpSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"code\":\"" + KNOWN_CODE + "\"}")
                         .cookie(cookie))
                 .andDo(print())
                 .andExpect(status().isOk())
