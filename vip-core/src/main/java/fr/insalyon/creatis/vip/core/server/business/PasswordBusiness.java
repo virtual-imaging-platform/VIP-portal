@@ -49,7 +49,7 @@ public class PasswordBusiness extends CommonBusiness {
 
     public void update(User user, String currentPassword, String newPassword) throws VipException {
         try {
-                if (!authenticate(user.getEmail(), currentPassword)) {
+            if (!authenticate(user.getEmail(), currentPassword)) {
                 logger.error("The current password mismatch for {}", user.getEmail());
                 throw new VipException("The current password mismatch.");
             }
@@ -80,11 +80,12 @@ public class PasswordBusiness extends CommonBusiness {
                 throw new VipException("Wrong reset code.");
             }
         } catch (DAOException ex) {
-            logger.error("Error resetting password for {}", email, ex);
             throw new VipException(ex);
         }
     }
-      public boolean authenticate(String email, String plainPassword) throws DAOException, VipException {
+
+    public boolean authenticate(String email, String plainPassword) throws DAOException, VipException {
+
       return userDAO.authenticate(email, md5(plainPassword), encoder);
-  }
+    }
 }

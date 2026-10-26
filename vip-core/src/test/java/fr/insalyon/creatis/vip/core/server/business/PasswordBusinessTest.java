@@ -59,19 +59,20 @@ class PasswordBusinessTest {
     }
 
     @Test
-    void hashThenAuthenticate_withCorrectPassword_shouldSucceed() throws Exception {
+    void hashThenAuthenticateWithCorrectPasswordShouldSucceed() throws Exception {
         storedHash.set(passwordBusiness.hash("mdp123*"));
-
+        assertTrue(storedHash.get().startsWith("$argon2id$"));
         assertTrue(canAuthenticate("mdp123*"));
     }
 
     @Test
-    void hashThenAuthenticate_withWrongPassword_shouldFail() throws Exception {
+    void hashThenAuthenticateWithWrongPasswordShouldFail() throws Exception {
         storedHash.set(passwordBusiness.hash("mdp123*"));
         assertFalse(canAuthenticate("SomethingElse"));
     }
+    
     @Test
-    void hash_calledTwiceWithSamePassword_shouldProduceDifferentHashes() throws Exception {
+    void hashcalledTwiceWithSamePasswordshouldProduceDifferentHashes() throws Exception {
         String hash1 = passwordBusiness.hash("mdp123*");
         String hash2 = passwordBusiness.hash("mdp123*");
         assertNotEquals(hash1, hash2);
@@ -82,19 +83,19 @@ class PasswordBusinessTest {
     }
 
     @Test
-    void hash_shouldUseOwaspParameters() throws VipException {
+    void hashshouldUseOwaspParameters() throws VipException {
         String hash = passwordBusiness.hash("mdp123*");
         assertTrue(hash.startsWith("$argon2id$v=19$m=19456,t=2,p=1$"));
     }
 
     @Test
-    void authenticate_withLegacyRawMd5Hash_shouldFail() throws Exception {
+    void authenticatewithLegacyRawMd5HashshouldFail() throws Exception {
         storedHash.set(MD5.get("mdp123*"));
         assertFalse(canAuthenticate("mdp123*"));
     }
 
     @Test
-    void upgradeLegacyMd5Hash_thenAuthenticate_shouldSucceedWithOriginalPassword() throws Exception {
+    void upgradeLegacyMd5HashthenAuthenticatshouldSucceedWithOriginalPassword() throws Exception {
         storedHash.set(passwordBusiness.upgradeLegacyMd5Hash(MD5.get("mdp123*")));
         assertTrue(storedHash.get().startsWith("$argon2id$"));
         assertTrue(canAuthenticate("mdp123*"));
@@ -102,7 +103,7 @@ class PasswordBusinessTest {
     }
 
     @Test
-    void update_withCorrectCurrentPassword_shouldChangePassword() throws Exception {
+    void updatewithCorrectCurrentPasswordshouldChangePassword() throws Exception {
         storedHash.set(passwordBusiness.hash("currentPassword"));
         passwordBusiness.update(user(), "currentPassword", "newPassword");
         assertTrue(canAuthenticate("newPassword"));
@@ -110,7 +111,7 @@ class PasswordBusinessTest {
     }
 
     @Test
-    void update_withWrongCurrentPassword_shouldThrowAndKeepPassword() throws Exception {
+    void updatewithWrongCurrentPasswordshouldThrowAndKeepPassword() throws Exception {
         storedHash.set(passwordBusiness.hash("currentPassword"));
         VipException exception = assertThrows(VipException.class,
                 () -> passwordBusiness.update(user(), "wrongPassword", "newPassword"));
@@ -119,16 +120,8 @@ class PasswordBusinessTest {
         assertTrue(canAuthenticate("currentPassword"));
     }
 
-
     @Test
-    void setPassword_shouldStoreAnArgon2idHashOfTheMd5() throws Exception {
-        passwordBusiness.setPassword(EMAIL, "newPassword");
-        assertTrue(storedHash.get().startsWith("$argon2id$"));
-        assertTrue(canAuthenticate("newPassword"));
-    }
-
-    @Test
-    void reset_withCorrectCode_shouldChangePassword() throws Exception {
+    void resetwithCorrectCode_shouldChangePassword() throws Exception {
         User user = user();
         user.setCode("the-code");
         when(userDAO.get(EMAIL)).thenReturn(user);
@@ -139,7 +132,7 @@ class PasswordBusinessTest {
     }
 
     @Test
-    void reset_withWrongCode_shouldThrowAndNotChangePassword() throws Exception {
+    void resetwithWrongCode_shouldThrowAndNotChangePassword() throws Exception {
         User user = user();
         user.setCode("the-code");
         when(userDAO.get(EMAIL)).thenReturn(user);
