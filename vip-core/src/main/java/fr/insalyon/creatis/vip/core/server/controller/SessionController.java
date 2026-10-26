@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.controller;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import fr.insalyon.creatis.vip.core.server.business.SessionBusiness;
 import fr.insalyon.creatis.vip.core.server.business.UserBusiness;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.core.server.model.Session;
+import fr.insalyon.creatis.vip.core.server.model.TwoFactorCodeRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -47,22 +49,32 @@ public class SessionController {
 
         return session;
     }
-
     @PostMapping
-    public Session createSession(@RequestBody @Valid AuthenticationCredentials credentials, HttpServletRequest request,
-            HttpServletResponse response)
+    public Map<String, Boolean> createSession(@RequestBody @Valid AuthenticationCredentials credentials,
+            HttpServletRequest request)
             throws VipException {
         try {
-            Session session = sessionBusiness.signin(credentials);
-
-            sessionBusiness.createLoginCookies(request, response, session);
-            return session;
+            sessionBusiness.signin(credentials, request);
+            return Map.of("twoFactorRequired", true);
         } catch (VipException e) {
             if (e.getMessage().startsWith("Authentication failed")) {
                 throw new VipException(DefaultError.BAD_CREDENTIALS);
             }
             throw new VipException("Failed to create user session!", e);
         }
+    }
+    @PostMapping("/code")
+    public Session verifyTwoFactorCode(@RequestBody @Valid TwoFactorCodeRequest codeRequest,
+            HttpServletRequest request, HttpServletResponse response)
+            throws VipException {
+        Session session = sessionBusiness.verifyTwoFactorCode(codeRequest.getCode(), request);
+
+        sessionBusiness.createLoginCookies(request, response, session);
+        return session;
+    }
+    @PostMapping("/code/resend")
+    public void resendTwoFactorCode(HttpServletRequest request) throws VipException {
+        sessionBusiness.resendTwoFactorCode(request);
     }
 
     @DeleteMapping

@@ -2,7 +2,7 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { sessionApi } from '@/api/session.api'
 import { usersApi } from '@/api/users.api'
-import type { VipSession, LoginCredentials, RegisterPayload } from '@/types/auth.types'
+import type { VipSession, LoginCredentials, RegisterPayload,TwoFactorCodeChallenge } from '@/types/auth.types'
 import type { ProfileUser } from '@/types/profile.types'
 
 
@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   const session = ref<VipSession | null>(null)
   const isLoading = ref(false)
   const initialized = ref(false)
+  const twoFactorPending = ref(false)
 
   const isAuthenticated = computed(() => !!session.value)
 
@@ -35,16 +36,38 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function login(credentials: LoginCredentials) {
+  async function login(credentials: LoginCredentials): Promise<TwoFactorCodeChallenge> {
     isLoading.value = true;
     try {
-      const vipSession = await sessionApi.login(credentials);
+      const challenge = await sessionApi.login(credentials);
+      twoFactorPending.value = challenge.twoFactorRequired;
+      return challenge;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  async function verifyCode(code: string): Promise<VipSession> {
+    isLoading.value = true;
+    try {
+      const vipSession = await sessionApi.verifyCode(code);
+      twoFactorPending.value = false;
       if (vipSession.confirmed === false) {
         return vipSession;
       }
       session.value = vipSession;
       await loadCurrentUser();
       return vipSession;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  function cancelTwoFactor() {
+    twoFactorPending.value = false
+  }
+  async function resendCode() {
+    isLoading.value = true;
+    try {
+      await sessionApi.resendCode();
     } finally {
       isLoading.value = false;
     }
@@ -66,6 +89,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     session.value = null
     initialized.value = false
+    twoFactorPending.value = false
   }
 
   async function register(payload: RegisterPayload) {
@@ -101,6 +125,10 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading,
     initialized,
     isAuthenticated,
+    twoFactorPending,
+    verifyCode,
+    resendCode,
+    cancelTwoFactor,
     initialize,
     login,
     register,
