@@ -496,6 +496,6 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
 
         engineBusiness.add(engine);
         resourceBusiness.add(resource);
-        resourceBusiness.associate(resource, appVersionBusiness.getVersion(appName, version));
+        resourceBusiness.associate(resource, appVersionBusiness.getVersion(appName, version), 0);
     }
 }

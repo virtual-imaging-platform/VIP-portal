@@ -64,6 +64,8 @@ public class EditVersionLayout extends AbstractFormLayout {
     private TextAreaItem noteField;
     private ListGrid tagsGrid;
     private SelectItem resourcesList;
+    private ListGrid resourcePrioritiesGrid;
+    private Map<String, Integer> resourcePriorityValues;
     private IButton saveButton;
     private IButton removeButton;
     private DataSource suggestionTags;
@@ -134,6 +136,23 @@ public class EditVersionLayout extends AbstractFormLayout {
         resourcesList = new SelectItem();
         resourcesList.setMultiple(true);
         resourcesList.setWidth(450);
+        resourcesList.addChangedHandler(event -> refreshResourcePrioritiesGrid());
+
+        resourcePrioritiesGrid = new ListGrid();
+        resourcePrioritiesGrid.setWidth(450);
+        resourcePrioritiesGrid.setHeight(150);
+        resourcePrioritiesGrid.setCanEdit(true);
+        resourcePrioritiesGrid.setCanRemoveRecords(false);
+        resourcePrioritiesGrid.setEditEvent(ListGridEditEvent.CLICK);
+
+        ListGridField resourceNameField = new ListGridField("resourceName", "Resource");
+        resourceNameField.setCanEdit(false);
+
+        ListGridField priorityField = new ListGridField("priority", "Priority");
+        priorityField.setType(ListGridFieldType.INTEGER);
+        priorityField.setCanEdit(true);
+
+        resourcePrioritiesGrid.setFields(resourceNameField, priorityField);
 
         suggestionTags = new DataSource();
         suggestionTags.setClientOnly(true);
@@ -153,6 +172,7 @@ public class EditVersionLayout extends AbstractFormLayout {
                             noteField.getValueAsString() == null ? null : noteField.getValueAsString().trim());
 
                     toSave.setResources(resourcesToSet(Arrays.asList(resourcesList.getValues())));
+                    toSave.setResourcePriorities(getSelectedResourcePriorities());
                     toSave.setTags(tagsToSet(toSave.getApplicationName(), toSave.getVersion()));
                     save(toSave);
                 }
@@ -222,6 +242,8 @@ public class EditVersionLayout extends AbstractFormLayout {
         addMember(FieldUtil.getForm(sourceField));
         addFieldResponsiveHeight("Note", noteField);
         addField("Resources authorized", resourcesList);
+        addMember(WidgetUtil.getLabel("<b>" + "Resource priority" + "</b>", 15));
+        addMember(resourcePrioritiesGrid);
         addMember(WidgetUtil.getLabel("<b>" + "Tags Settings" + "</b>", 15));
         addMember(tagsGrid);
         addMember(createTagCreationEntry());
@@ -304,7 +326,18 @@ public class EditVersionLayout extends AbstractFormLayout {
     }
 
     public void setVersion(String version, String descriptor, boolean isVisible, String source,
-        String note, Map<String, String> settings, String[] resources) {
+                           String note, Map<String, String> settings, String[] resources) {
+        setVersion(version, descriptor, isVisible, source, note, settings, resources, null);
+    }
+
+    public void setVersion(String version, String descriptor, boolean isVisible, String source,
+        String note, Map<String, String> settings, String[] resources, Map<String, Integer> priorities) {
+        resourcePrioritiesGrid.setData(new ListGridRecord[0]);
+        resourcePriorityValues.clear();
+        if (priorities != null) {
+            resourcePriorityValues.putAll(priorities);
+        }
+
         if (version != null) {
             this.versionField.setValue(version);
             this.versionField.setDisabled(true);
@@ -326,10 +359,12 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.isVisibleField.setValue(true);
             this.sourceField.setValue("");
             this.noteField.setValue("");
+            this.resourcesList.setValues(new String[0]);
             this.removeButton.setDisabled(true);
             this.newVersion = true;
         }
         fetchData();
+        refreshResourcePrioritiesGrid();
     }
 
     private Map<String, String> settingsToMap() {
@@ -391,6 +426,45 @@ public class EditVersionLayout extends AbstractFormLayout {
         return record;
     }
 
+    private void saveDisplayedPriorities() {
+        for (ListGridRecord record : resourcePrioritiesGrid.getRecords()) {
+            String name = record.getAttribute("resourceName");
+            if (name == null) continue;
+
+            resourcePriorityValues.put(name, record.getAttributeAsInt("priority"));
+        }
+    }
+
+    private void refreshResourcePrioritiesGrid() {
+        if (resourcePrioritiesGrid == null) return;
+
+        // Preserve the values currently displayed before rebuilding the grid.
+        saveDisplayedPriorities();
+        resourcePrioritiesGrid.setData(new ListGridRecord[0]);
+        String[] selectedResources = resourcesList.getValues();
+        if (selectedResources == null) return;
+
+        for (String name : selectedResources) {
+            ListGridRecord record = new ListGridRecord();
+            record.setAttribute("resourceName", name);
+            record.setAttribute("priority", resourcePriorityValues.getOrDefault(name, 0));
+            resourcePrioritiesGrid.addData(record);
+        }
+    }
+
+    private Map<String, Integer> getSelectedResourcePriorities() {
+        saveDisplayedPriorities();
+        Map<String, Integer> result = new HashMap<>();
+        String[] selectedResources = resourcesList.getValues();
+        if (selectedResources == null) return result;
+
+        for (String name : selectedResources) {
+            result.put(name, resourcePriorityValues.getOrDefault(name, 0));
+        }
+
+        return result;
+    }
+
     private Set<Resource> resourcesToSet(List<String> resources) {
         return resources.stream().map(Resource::new).collect(Collectors.toSet());
     }
@@ -431,6 +505,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onSuccess(List<Resource> result) {
                 String[] data = result.stream().map(Resource::getName).toArray(String[]::new);
                 resourcesList.setValueMap(data);
+                refreshResourcePrioritiesGrid();
             }
         };
         service.getResources(callback);

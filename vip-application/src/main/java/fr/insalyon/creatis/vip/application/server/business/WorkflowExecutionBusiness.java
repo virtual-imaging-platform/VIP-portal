@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.models.Engine;
@@ -40,7 +41,7 @@ public class WorkflowExecutionBusiness extends CommonBusiness {
     }
 
     public String launch(String workflowName, Resource resource, Engine engine, AppVersion appVersion,
-                           List<Map<String, List<String>>> parameters) throws VipException {
+                           List<Map<String, List<String>>> parameters, List<Resource> orderedResources) throws VipException {
 
         try {
             String workflowContent = appVersion.getDescriptor();
@@ -48,9 +49,17 @@ public class WorkflowExecutionBusiness extends CommonBusiness {
             String proxyFileName = server.getServerProxy(server.getVoName());
             Map<String,String> settings = new HashMap<>(appVersion.getSettings());
             settings.put(ApplicationConstants.DEFAULT_EXECUTOR_GASW, resource.getType().toString());
+
+            // Add ordered resource list for fallback mechanism (types only, comma-separated)
+            String resourcesCSV = orderedResources.stream()
+                .map(r -> r.getType().toString())
+                .collect(Collectors.joining(","));
+            settings.put(ApplicationConstants.FALLBACK_RESOURCES_GASW, resourcesCSV);
+
             String settingsJSON = new ObjectMapper().writeValueAsString(settings);
             logger.info("Launching workflow of [{}/{}]", appVersion.getApplicationName(), appVersion.getVersion());
             logger.info("Launching on engine [{}] and resource [{}] (type : [{}])", engine.getName(), resource.getName(), resource.getType());
+            logger.info("Fallback resources: {}", resourcesCSV);
             logger.info("inputs : {}", inputs);
             logger.info("settings: {}", settingsJSON);
             return this.engine.launch(engine.getEndpoint(), workflowContent, inputs, settingsJSON, resource.getConfiguration(), proxyFileName);
