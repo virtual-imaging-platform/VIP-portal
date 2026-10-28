@@ -28,8 +28,11 @@ import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
 import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Comparator;
 
 public class VersionsLayout extends VLayout {
 
@@ -66,7 +69,7 @@ public class VersionsLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setVersion(null, null, null, null, true, null, null, null);
+                appsTab.setVersion(null, null, null, null, true, null, null, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -167,10 +170,15 @@ public class VersionsLayout extends VLayout {
                 List<VersionRecord> dataList = new ArrayList<VersionRecord>();
 
                 for (AppVersion version : result) {
+                    List<String> sortedResourcesNames = version.getResourcesNames().stream()
+                        .sorted(Comparator.comparingInt(r -> version.getResourcePriorities().getOrDefault(r, 0)))
+                        .collect(Collectors.toList());
+
                     dataList.add(new VersionRecord(
                         version.getVersion(), version.getDescriptor(),
                         version.getDoi(), version.isVisible(), version.getSource(),
-                        version.getNote(), version.getSettings(), version.getResourcesNames()));
+                        version.getNote(), version.getSettings(), sortedResourcesNames,
+                        version.getResourcePriorities()));
                 }
                 grid.setData(dataList.toArray(new VersionRecord[]{}));
             }
@@ -198,7 +206,8 @@ public class VersionsLayout extends VLayout {
             record.getAttributeAsBoolean("visible"),
             record.getAttribute("source"),
             record.getAttribute("note"),
-            record.getAttributeAsStringArray("resources"));
+            record.getAttributeAsStringArray("resources"),
+            record.getAttributeAsMap("priorities"));
     }
 
     private void remove(String version) {
