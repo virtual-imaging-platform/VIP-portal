@@ -118,7 +118,7 @@ public class WorkflowLaunchBusiness extends CommonBusiness {
 
         String workflowId;
         try {
-            workflowId = workflowExecutionBusiness.launch(workflow.getWorkflowName(), resource, engine, appVersion, actualInputs);
+            workflowId = workflowExecutionBusiness.launch(workflow.getWorkflowName(), resource, engine, appVersion, actualInputs, resources);
         } catch (Exception e) {
             // this method manage the email sending, and return the exception to make bubble up
             throw sendMailsOnLaunchException(e, engine);

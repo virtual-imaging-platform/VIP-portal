@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -27,7 +28,6 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -49,7 +49,6 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 public class EditVersionLayout extends AbstractFormLayout {
-    
     private boolean newVersion;
     private String applicationName;
     private String version;
@@ -63,7 +62,9 @@ public class EditVersionLayout extends AbstractFormLayout {
     private TextItem sourceField;
     private TextAreaItem noteField;
     private ListGrid tagsGrid;
-    private SelectItem resourcesList;
+    private ListGrid resourcesGrid;
+    private Set<String> selectedResourceNames = new HashSet<>();
+    private Map<String, Integer> resourcePriorityValues = new HashMap<>();
     private IButton saveButton;
     private IButton removeButton;
     private DataSource suggestionTags;
@@ -130,10 +131,29 @@ public class EditVersionLayout extends AbstractFormLayout {
             new ListGridField("visible", "Visible").setType(ListGridFieldType.BOOLEAN),
             new ListGridField("boutiques", "Boutiques").setType(ListGridFieldType.BOOLEAN)
         );
-  
-        resourcesList = new SelectItem();
-        resourcesList.setMultiple(true);
-        resourcesList.setWidth(450);
+
+        resourcesGrid = new ListGrid();
+        resourcesGrid.setWidth(450);
+        resourcesGrid.setHeight(250);
+        resourcesGrid.setCanEdit(true);
+        resourcesGrid.setCanRemoveRecords(false);
+        resourcesGrid.setEditEvent(ListGridEditEvent.CLICK);
+
+        ListGridField selectedField = new ListGridField("selected", "Authorized");
+        selectedField.setType(ListGridFieldType.BOOLEAN);
+        selectedField.setCanEdit(true);
+        selectedField.setWidth(90);
+        selectedField.setEditorType(new CheckboxItem());
+
+        ListGridField resourceNameField = new ListGridField("resourceName", "Resource");
+        resourceNameField.setCanEdit(false);
+
+        ListGridField priorityField = new ListGridField("priority", "Priority (lower = preferred)");
+        priorityField.setType(ListGridFieldType.INTEGER);
+        priorityField.setCanEdit(true);
+        priorityField.setWidth(180);
+
+        resourcesGrid.setFields(selectedField, resourceNameField, priorityField);
 
         suggestionTags = new DataSource();
         suggestionTags.setClientOnly(true);
@@ -152,7 +172,8 @@ public class EditVersionLayout extends AbstractFormLayout {
                             sourceField.getValueAsString(),
                             noteField.getValueAsString() == null ? null : noteField.getValueAsString().trim());
 
-                    toSave.setResources(resourcesToSet(Arrays.asList(resourcesList.getValues())));
+                    toSave.setResources(getSelectedResourcesFromGrid());
+                    toSave.setResourcePriorities(getSelectedPrioritiesFromGrid());
                     toSave.setTags(tagsToSet(toSave.getApplicationName(), toSave.getVersion()));
                     save(toSave);
                 }
@@ -221,7 +242,8 @@ public class EditVersionLayout extends AbstractFormLayout {
         addInline(sourceLabel, sourceBtn);
         addMember(FieldUtil.getForm(sourceField));
         addFieldResponsiveHeight("Note", noteField);
-        addField("Resources authorized", resourcesList);
+        addMember(WidgetUtil.getLabel("<b>" + "Resources authorized" + "</b>", 15));
+        addMember(resourcesGrid);
         addMember(WidgetUtil.getLabel("<b>" + "Tags Settings" + "</b>", 15));
         addMember(tagsGrid);
         addMember(createTagCreationEntry());
@@ -304,7 +326,24 @@ public class EditVersionLayout extends AbstractFormLayout {
     }
 
     public void setVersion(String version, String descriptor, boolean isVisible, String source,
-        String note, Map<String, String> settings, String[] resources) {
+                           String note, Map<String, String> settings, String[] resources) {
+        setVersion(version, descriptor, isVisible, source, note, settings, resources, null);
+    }
+
+    public void setVersion(String version, String descriptor, boolean isVisible, String source,
+        String note, Map<String, String> settings, String[] resources, Map<String, Integer> priorities) {
+        selectedResourceNames.clear();
+        if (resources != null) {
+            selectedResourceNames.addAll(Arrays.asList(resources));
+        }
+
+        resourcePriorityValues.clear();
+        if (priorities != null) {
+            resourcePriorityValues.putAll(priorities);
+        }
+
+        resourcesGrid.setData(new ListGridRecord[0]);
+
         if (version != null) {
             this.versionField.setValue(version);
             this.versionField.setDisabled(true);
@@ -313,7 +352,6 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.isVisibleField.setValue(isVisible);
             this.sourceField.setValue(source);
             this.noteField.setValue(note == null ? "" : note);
-            this.resourcesList.setValues(resources);
             this.removeButton.setDisabled(false);
             this.newVersion = false;
             this.version = version;
@@ -391,8 +429,32 @@ public class EditVersionLayout extends AbstractFormLayout {
         return record;
     }
 
-    private Set<Resource> resourcesToSet(List<String> resources) {
-        return resources.stream().map(Resource::new).collect(Collectors.toSet());
+    private Set<Resource> getSelectedResourcesFromGrid() {
+        Set<Resource> selected = new HashSet<>();
+        for (ListGridRecord record : resourcesGrid.getRecords()) {
+            if (record.getAttributeAsBoolean("selected")) {
+                String name = record.getAttribute("resourceName");
+                if (name == null) continue;
+
+                selected.add(new Resource(name));
+            }
+        }
+
+        return selected;
+    }
+
+    private Map<String, Integer> getSelectedPrioritiesFromGrid() {
+        Map<String, Integer> priorities = new HashMap<>();
+        for (ListGridRecord record : resourcesGrid.getRecords()) {
+            if (record.getAttributeAsBoolean("selected")) {
+                String name = record.getAttribute("resourceName");
+                if (name == null) continue;
+
+                priorities.put(name, record.getAttributeAsInt("priority"));
+            }
+        }
+
+        return priorities;
     }
 
     private void fetchData() {
@@ -429,8 +491,21 @@ public class EditVersionLayout extends AbstractFormLayout {
     
             @Override
             public void onSuccess(List<Resource> result) {
-                String[] data = result.stream().map(Resource::getName).toArray(String[]::new);
-                resourcesList.setValueMap(data);
+                ListGridRecord[] records = result.stream()
+                        .map(resource -> {
+                            String name = resource.getName();
+                            ListGridRecord record = new ListGridRecord();
+                            record.setAttribute("selected", selectedResourceNames.contains(name));
+                            record.setAttribute("resourceName", name);
+                            record.setAttribute("priority", resourcePriorityValues.getOrDefault(name, 0));
+                            return record;
+                        })
+                        .sorted(
+                            Comparator.comparing(
+                                (ListGridRecord r) -> !r.getAttributeAsBoolean("selected"))
+                                .thenComparingInt(r -> r.getAttributeAsInt("priority")))
+                        .toArray(ListGridRecord[]::new);
+                resourcesGrid.setData(records);
             }
         };
         service.getResources(callback);

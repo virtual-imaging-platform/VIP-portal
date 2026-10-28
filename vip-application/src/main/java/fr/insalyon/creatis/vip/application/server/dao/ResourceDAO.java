@@ -1,6 +1,7 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import fr.insalyon.creatis.vip.application.models.AppVersion;
 import fr.insalyon.creatis.vip.application.models.Engine;
@@ -27,13 +28,17 @@ public interface ResourceDAO {
 
     public List<Resource> getByAppVersion(AppVersion appVersion) throws DAOException;
 
+    public Map<String, Integer> getPrioritiesByAppVersion(AppVersion appVersion) throws DAOException;
+
+    public void updatePriorityByAppVersion(Resource resource, AppVersion appVersion, int priority) throws DAOException;
+
     public List<Resource> getByGroup(Group group) throws DAOException;
 
     public void associate(Resource resource, Group group) throws DAOException;
 
     public void dissociate(Resource resource, Group group) throws DAOException;
 
-    public void associate(Resource resource, AppVersion appVersion) throws DAOException;
+    public void associate(Resource resource, AppVersion appVersion, int priority) throws DAOException;
 
     public void dissociate(Resource resource, AppVersion appVersion) throws DAOException;
 

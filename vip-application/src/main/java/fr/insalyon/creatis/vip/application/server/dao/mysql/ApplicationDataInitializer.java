@@ -81,6 +81,7 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                     "resourcename VARCHAR(255), "
                 +   "application VARCHAR(255), "
                 +   "version VARCHAR(255), "
+                +   "priority INT DEFAULT 0, "
                 +   "PRIMARY KEY (resourcename, application, version), "
                 +   "FOREIGN KEY (resourcename) REFERENCES VIPResources(name) "
                 +   "ON DELETE CASCADE ON UPDATE CASCADE, "

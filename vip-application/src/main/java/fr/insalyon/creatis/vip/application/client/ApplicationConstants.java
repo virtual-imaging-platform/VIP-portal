@@ -100,6 +100,7 @@ public class ApplicationConstants {
     public static final String INPUT_VALID_CHARS = "0-9.,A-Za-z-+@/_():~ ";
     public static final String EXEC_NAME_VALID_CHARS = "0-9A-Za-z-_ ";
     public static final String DEFAULT_EXECUTOR_GASW = "default.executor";
+    public static final String FALLBACK_RESOURCES_GASW = "fallback.resources";
 
     public static String getLaunchTabID(String applicationName) {
         return "launch_"
