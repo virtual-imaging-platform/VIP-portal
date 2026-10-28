@@ -3,6 +3,9 @@ package fr.insalyon.creatis.vip.application.server.business;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +63,13 @@ public class ResourceBusiness extends CommonBusiness {
 
     public List<Resource> getAvailableForExecution(User user, AppVersion appVersion) throws VipException {
         List<String> resourcesName = appVersion.getResourcesNames();
-
+        Map<String, Integer> priorities = appVersion.getResourcePriorities();
         return getAvailableForExecution(user).stream()
                 .filter((resource) -> resourcesName.contains(resource.getName()))
+                .sorted(
+                    Comparator
+                        .comparingInt((Resource resource) -> priorities.getOrDefault(resource.getName(), 0))
+                        .thenComparing(Resource::getName))
                 .distinct()
                 .toList();
     }
@@ -187,6 +194,22 @@ public class ResourceBusiness extends CommonBusiness {
     public List<Resource> getByAppVersion(AppVersion appVersion) throws VipException {
         try {
             return mapAssociated(resourceDAO.getByAppVersion(appVersion));
+        } catch (DAOException e) {
+            throw new VipException(e);
+        }
+    }
+
+    public Map<String, Integer> getPrioritiesByAppVersion(AppVersion appVersion) throws VipException {
+        try {
+            return resourceDAO.getPrioritiesByAppVersion(appVersion);
+        } catch (DAOException e) {
+            throw new VipException(e);
+        }
+    }
+
+    public void updatePriority(Resource resource, AppVersion appVersion, int priority) throws VipException {
+        try {
+            resourceDAO.updatePriorityByAppVersion(resource, appVersion, priority);
         } catch (DAOException e) {
             throw new VipException(e);
         }

@@ -80,7 +80,8 @@ public class AppVersionBusiness extends CommonBusiness {
                 tagBusiness.addOrUpdate(tag);
             }
             for (Resource resource : version.getResources()) {
-                resourceBusiness.associate(resource, version, 0);
+                int priority = version.getResourcePriority(resource.getName());
+                resourceBusiness.associate(resource, version, priority);
             }
         } catch (DAOException e) {
             throw new VipException(e);
@@ -113,8 +114,11 @@ public class AppVersionBusiness extends CommonBusiness {
 
             applicationDAO.updateVersion(version);
             for (Resource resource : version.getResources()) {
-                if ( ! beforeResourceNames.removeIf((s) -> s.equals(resource.getName()))) {
-                    resourceBusiness.associate(resource, version, 0);
+                int priority = version.getResourcePriority(resource.getName());
+                if (beforeResourceNames.remove(resource.getName())) {
+                    resourceBusiness.updatePriority(resource, version, priority);
+                } else {
+                    resourceBusiness.associate(resource, version, priority);
                 }
             }
             for (Tag tag : editedTags) {
@@ -169,6 +173,7 @@ public class AppVersionBusiness extends CommonBusiness {
 
             for (AppVersion version : versions) {
                 version.setResources(new HashSet<>(resourceBusiness.getByAppVersion(version)));
+                version.setResourcePriorities(resourceBusiness.getPrioritiesByAppVersion(version));
                 version.setTags(new HashSet<>(tagBusiness.getTags(version)));
             }
             return versions;
@@ -232,6 +237,7 @@ public class AppVersionBusiness extends CommonBusiness {
 
             if (version != null) {
                 version.setResources(new HashSet<>(resourceBusiness.getByAppVersion(version)));
+                version.setResourcePriorities(resourceBusiness.getPrioritiesByAppVersion(version));
                 version.setTags(new HashSet<>(tagBusiness.getTags(version)));
             }
 
@@ -252,9 +258,17 @@ public class AppVersionBusiness extends CommonBusiness {
 
             if (appVersion != null) {
                 // to avoid permissions leaks
-                appVersion.setResources(new HashSet<>(permissions.filterOnlySame(
-                        resourceBusiness.getByAppVersion(appVersion),
-                        resourceBusiness.getUserContextResources())));
+                List<Resource> visibleResources = permissions.filterOnlySame(
+                                resourceBusiness.getByAppVersion(appVersion),
+                                resourceBusiness.getUserContextResources());
+
+                appVersion.setResources(new HashSet<>(visibleResources));
+
+                Map<String, Integer> priorities = resourceBusiness.getPrioritiesByAppVersion(appVersion);
+                Set<String> visibleNames = visibleResources.stream().map(Resource::getName).collect(Collectors.toSet());
+                priorities.keySet().retainAll(visibleNames);
+                appVersion.setResourcePriorities(priorities);
+
                 appVersion.setTags(new HashSet<>(tagBusiness.getTags(appVersion)));
             }
 
@@ -285,9 +299,17 @@ public class AppVersionBusiness extends CommonBusiness {
 
             for (AppVersion v : versions) {
                 // to avoid permissions leaks
-                v.setResources(new HashSet<>(permissions.filterOnlySame(
+                List<Resource> visibleResources = permissions.filterOnlySame(
                         resourceBusiness.getByAppVersion(v),
-                        userResources)));
+                        userResources);
+
+                v.setResources(new HashSet<>(visibleResources));
+
+                Map<String, Integer> priorities = resourceBusiness.getPrioritiesByAppVersion(v);
+                Set<String> visibleNames = visibleResources.stream().map(Resource::getName).collect(Collectors.toSet());
+                priorities.keySet().retainAll(visibleNames);
+                v.setResourcePriorities(priorities);
+
                 v.setTags(new HashSet<>(tagBusiness.getTags(v)));
             }
 
