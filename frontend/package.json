@@ -20,7 +20,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
     "axios": "^1.13.6",
-    "dompurify": "^3.3.3",
+    "dompurify": "^3.4.17",
     "lucide-vue-next": "^0.577.0",
     "pinia": "^3.0.4",
     "semver": "^7.7.4",
