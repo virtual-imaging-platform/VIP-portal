@@ -37,6 +37,7 @@ public class GeneralInformationContextMenu extends Menu {
         downloadFileItem.setIcon("icon-download.png");
         downloadFileItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 downloadFile(record.getValue());
             }
@@ -46,6 +47,7 @@ public class GeneralInformationContextMenu extends Menu {
         jumpToItem.setIcon("icon-jumpto.png");
         jumpToItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 String folder = record.getValue().substring(0, record.getValue().lastIndexOf("/"));
                 BrowserLayout.getInstance().loadData(folder, false);
@@ -66,11 +68,13 @@ public class GeneralInformationContextMenu extends Menu {
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<String> callback = new AsyncCallback<String>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to download file:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(String result) {
                 modal.hide();
                 OperationLayout.getInstance().addOperation(result);

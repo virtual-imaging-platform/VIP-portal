@@ -33,10 +33,12 @@ public abstract class AbstractAuthenticationProvider implements AuthenticationPr
     @Autowired
     protected UsersGroupsDAO usersGroupsDAO;
 
+    @Override
     public final void afterPropertiesSet() throws Exception {
         Assert.notNull(this.messages, "A message source must be set");
     }
 
+    @Override
     public void setMessageSource(MessageSource messageSource) {
         this.messages = new MessageSourceAccessor(messageSource);
     }

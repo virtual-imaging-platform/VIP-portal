@@ -35,6 +35,7 @@ public class SocialModule extends Module {
         socialButton = new ToolStripButton();
         socialButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(
                     SocialConstants.TAB_SOCIAL, SocialTab::new);
@@ -47,6 +48,7 @@ public class SocialModule extends Module {
 
         timer = new Timer() {
 
+            @Override
             public void run() {
                 verifyMessages();
             }
@@ -68,11 +70,13 @@ public class SocialModule extends Module {
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<Integer> callback = new AsyncCallback<Integer>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Connection lost with the server.", 20);
                 timer.cancel();
             }
 
+            @Override
             public void onSuccess(Integer result) {
 
                 if (result > 0) {

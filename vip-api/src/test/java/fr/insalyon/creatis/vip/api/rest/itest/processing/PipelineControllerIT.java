@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.core.models.GroupType;
 public class PipelineControllerIT extends BaseRestApiSpringIT {
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
         super.setUp();
     }

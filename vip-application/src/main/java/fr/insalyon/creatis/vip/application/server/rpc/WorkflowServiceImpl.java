@@ -140,6 +140,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationInput
      * @throws VipException
      */
+    @Override
     public void addSimulationInput(SimulationInput simulationInput)
             throws VipException {
         inputBusiness.addSimulationInput(
@@ -151,6 +152,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationInput
      * @throws VipException
      */
+    @Override
     public void updateSimulationInput(SimulationInput simulationInput)
             throws VipException {
         inputBusiness.updateSimulationInput(
@@ -163,6 +165,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param applicationName
      * @throws VipException
      */
+    @Override
     public void removeSimulationInput(String inputName, String applicationName)
             throws VipException {
         inputBusiness.removeSimulationInput(
@@ -175,6 +178,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param applicationName
      * @throws VipException
      */
+    @Override
     public void removeSimulationInputExample(
         String inputName, String applicationName)
         throws VipException {
@@ -186,6 +190,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @return @throws VipException
      */
+    @Override
     public List<SimulationInput> getSimulationInputByUser()
         throws VipException {
         return inputBusiness.getSimulationInputByUser(
@@ -197,6 +202,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationInput
      * @throws VipException
      */
+    @Override
     public void saveInputsAsExamples(SimulationInput simulationInput)
         throws VipException {
         inputBusiness.saveSimulationInputAsExample(
@@ -282,6 +288,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationIDs
      * @throws VipException
      */
+    @Override
     public void purgeSimulations(List<String> simulationIDs) throws VipException {
         try {
             authenticateSystemAdministrator(logger);
@@ -324,6 +331,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationID
      * @throws VipException
      */
+    @Override
     public void cleanWorkflow(String simulationID) throws VipException {
         trace(logger, "Cleaning simulation '" + simulationID + "'.");
         workflowBusiness.clean(simulationID, getSessionUser().getEmail());
@@ -360,10 +368,12 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws VipException
      */
+    @Override
     public Workflow getSimulation(String workflowId) throws VipException {
         return listWorkflowsBusiness.getNotRefreshedWorkflow(workflowId);
     }
 
+    @Override
     public String getFile(String baseDir, String fileName) {
         try {
             FileReader fr = new FileReader(
@@ -390,6 +400,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         return null;
     }
 
+    @Override
     public String getFileURL(String baseDir, String fileName) {
         return "https://" + server.getApacheHost() + ":"
                 + server.getApacheSSLPort()
@@ -397,6 +408,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 + baseDir + "/" + fileName;
     }
 
+    @Override
     public List<String> getLogs(String baseDir) {
         List<String> list = new ArrayList<String>();
 
@@ -421,10 +433,12 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param path
      * @throws VipException
      */
+    @Override
     public void deleteLogData(String path) throws VipException {
         workflowBusiness.deleteLogData(path);
     }
 
+    @Override
     public List<SimulationInput> getWorkflowsInputByUserAndAppName(
         String user, String appName) {
         try {
@@ -442,6 +456,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws VipException
      */
+    @Override
     public List<String> getPerformanceStats(List<Workflow> workflowList, int type) throws VipException {
 
         try {
@@ -483,6 +498,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws VipException
      */
+    @Override
     public List<Activity> getProcessors(String simulationID) throws VipException {
         return workflowBusiness.getProcessors(simulationID);
     }
@@ -503,6 +519,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param newUser
      * @throws VipException
      */
+    @Override
     public void updateUser(String currentUser, String newUser) throws VipException {
         trace(logger, "Updating user '" + currentUser + "' to '" + newUser + "'.");
         workflowBusiness.updateUser(currentUser, newUser);

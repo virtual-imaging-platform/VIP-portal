@@ -102,11 +102,13 @@ public class ViewerWindow extends Window {
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get file:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(String result) {
                 modal.hide();
                 pane.setContents(result.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br />"));
@@ -127,6 +129,7 @@ public class ViewerWindow extends Window {
         refreshButton.setTitle("Refresh");
         refreshButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 load();
             }
@@ -138,6 +141,7 @@ public class ViewerWindow extends Window {
         downloadButton.setTitle("Download");
         downloadButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 com.google.gwt.user.client.Window.open(
                         GWT.getModuleBaseURL()
