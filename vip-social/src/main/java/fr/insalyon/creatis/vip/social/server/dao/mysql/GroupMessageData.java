@@ -33,6 +33,7 @@ public class GroupMessageData extends JdbcDaoSupport implements GroupMessageDAO 
         this.userDAO = userDAO;
     }
 
+    @Override
     public long add(String sender, String groupName, String title, String message) throws DAOException {
 
         try {
@@ -59,6 +60,7 @@ public class GroupMessageData extends JdbcDaoSupport implements GroupMessageDAO 
         }
     }
 
+    @Override
     public void remove(long id) throws DAOException {
 
         try {
@@ -75,6 +77,7 @@ public class GroupMessageData extends JdbcDaoSupport implements GroupMessageDAO 
         }
     }
 
+    @Override
     public GroupMessage get(long id) throws DAOException {
 
         try {
@@ -103,6 +106,7 @@ public class GroupMessageData extends JdbcDaoSupport implements GroupMessageDAO 
         }
     }
 
+    @Override
     public List<GroupMessage> getMessageByGroup(String groupName, int limit, Date startDate) throws DAOException {
 
         try {

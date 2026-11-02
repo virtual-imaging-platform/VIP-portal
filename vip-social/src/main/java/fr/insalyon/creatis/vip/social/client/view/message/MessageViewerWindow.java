@@ -110,10 +110,12 @@ public class MessageViewerWindow extends Window {
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to mark message as read:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 SocialModule.verifyMessages();
             }

@@ -16,6 +16,7 @@ public class EngineIT extends BaseApplicationSpringIT {
     private Engine engine;
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         engine = new Engine("test engine", "test endpoint", "enabled");

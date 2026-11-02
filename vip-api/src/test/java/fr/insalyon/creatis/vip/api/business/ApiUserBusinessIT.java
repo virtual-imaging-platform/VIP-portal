@@ -24,6 +24,7 @@ public class ApiUserBusinessIT extends BaseSpringIT {
     private User user1;
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 

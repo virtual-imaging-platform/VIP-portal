@@ -47,6 +47,7 @@ public class MessageComposerWindow extends AbstractComposeWindow {
         HLayout buttonsLayout = new HLayout(5);
         Label sendLabel = WidgetUtil.getLabel("Send Message", SocialConstants.ICON_SEND, 15, Cursor.HAND);
         sendLabel.addClickHandler(new ClickHandler() {
+            @Override
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
                     sendMessage(usersPickList.getValues(),
@@ -84,11 +85,13 @@ public class MessageComposerWindow extends AbstractComposeWindow {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to get users list:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<User> result) {
 
                 LinkedHashMap<String, String> usersMap = new LinkedHashMap<String, String>();
@@ -109,11 +112,13 @@ public class MessageComposerWindow extends AbstractComposeWindow {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to get users list:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<User> result) {
                 for (User user : result) {
                     if (user.getFullName().equals(userFullName)) {
@@ -132,11 +137,13 @@ public class MessageComposerWindow extends AbstractComposeWindow {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to send message:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 destroy();
                 Layout.getInstance().setNoticeMessage("Message successfully sent.");

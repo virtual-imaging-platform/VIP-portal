@@ -50,6 +50,7 @@ public class MessageLayout extends AbstractMainLayout {
         moreDataBoxLayout = new MoreDataBoxLayout("messages");
         moreDataBoxLayout.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 messagesLayout.removeMember(moreDataBoxLayout);
                 loadData(lastDate);
@@ -61,6 +62,7 @@ public class MessageLayout extends AbstractMainLayout {
         this.addMember(messagesLayout);
     }
 
+    @Override
     public void loadData() {
 
         messagesLayout.removeMembers(messagesLayout.getMembers());
@@ -72,10 +74,12 @@ public class MessageLayout extends AbstractMainLayout {
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<List<Message>> callback = new AsyncCallback<List<Message>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to get list of messages:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<Message> result) {
 
                 if (!result.isEmpty()) {
@@ -103,6 +107,7 @@ public class MessageLayout extends AbstractMainLayout {
             Label composeLabel = WidgetUtil.getLabel("New Message", SocialConstants.ICON_COMPOSE, 15, Cursor.HAND);
             composeLabel.addClickHandler(new ClickHandler() {
 
+                @Override
                 public void onClick(ClickEvent event) {
                     new MessageComposerWindow().show();
                 }
@@ -113,6 +118,7 @@ public class MessageLayout extends AbstractMainLayout {
         Label refreshLabel = WidgetUtil.getLabel("Refresh", SocialConstants.ICON_REFRESH, 15, Cursor.HAND);
         refreshLabel.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 loadData();
             }

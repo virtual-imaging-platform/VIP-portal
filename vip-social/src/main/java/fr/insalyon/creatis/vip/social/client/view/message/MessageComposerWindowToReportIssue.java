@@ -42,6 +42,7 @@ public class MessageComposerWindowToReportIssue extends AbstractComposeWindow {
         HLayout buttonsLayout = new HLayout(5);
         Label sendLabel = WidgetUtil.getLabel("Send Message", SocialConstants.ICON_SEND, 15, Cursor.HAND);
         sendLabel.addClickHandler(new ClickHandler() {
+            @Override
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
                     sendMessage(subjectItem.getValueAsString().trim(),
@@ -71,11 +72,13 @@ public class MessageComposerWindowToReportIssue extends AbstractComposeWindow {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to send message:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 destroy();
                 Layout.getInstance().setNoticeMessage("Message successfully sent.");

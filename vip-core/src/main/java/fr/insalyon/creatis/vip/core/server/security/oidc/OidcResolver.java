@@ -116,6 +116,7 @@ public class OidcResolver {
         public OidcJwtConverter(OidcResolver oidcResolver) {
             this.oidcResolver = oidcResolver;
         }
+        @Override
         public AbstractAuthenticationToken convert(Jwt jwt) {
             // At this point, jwt has been checked for: iss, exp, nbf: i.e. trusted issuer + validity dates.
             // We could also, but do not, check aud: this is optional in OIDC spec, and wasn't done by previous implementation.

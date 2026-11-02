@@ -33,6 +33,7 @@ public class PublicationsIT extends BaseSpringIT {
     private final String publicationApplicationName = "testApp";
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 

@@ -32,6 +32,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         userBusiness = getBean(UserBusiness.class);
     }
 
+    @Override
     public List<Message> getMessagesByUser(Date startDate) throws SocialException {
         try {
             return messageBusiness.getMessagesByUser(startDate);
@@ -40,6 +41,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public List<Message> getSentMessagesByUser(Date startDate) throws SocialException {
         try {
             return messageBusiness.getSentMessagesByUser(startDate);
@@ -48,6 +50,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public List<GroupMessage> getGroupMessages(String groupName, Date startDate)
             throws SocialException {
         try {
@@ -57,6 +60,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public void markMessageAsRead(long id) throws SocialException {
         try {
             messageBusiness.markAsRead(id);
@@ -65,6 +69,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public void removeMessage(long id) throws SocialException {
         try {
             messageBusiness.remove(id);
@@ -73,6 +78,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public void removeMessageByReceiver(long id) throws SocialException {
         try {
             messageBusiness.removeByReceiver(id);
@@ -81,6 +87,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public void removeGroupMessage(long id) throws SocialException {
         try {
             messageBusiness.removeGroupMessage(id);
@@ -89,6 +96,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public List<User> getUsers() throws SocialException {
         try {
             if (isSystemAdministrator()) {
@@ -101,6 +109,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public void sendMessage(String[] recipients, String subject, String message)
             throws SocialException {
         try {
@@ -111,6 +120,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public void sendMessageWithSupportCopy(
             String[] recipients, String subject, String message)
             throws SocialException {
@@ -127,6 +137,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public void sendMessageToVipSupport(
             String subject, String message, List<String> workflowID,
             List<String> simulationNames) throws SocialException {
@@ -140,6 +151,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public void sendGroupMessage(String groupName, String subject, String message)
             throws SocialException {
 
@@ -154,6 +166,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    @Override
     public int verifyMessages() throws SocialException {
         try {
             return messageBusiness.verifyMessages(
