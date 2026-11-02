@@ -52,6 +52,11 @@ public class OidcLoginController {
         }
         Map<String, Object> userAttributes = authToken.getPrincipal().getAttributes();
         logger.info("OIDC login success. User attributes: [{}]", userAttributes);
+        logger.info("Verifying if email is verified, Ignoring aud");
+        if ( ! (userAttributes.get("email_verified") instanceof Boolean email_verified && email_verified)) {
+            logger.error("OIDC login error: the email is not verified");
+            throw new VipException(ApiError.WRONG_OIDC_LOGIN);
+        }
 
         Object institution = userAttributes.get("eduperson_scoped_affiliation");
         String domainName;
