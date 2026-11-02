@@ -150,6 +150,7 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
         }
     }
 
+    @Override
     public WorkflowStatus getStatus(String addressWS, String workflowID) throws VipException {
         loadTrustStore(server);
 

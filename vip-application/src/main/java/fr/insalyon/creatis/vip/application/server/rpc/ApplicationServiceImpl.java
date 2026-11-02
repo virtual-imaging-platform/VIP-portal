@@ -344,6 +344,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         return tagBusiness.getAll();
     }
 
+    @Override
     public List<Tag> getNonBoutiquesTags() throws VipException {
         return tagBusiness.getAll().stream()
                 .filter(tag -> !tag.isBoutiques())

@@ -59,10 +59,12 @@ public class GateLabDownloadsLayout extends HLayout {
     private void loadInputData() {
 
         AsyncCallback<Map<String, String>> callback = new AsyncCallback<Map<String, String>>() {
+            @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load input information:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Map<String, String> result) {
                 input = result.get("inputlink");
                 inputLabel.setContents("<font color=\"#666666\">" + input + "</font>");
@@ -82,10 +84,12 @@ public class GateLabDownloadsLayout extends HLayout {
 
         WorkflowServiceAsync serviceOut = WorkflowService.Util.getInstance();
         AsyncCallback<List<InOutData>> callback = new AsyncCallback<List<InOutData>>() {
+            @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to get simulation output:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<InOutData> result) {
                 for (InOutData data : result) {
                     if (data.getProcessor().toLowerCase().contains("result")) {
@@ -114,10 +118,12 @@ public class GateLabDownloadsLayout extends HLayout {
     private void downloadFile(String path) {
 
         AsyncCallback<String> callback = new AsyncCallback<String>() {
+            @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to download file:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(String result) {
                 Layout.getInstance().setNoticeMessage("File added to transfer queue.");
                 OperationLayout.getInstance().addOperation(result);

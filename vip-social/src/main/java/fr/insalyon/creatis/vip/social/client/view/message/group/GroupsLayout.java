@@ -45,6 +45,7 @@ public class GroupsLayout extends AbstractMainLayout {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         AsyncCallback<List<Group>> callback = new AsyncCallback<>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to get user's groups:<br />" + caught.getMessage());
             }
@@ -68,6 +69,7 @@ public class GroupsLayout extends AbstractMainLayout {
         groupsItem.setEmptyPickListMessage("You have no groups");
         groupsItem.addChangedHandler(new ChangedHandler() {
 
+            @Override
             public void onChanged(ChangedEvent event) {
                 
                 groupLayout.removeMembers(groupLayout.getMembers());

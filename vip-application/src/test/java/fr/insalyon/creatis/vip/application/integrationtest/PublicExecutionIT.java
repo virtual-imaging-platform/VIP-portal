@@ -23,6 +23,7 @@ public class PublicExecutionIT extends BaseApplicationSpringIT {
     private PublicExecutionBusiness business;
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
         super.setUp();
     }

@@ -77,6 +77,7 @@ public class GroupMessageBoxLayout extends HLayout {
 
         mainLayout.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 setBackgroundColor("#FFFFFF");
                 new GroupMessageViewerWindow(message).show();
@@ -118,6 +119,7 @@ public class GroupMessageBoxLayout extends HLayout {
             removeImg.setPrompt("Remove");
             removeImg.addClickHandler(new ClickHandler() {
 
+                @Override
                 public void onClick(ClickEvent event) {
                     remove();
                 }
@@ -132,16 +134,19 @@ public class GroupMessageBoxLayout extends HLayout {
 
         SC.confirm("Do you really want to remove this message?", new BooleanCallback() {
 
+            @Override
             public void execute(Boolean value) {
 
                 if (value != null && value) {
                     SocialServiceAsync service = SocialService.Util.getInstance();
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                        @Override
                         public void onFailure(Throwable caught) {
                             Layout.getInstance().setWarningMessage("Unable to remove message:<br />" + caught.getMessage());
                         }
 
+                        @Override
                         public void onSuccess(Void result) {
                             destroy();
                         }

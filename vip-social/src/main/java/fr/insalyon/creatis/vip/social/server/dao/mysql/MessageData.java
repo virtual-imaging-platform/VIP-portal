@@ -39,6 +39,7 @@ public class MessageData extends JdbcDaoSupport implements MessageDAO {
         this.userDAO = userDAO;
     }
 
+    @Override
     public long add(String sender, String title, String message) throws DAOException {
 
         try {
@@ -64,6 +65,7 @@ public class MessageData extends JdbcDaoSupport implements MessageDAO {
         }
     }
 
+    @Override
     public void associateMessageToUser(String receiver, long messageId) throws DAOException {
 
         try {
@@ -82,6 +84,7 @@ public class MessageData extends JdbcDaoSupport implements MessageDAO {
         }
     }
 
+    @Override
     public List<Message> getMessagesByUser(
         String email, int limit, Date startDate)
         throws DAOException {
@@ -118,6 +121,7 @@ public class MessageData extends JdbcDaoSupport implements MessageDAO {
         }
     }
 
+    @Override
     public List<Message> getSentMessagesByUser(
         String email, int limit, Date startDate)
         throws DAOException {
@@ -167,6 +171,7 @@ public class MessageData extends JdbcDaoSupport implements MessageDAO {
         }
     }
 
+    @Override
     public void markAsRead(long id, String receiver) throws DAOException {
 
         try {
@@ -186,6 +191,7 @@ public class MessageData extends JdbcDaoSupport implements MessageDAO {
         }
     }
 
+    @Override
     public void remove(long id) throws DAOException {
 
         try {
@@ -202,6 +208,7 @@ public class MessageData extends JdbcDaoSupport implements MessageDAO {
         }
     }
 
+    @Override
     public void removeByReceiver(long id, String receiver) throws DAOException {
 
         try {
@@ -229,6 +236,7 @@ public class MessageData extends JdbcDaoSupport implements MessageDAO {
         }
     }
 
+    @Override
     public Message get(long id) throws DAOException {
 
         try {
@@ -256,6 +264,7 @@ public class MessageData extends JdbcDaoSupport implements MessageDAO {
         }
     }
 
+    @Override
     public int verifyMessages(String email) throws DAOException {
 
         try {

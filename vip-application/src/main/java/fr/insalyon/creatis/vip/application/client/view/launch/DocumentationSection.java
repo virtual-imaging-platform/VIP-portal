@@ -50,6 +50,7 @@ public class DocumentationSection extends SectionStackSection {
         docButton.setShowDown(false);
         docButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 setExpanded(true);
             }
