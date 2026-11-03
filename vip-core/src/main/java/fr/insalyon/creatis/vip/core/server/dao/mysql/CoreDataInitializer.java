@@ -59,7 +59,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
         initializeUserTables();
         initializeGroupTables();
         initializeTermsOfUseTable();
-        initializeTwoFactorTable();
     }
 
     private void initializeUserTables() {
@@ -85,6 +84,9 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                         + "failed_authentications INT,"
                         + "account_locked BOOLEAN,"
                         + "apikey VARCHAR(255),"
+                        + "two_factor_code_hash VARCHAR(64),"
+                        + "two_factor_expires_at TIMESTAMP NULL,"
+                        + "two_factor_attempts INT DEFAULT 0,"
                         + "PRIMARY KEY(email),"
                         + "UNIQUE (id),"
                         + "UNIQUE (first_name,last_name),"
@@ -151,15 +153,5 @@ public class CoreDataInitializer extends JdbcDaoSupport {
         }
     }
 
-    private void initializeTwoFactorTable()
-        {tableInitializer.createTable("VIPTwoFactorCodes",
-                "email VARCHAR(255), "
-                        + "code_hash VARCHAR(64), "
-                        + "expires_at TIMESTAMP NULL, "
-                        + "attempts INT, "
-                        + "PRIMARY KEY (email), "
-                        + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE");
-        }
 
 }

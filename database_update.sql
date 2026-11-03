@@ -52,3 +52,9 @@ ALTER TABLE VIPAppVersions ADD note TEXT;
 ALTER TABLE VIPUsers ADD id VARCHAR(8) UNIQUE;
 /* becareful the uuids generated here are hex based (limitation of sql functions) */
 UPDATE VIPUsers SET id = SUBSTRING(UUID(), 1, 8) WHERE id IS NULL;
+
+
+-- v4.8
+ALTER TABLE VIPUsers ADD two_factor_code_hash VARCHAR(64);
+ALTER TABLE VIPUsers ADD two_factor_expires_at TIMESTAMP NULL;
+ALTER TABLE VIPUsers ADD two_factor_attempts INT DEFAULT 0;
