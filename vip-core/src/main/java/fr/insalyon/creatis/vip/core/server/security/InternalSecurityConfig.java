@@ -47,6 +47,8 @@ public class InternalSecurityConfig {
                 .securityMatcher(internal.matcher("/**"))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(internal.matcher(HttpMethod.POST, "/session")).permitAll()
+                        .requestMatchers(internal.matcher(HttpMethod.POST, "/session/code")).permitAll()
+                        .requestMatchers(internal.matcher(HttpMethod.POST, "/session/code/resend")).permitAll()
                         .requestMatchers(internal.matcher(HttpMethod.POST, "/users")).permitAll()
                         .requestMatchers(internal.matcher(HttpMethod.PUT, "/users/*/activate")).permitAll()
                         .requestMatchers(internal.matcher(HttpMethod.GET, "/applications/public")).permitAll()
@@ -62,6 +64,8 @@ public class InternalSecurityConfig {
                         // /internal/csrf GET endpoint
                         .ignoringRequestMatchers(
                             internal.matcher(HttpMethod.POST, "/session"),
+                            internal.matcher(HttpMethod.POST, "/session/code"),
+                            internal.matcher(HttpMethod.POST, "/session/code/resend"),
                             internal.matcher(HttpMethod.POST, "/users"),
                             internal.matcher(HttpMethod.PUT, "/users/*/activate")
                         ))

@@ -84,6 +84,9 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                         + "failed_authentications INT,"
                         + "account_locked BOOLEAN,"
                         + "apikey VARCHAR(255),"
+                        + "two_factor_code_hash VARCHAR(64),"
+                        + "two_factor_expires_at TIMESTAMP NULL,"
+                        + "two_factor_attempts INT DEFAULT 0,"
                         + "PRIMARY KEY(email),"
                         + "UNIQUE (id),"
                         + "UNIQUE (first_name,last_name),"
@@ -149,4 +152,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
             }
         }
     }
+
+
 }

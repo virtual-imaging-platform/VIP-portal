@@ -18,6 +18,8 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.core.server.model.Session;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,21 +36,85 @@ public class SessionBusiness {
     private final Server server;
     private final UserDAO userDAO;
     private final AuthenticationBusiness authenticationBusiness;
+    private final TwoFactorBusiness twoFactorBusiness;
+    private final UserBusiness userBusiness;
+    private static final String SESSION_2FA = "SESSION_2FA";
+    private static final String  SESSION_2FA_LAST_SENT = "SESSION_2FA_LAST_SENT";
+    private static final long RESEND_DELAY_MS = 30_000; // 30 seconds
 
 
     @Autowired
-    public SessionBusiness(Supplier<User> userProvider, Server server, UserDAO userDAO, AuthenticationBusiness authenticationBusiness) {
+    public SessionBusiness(Supplier<User> userProvider, Server server, UserDAO userDAO, AuthenticationBusiness authenticationBusiness, TwoFactorBusiness twoFactorBusiness, UserBusiness userBusiness) {
         this.userProvider = userProvider;
         this.server = server;
         this.userDAO = userDAO;
         this.authenticationBusiness = authenticationBusiness;
+        this.twoFactorBusiness = twoFactorBusiness;
+        this.userBusiness = userBusiness;
     }
 
-    public Session signin(AuthenticationCredentials creds)
-            throws VipException {
-        User user = authenticationBusiness.signin(creds.getUsername(), creds.getPassword());
+    public void signin(AuthenticationCredentials creds, HttpServletRequest request) throws VipException {
+        User user = authenticationBusiness.signinWithoutResetingSession(
+                creds.getUsername(), creds.getPassword());
 
-        return getSession(user);
+        twoFactorBusiness.sendCode(user.getEmail());
+
+        HttpSession httpSession = request.getSession(true);
+        httpSession.setAttribute(SESSION_2FA, user.getEmail());
+        HttpSession httpSessionLastSent = request.getSession(true);
+        httpSessionLastSent.setAttribute(SESSION_2FA_LAST_SENT, System.currentTimeMillis());
+    }
+
+    public Session verifyTwoFactorCode(String code, HttpServletRequest request)
+            throws VipException {
+        HttpSession httpSession = request.getSession(false);
+        String email = (httpSession == null) ? null
+                : (String) httpSession.getAttribute(SESSION_2FA);
+
+        if (email == null) {
+            logger.warn("2FA code submitted without a pending sign-in");
+            throw new VipException(DefaultError.BAD_CREDENTIALS);
+        }
+        if (!twoFactorBusiness.verifyCode(email, code)) {
+            throw new VipException(DefaultError.BAD_CREDENTIALS);
+        }
+        httpSession.removeAttribute(SESSION_2FA);
+        request.changeSessionId();
+
+        try {
+            User user = userBusiness.getUserWithSession(email);
+            return getSession(user);
+        } catch (DAOException ex) {
+            throw new VipException(ex);
+        }
+    }
+    
+    public  Session resendTwoFactorCode(HttpServletRequest request) throws VipException {
+        HttpSession httpSession = request.getSession(false);
+        String email = (httpSession == null) ? null
+                : (String) httpSession.getAttribute(SESSION_2FA);
+
+        if (email == null) {
+            logger.warn("2FA code resend requested without a pending sign-in");
+            throw new VipException(DefaultError.BAD_CREDENTIALS);
+        }
+
+        Long lastSentTime = (Long) httpSession.getAttribute(SESSION_2FA_LAST_SENT);
+        long currentTime = System.currentTimeMillis();
+        if (lastSentTime != null && (currentTime - lastSentTime) < RESEND_DELAY_MS) {
+            logger.warn("2FA code resend requested too soon for user {}", email);
+            throw new VipException("Please wait before requesting a new code.");
+        }
+
+        twoFactorBusiness.sendCode(email);
+        httpSession.setAttribute(SESSION_2FA_LAST_SENT, currentTime);
+
+        try {
+            User user = userBusiness.getUserWithSession(email);
+            return getSession(user);
+        } catch (DAOException ex) {
+            throw new VipException(ex);
+        }
     }
 
     public void signout(HttpServletRequest request, HttpServletResponse response) throws VipException {
