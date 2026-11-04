@@ -32,7 +32,7 @@ export const useEnginesStore = defineStore('engines', () => {
       engines.value.splice(idx, 1, updated)
       notifications.success(`Successfully updated engine ${updated.name}`)
     } catch (err: any) {
-      notifications.error(err)
+      notifications.error(`Could not update engine ${engine.name}`)
     }
   }
 
@@ -43,7 +43,9 @@ export const useEnginesStore = defineStore('engines', () => {
       totalCount.value = totalCount.value + 1
       notifications.success(`Successfully created engine ${added.name}`)
     } catch (err: any) {
-      notifications.error(err)
+      err.response?.status === 400
+        ? notifications.error(`Engine ${engine.name} already exists`)
+        : notifications.error(`Could not create engine ${engine.name}`)
     }
   }
 
@@ -56,10 +58,11 @@ export const useEnginesStore = defineStore('engines', () => {
       totalCount.value = totalCount.value - 1
       notifications.success(`Successfully removed engine ${engine.name}`)
     } catch (err: any) {
-      notifications.error(err)
+      err.response?.status === 404
+        ? notifications.error(`Engine ${engine.name} not found`)
+        : notifications.error(`Could not delete engine ${engine.name}`)
     }
   }
-
 
   return {
     engines,
