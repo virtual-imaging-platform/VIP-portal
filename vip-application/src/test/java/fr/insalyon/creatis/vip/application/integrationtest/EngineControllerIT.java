@@ -91,6 +91,14 @@ public class EngineControllerIT extends BaseInternalApiSpringIT {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("endpoint").value(engine.getEndpoint()));
+
+        // fail if not exists
+        mockMvc.perform(get("/internal/engines/" + "non_existing")
+                        .with(getUserSecurityMock(adminUser))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.NOT_FOUND.getCode()))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -143,6 +151,14 @@ public class EngineControllerIT extends BaseInternalApiSpringIT {
                 .andExpect(jsonPath("$.total").value(1))
                 .andExpect(jsonPath("$.data[0].name").value("e2"))
                 .andExpect(status().isOk());
+
+        // fail if not exists
+        mockMvc.perform(delete("/internal/engines/" + "non_existing")
+                        .with(getUserSecurityMock(adminUser))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.NOT_FOUND.getCode()))
+                .andExpect(status().isNotFound());
     }
 
     @Test

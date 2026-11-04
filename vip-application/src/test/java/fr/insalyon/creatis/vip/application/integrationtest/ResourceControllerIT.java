@@ -165,6 +165,14 @@ public class ResourceControllerIT extends BaseInternalApiSpringIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(resource)))
                 .andExpect(status().isOk());
+        
+        // fail if not exists
+        mockMvc.perform(delete("/internal/resources/" + "non_existing")
+                .with(getUserSecurityMock(adminUser))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.NOT_FOUND.getCode()))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -196,7 +204,7 @@ public class ResourceControllerIT extends BaseInternalApiSpringIT {
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.errorCode").value(DefaultError.NOT_FOUND.getCode()))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
 
         // not access (basic user)
         mockMvc.perform(get("/internal/resources/" + resource.getName())
