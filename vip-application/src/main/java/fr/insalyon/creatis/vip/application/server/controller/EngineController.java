@@ -3,6 +3,8 @@ package fr.insalyon.creatis.vip.application.server.controller;
 import java.util.Optional;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +29,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 @RestController
 @RequestMapping("/engines")
 public class EngineController {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final EngineBusiness engineBusiness;
 
@@ -81,9 +85,10 @@ public class EngineController {
     @DeleteMapping(value = "{name}")
     public void delete(@PathVariable String name) throws VipException {
         Engine engine = get(name);
-        if (engine != null) {
-            engineBusiness.remove(name);
+        if (engine == null) {
+            throw new VipException(DefaultError.NOT_FOUND, Engine.class.getSimpleName(), name);
         }
+        engineBusiness.remove(name);
     }
 
 }
