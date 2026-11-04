@@ -78,6 +78,18 @@ const router = createRouter({
       meta: { requiresAuth: true, title: 'Executions' },
     },
     {
+      path: '/engines',
+      name: 'engines',
+      component: () => import('@/views/EnginesView.vue'),
+      meta: { requiresAuth: true, requiredRoles: ['Administrator'], title: 'Engines' },
+    },
+    {
+      path: '/resources',
+      name: 'resources',
+      component: () => import('@/views/ResourcesView.vue'),
+      meta: { requiresAuth: true, requiredRoles: ['Administrator'], title: 'Resources' },
+    },
+    {
       path: '/workflows/:id',
       name: 'workflow-detail',
       component: () => import('@/views/WorkflowDetailView.vue'),
@@ -95,6 +107,11 @@ const router = createRouter({
       component: () => import('@/views/LandingView.vue'),
       meta: { title: 'Landing' },
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/LandingView.vue'), //TODO? NotFoundView,
+    },
   ],
 })
 
@@ -105,18 +122,31 @@ router.beforeEach(async (to) => {
     await auth.initialize()
   }
 
-  if (to.name === 'home') {
-    return auth.isAuthenticated ? { name: 'dashboard' } : undefined
+  if (to.name === 'not-found') {
+    return auth.isAuthenticated ? { name: 'dashboard' } : { name: 'home' }
   }
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: 'login' }
   }
 
+  // redirect authenticated user when trying landing page or auth related routes
   if (
-    !to.meta.requiresAuth &&
     auth.isAuthenticated &&
-    ['login', 'register', 'activate'].includes(to.name as string)
+    ['home', 'login', 'register', 'activate'].includes(to.name as string)
+  ) {
+    return { name: 'dashboard' }
+  }
+
+  const requiredRoles = to.meta.requiredRoles as string[]
+
+  // redirect the route requires auth & a role but the user does not have it
+  //TODO use canAccess function
+  if (
+    auth.isAuthenticated &&
+    to.meta.requiresAuth &&
+    requiredRoles?.length &&
+    !requiredRoles.some((role) => auth.user?.level.includes(role))
   ) {
     return { name: 'dashboard' }
   }

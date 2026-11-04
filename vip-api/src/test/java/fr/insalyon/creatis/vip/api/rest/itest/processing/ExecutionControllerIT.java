@@ -200,7 +200,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
         mockMvc.perform(
                         get("/rest/executions/WrongExecId").with(baseUser1()))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode").value(DefaultError.NOT_FOUND.getCode()));
     }
