@@ -38,12 +38,12 @@ public class PasswordBusiness extends CommonBusiness {
         return encoder.encode(existingMd5Hash);
     }
 
-    private String md5(String plainPassword) {
+    private String md5(String plainPassword) throws VipException {
         try {
             return MD5.get(plainPassword);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             logger.error("Error computing MD5 step for password hashing", ex);
-            throw new RuntimeException(ex);
+            throw new VipException(ex);
         }
     }
 
