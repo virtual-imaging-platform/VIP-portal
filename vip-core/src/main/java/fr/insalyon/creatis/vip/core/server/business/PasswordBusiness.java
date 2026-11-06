@@ -43,7 +43,7 @@ public class PasswordBusiness extends CommonBusiness {
             return MD5.get(plainPassword);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             logger.error("Error computing MD5 step for password hashing", ex);
-            throw new VipException(ex);
+            throw new VipException("Error computing MD5 step for password hashing", ex);
         }
     }
 
@@ -56,7 +56,7 @@ public class PasswordBusiness extends CommonBusiness {
 
             userDAO.resetPassword(user.getEmail(), hash(newPassword));
         } catch (DAOException ex) {
-            throw new VipException(ex);
+            throw new VipException("Error updating password", ex);
         }
     }
 
@@ -65,7 +65,7 @@ public class PasswordBusiness extends CommonBusiness {
             userDAO.resetPassword(email, hash(newPassword));
         } catch (DAOException ex) {
             logger.error("Error setting password for {}", email, ex);
-            throw new VipException(ex);
+            throw new VipException("Error setting password", ex);
         }
     }
 
