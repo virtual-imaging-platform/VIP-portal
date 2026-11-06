@@ -10,7 +10,7 @@ public class CurrentUserRolesBusiness {
     public boolean hasRole(String role) {
 
         return AuthorityAuthorizationManager.hasRole(role)
-                .check(() -> SecurityContextHolder.getContext().getAuthentication(), null)
+                .authorize(() -> SecurityContextHolder.getContext().getAuthentication(), null)
                 .isGranted();
     }
 }

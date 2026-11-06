@@ -132,15 +132,4 @@ public class RestApiSecurityConfig {
                 vipAuthenticationEntryPoint, apikeyAuthenticationProvider);
     }
 
-    /*
-        Do not use the default firewall (StrictHttpFirewall) because it blocks
-        "//" in url and it is used in gwt rpc calls
-     */
-    @Bean
-    public DefaultHttpFirewall httpFirewall() {
-        DefaultHttpFirewall firewall = new DefaultHttpFirewall();
-        firewall.setAllowUrlEncodedSlash(true);
-        return firewall;
-    }
-
 }
