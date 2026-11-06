@@ -89,13 +89,13 @@ class PasswordBusinessTest {
     }
 
     @Test
-    void authenticatewithLegacyRawMd5HashshouldFail() throws Exception {
+    void authenticatewithLegacyRawMd5HashShouldFail() throws Exception {
         storedHash.set(MD5.get("mdp123*"));
         assertFalse(canAuthenticate("mdp123*"));
     }
 
     @Test
-    void upgradeLegacyMd5HashthenAuthenticatshouldSucceedWithOriginalPassword() throws Exception {
+    void upgradeLegacyMd5HashthenAuthenticatShouldSucceedWithOriginalPassword() throws Exception {
         storedHash.set(passwordBusiness.upgradeLegacyMd5Hash(MD5.get("mdp123*")));
         assertTrue(storedHash.get().startsWith("$argon2id$"));
         assertTrue(canAuthenticate("mdp123*"));
@@ -103,7 +103,7 @@ class PasswordBusinessTest {
     }
 
     @Test
-    void updatewithCorrectCurrentPasswordshouldChangePassword() throws Exception {
+    void updatewithCorrectCurrentPasswordShouldChangePassword() throws Exception {
         storedHash.set(passwordBusiness.hash("currentPassword"));
         passwordBusiness.update(user(), "currentPassword", "newPassword");
         assertTrue(canAuthenticate("newPassword"));
@@ -111,7 +111,7 @@ class PasswordBusinessTest {
     }
 
     @Test
-    void updatewithWrongCurrentPasswordshouldThrowAndKeepPassword() throws Exception {
+    void updatewithWrongCurrentPasswordShouldThrowAndKeepPassword() throws Exception {
         storedHash.set(passwordBusiness.hash("currentPassword"));
         VipException exception = assertThrows(VipException.class,
                 () -> passwordBusiness.update(user(), "wrongPassword", "newPassword"));
@@ -121,7 +121,7 @@ class PasswordBusinessTest {
     }
 
     @Test
-    void resetwithCorrectCode_shouldChangePassword() throws Exception {
+    void resetwithCorrectCodeShouldChangePassword() throws Exception {
         User user = user();
         user.setCode("the-code");
         when(userDAO.get(EMAIL)).thenReturn(user);
@@ -132,7 +132,7 @@ class PasswordBusinessTest {
     }
 
     @Test
-    void resetwithWrongCode_shouldThrowAndNotChangePassword() throws Exception {
+    void resetwithWrongCodeShouldThrowAndNotChangePassword() throws Exception {
         User user = user();
         user.setCode("the-code");
         when(userDAO.get(EMAIL)).thenReturn(user);
