@@ -43,7 +43,7 @@ public class PasswordBusiness extends CommonBusiness {
             return MD5.get(plainPassword);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             logger.error("Error computing MD5 step for password hashing", ex);
-            throw new VipException("Error computing MD5 step for password hashing", ex);
+            throw new VipException("Error hashing password", ex);
         }
     }
 
