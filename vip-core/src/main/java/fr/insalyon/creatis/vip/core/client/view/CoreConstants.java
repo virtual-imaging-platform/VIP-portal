@@ -47,9 +47,11 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SIMULATION_ADVANCED_MAX = "simulation.max.advanced";
     public static final String LAB_SIMULATION_PLATFORM_MAX = "simulation.max.platfrom";
     public static final String LAB_SIMULATION_BEGINNER_MAX = "simulation.max.beginner";
+    public static final String LAB_SIMULATION_FOLDER = "workflows.directory";
     public static final String LAB_SIMULATION_DB_HOST = "workflows.db.host";
     public static final String LAB_SIMULATION_DB_PORT = "workflows.db.port";
-    public static final String LAB_SIMULATION_FOLDER = "workflows.directory";
+    public static final String LAB_SIMULATION_DB_USER = "workflows.db.user";
+    public static final String LAB_SIMULATION_DB_PASSWORD = "workflows.db.password";
     public static final String LAB_SIMULATION_EXEC_MODE = "workflows.exec.mode";
     public static final String LAB_APACHE_HOST = "apache.host";
     public static final String LAB_APACHE_SSL_PORT = "apache.ssl.port";

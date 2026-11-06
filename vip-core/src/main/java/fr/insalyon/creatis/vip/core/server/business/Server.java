@@ -45,9 +45,13 @@ public interface Server {
 
     int getGRIDAPort();
 
-    String getWorkflowsHost();
-
     String getWorkflowsPath();
+
+    String getWorkflowsDbHost();
+
+    String getWorkflowsDbUser();
+
+    String getWorkflowsDbPassword();
 
     String getApacheHost();
 

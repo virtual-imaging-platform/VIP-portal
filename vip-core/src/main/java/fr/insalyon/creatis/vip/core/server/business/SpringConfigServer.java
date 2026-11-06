@@ -295,13 +295,23 @@ public class SpringConfigServer implements Server {
     }
 
     @Override
-    public String getWorkflowsHost() {
+    public String getWorkflowsPath() {
+        return env.getRequiredProperty(CoreConstants.LAB_SIMULATION_FOLDER);
+    }
+
+    @Override
+    public String getWorkflowsDbHost() {
         return env.getRequiredProperty(CoreConstants.LAB_SIMULATION_DB_HOST);
     }
 
     @Override
-    public String getWorkflowsPath() {
-        return env.getRequiredProperty(CoreConstants.LAB_SIMULATION_FOLDER);
+    public String getWorkflowsDbUser() {
+        return env.getProperty(CoreConstants.LAB_SIMULATION_DB_USER, "gasw");
+    }
+
+    @Override
+    public String getWorkflowsDbPassword() {
+        return env.getProperty(CoreConstants.LAB_SIMULATION_DB_PASSWORD, "gasw");
     }
 
     @Override
