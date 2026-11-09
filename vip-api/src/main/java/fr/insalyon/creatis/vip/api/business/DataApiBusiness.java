@@ -58,7 +58,7 @@ public class DataApiBusiness extends CommonBusiness {
         storageBusiness.deletePath(path);
     }
 
-    public PathProperties getPathProperties(String path ) throws VipException {
+    public PathProperties getPathProperties(String path) throws VipException {
         if (path.equals(ROOT)) {
             return getRootPathProperties();
         }
@@ -89,6 +89,15 @@ public class DataApiBusiness extends CommonBusiness {
                 storageBusiness.getModificationDate(path) / 1000);
             pathProperties.setMimeType(server.getCarminApiDirectoryMimeType());
         }
+        return pathProperties;
+    }
+
+    public PathProperties getFilePathProperties(String path) throws VipException {
+        PathProperties pathProperties = new PathProperties();
+        pathProperties.setPath(path);
+        pathProperties.setExists(true);
+        pathProperties.setIsDirectory(false);
+        pathProperties.setMimeType(getMimeType(path));
         return pathProperties;
     }
 

@@ -441,7 +441,7 @@ public class ExecutionBusiness {
                 executionId, currentUserProvider.get().getFolder());
         for (InOutData output : outputs) {
             String outputPath = output.getPath();
-            pathResults.add(dataApiBusiness.getPathProperties(outputPath));
+            pathResults.add(dataApiBusiness.getFilePathProperties(outputPath));
         }
         return pathResults;
     }
