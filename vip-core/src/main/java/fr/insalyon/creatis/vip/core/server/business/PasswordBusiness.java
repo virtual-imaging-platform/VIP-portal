@@ -34,9 +34,6 @@ public class PasswordBusiness extends CommonBusiness {
         return encoder.encode(md5(plainPassword));
     }
 
-    public String upgradeLegacyMd5Hash(String existingMd5Hash) {
-        return encoder.encode(existingMd5Hash);
-    }
 
     private String md5(String plainPassword) throws VipException {
         try {

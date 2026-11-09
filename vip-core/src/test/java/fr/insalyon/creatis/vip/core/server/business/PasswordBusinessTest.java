@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.lang.reflect.Field;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,11 +33,18 @@ class PasswordBusinessTest {
     private UserDAO userDAO;
     private PasswordBusiness passwordBusiness;
     private final AtomicReference<String> storedHash = new AtomicReference<>();
+    private PasswordEncoder encoder;
 
+    private String upgradeLegacyMd5Hash(String existingMd5Hash) {
+        return encoder.encode(existingMd5Hash);
+    }
     @BeforeEach
     void setUp() throws Exception {
         userDAO = mock(UserDAO.class);
         passwordBusiness = new PasswordBusiness(userDAO);
+        Field encoderField = PasswordBusiness.class.getDeclaredField("encoder");
+        encoderField.setAccessible(true);
+        encoder = (PasswordEncoder) encoderField.get(passwordBusiness);
         storedHash.set(null);
 
         when(userDAO.authenticate(eq(EMAIL), anyString(), any(PasswordEncoder.class)))
@@ -93,10 +101,10 @@ class PasswordBusinessTest {
         storedHash.set(MD5.get("mdp123*"));
         assertFalse(canAuthenticate("mdp123*"));
     }
-
+    
     @Test
     void upgradeLegacyMd5HashthenAuthenticatShouldSucceedWithOriginalPassword() throws Exception {
-        storedHash.set(passwordBusiness.upgradeLegacyMd5Hash(MD5.get("mdp123*")));
+        storedHash.set(upgradeLegacyMd5Hash(MD5.get("mdp123*")));
         assertTrue(storedHash.get().startsWith("$argon2id$"));
         assertTrue(canAuthenticate("mdp123*"));
         assertFalse(canAuthenticate("WrongPassword"));
