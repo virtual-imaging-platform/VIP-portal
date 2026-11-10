@@ -5,14 +5,8 @@ import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.WORKFLOW_1;
 import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.WORKFLOW_2;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser2;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -388,7 +382,9 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$[*]", hasSize(1)))
                 .andExpect(jsonPath("$[0].path", equalTo("/vip/Home/path/to/result.res")))
-                .andExpect(jsonPath("$[0].size", equalTo(42)));
+                .andExpect(jsonPath("$[0].size", nullValue()));
+
+        Mockito.verify(gridaClient, Mockito.never()).getFolderData(Mockito.anyString(), Mockito.anyBoolean());
     }
 
 

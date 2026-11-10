@@ -27,6 +27,9 @@ Vue 3 + TypeScript frontend for the VIP Portal.
 - `src/types`: shared TypeScript contracts
 
 ## Run Locally
+
+Modify the Backend IP in `.env.developement`
+
 ```bash
 npm install
 npm run dev
