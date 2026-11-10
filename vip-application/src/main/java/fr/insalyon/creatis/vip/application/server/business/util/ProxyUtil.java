@@ -12,6 +12,7 @@ public class ProxyUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ProxyUtil.class);
     public static final String CHARSET_UTF8 = "UTF-8";
+    public static final String TEXT_PLAIN_UTF8 = "text/plain;charset=UTF-8";
 
     public static String readAsString(String proxyFileName) {
 
