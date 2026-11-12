@@ -27,6 +27,7 @@ public class TagIT extends BaseApplicationSpringIT {
     private AppVersion appVersion;
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         app = new Application("applicationA", "super citation");

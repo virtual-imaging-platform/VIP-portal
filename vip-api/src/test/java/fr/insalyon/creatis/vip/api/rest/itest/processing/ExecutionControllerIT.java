@@ -79,6 +79,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
     @Autowired SimulationDAO mockSimulationDao;
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         UserTestUtils.reset();

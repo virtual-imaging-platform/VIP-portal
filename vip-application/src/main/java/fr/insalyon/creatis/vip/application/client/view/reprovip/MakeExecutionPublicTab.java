@@ -92,6 +92,7 @@ public class MakeExecutionPublicTab extends Tab {
         IButton submitButton = new IButton("Make execution public");
 
         submitButton.addClickHandler(new ClickHandler() {
+            @Override
             public void onClick(ClickEvent event) {
                 if (validate()) {
                     final PublicExecution execution = new PublicExecution(
@@ -104,9 +105,11 @@ public class MakeExecutionPublicTab extends Tab {
                         null);
 
                     ReproVipService.Util.getInstance().addPublicExecution(execution, new AsyncCallback<Void>() {
+                        @Override
                         public void onFailure(Throwable caught) {
                             SC.warn("Failed to add execution: " + caught.getMessage());
                         }
+                        @Override
                         public void onSuccess(Void result) {
                             SC.say("Execution added successfully!");
                         }
