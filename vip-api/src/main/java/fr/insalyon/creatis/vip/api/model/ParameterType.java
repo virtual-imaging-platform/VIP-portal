@@ -7,7 +7,7 @@ public enum ParameterType {
     File, String, Boolean, Int64, Double, List;
 
     public static ParameterType fromVipType(String vipType) {
-        return vipType.equalsIgnoreCase("URI") ? File : String;
+        return "URI".equalsIgnoreCase(vipType) ? File : String;
     }
 
     public static ParameterType fromBoutiquesInput(Input boutiquesInput) {

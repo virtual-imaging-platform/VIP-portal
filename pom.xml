@@ -315,7 +315,7 @@
                     <ruleset>${maven.multiModuleProjectDirectory}/ruleset.xml</ruleset>
                 </rulesets>
                 <includeTests>true</includeTests>
-                <failOnViolation>false</failOnViolation>
+                <failOnViolation>true</failOnViolation>
             </configuration>
         </plugin>
         </plugins>

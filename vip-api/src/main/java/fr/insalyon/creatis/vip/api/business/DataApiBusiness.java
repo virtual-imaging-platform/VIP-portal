@@ -58,8 +58,8 @@ public class DataApiBusiness extends CommonBusiness {
         storageBusiness.deletePath(path);
     }
 
-    public PathProperties getPathProperties(String path) throws VipException {
-        if (path.equals(ROOT)) {
+    public PathProperties getPathProperties(String path ) throws VipException {
+        if (ROOT.equals(path)) {
             return getRootPathProperties();
         }
         PathProperties pathProperties = new PathProperties();
@@ -102,7 +102,7 @@ public class DataApiBusiness extends CommonBusiness {
     }
 
     public List<PathProperties> listDirectory(String path) throws VipException {
-        if (path.equals(ROOT)) {
+        if (ROOT.equals(path)) {
             return getRootSubDirectoriesPathProps();
         }
         List<Data> directoryData = storageBusiness.listDir(path);

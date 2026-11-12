@@ -21,7 +21,7 @@ public class HomeParser extends ApplicationParser {
     @Override
     public boolean parse(String applicationName, String applicationVersion) {
 
-        if (applicationName.equals(Constants.APP_APPLICATION_IMPORTER)) {
+        if (Constants.APP_APPLICATION_IMPORTER.equals(applicationName)) {
             Layout.getInstance().addTab(
                 Constants.TAB_ID_BOUTIQUES, ImportTab::new);
             return true;
