@@ -158,6 +158,8 @@ public class CoreConstants implements IsSerializable {
     // MoteurServerRest
     public static final String MOTEUR_REST_PASSWORD = "moteur.rest.password";
     public static final String HOST_URL = "host.url";
+    // MIME type
+    public static final String TEXT_PLAIN_UTF8 = "text/plain;charset=UTF-8";    
 
     // permissions
     public static final String NOT_RIGHT = "You do not have the right to do that!";

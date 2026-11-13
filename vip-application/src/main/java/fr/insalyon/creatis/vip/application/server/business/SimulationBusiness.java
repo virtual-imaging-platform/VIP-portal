@@ -1,6 +1,8 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -254,17 +256,8 @@ public class SimulationBusiness extends CommonBusiness {
             if ( requestedPath == null) {
                 throw new VipException("Invalid workflow path!");
             }
-
-            Scanner scanner = new Scanner(requestedPath);
-            StringBuilder sb = new StringBuilder();
-
-            while (scanner.hasNext()) {
-                sb.append(scanner.nextLine());
-                sb.append("\n");
-            }
-
-            scanner.close();
-            return sb.toString();
+            String content = Files.readString(requestedPath, StandardCharsets.UTF_8);
+            return content;
 
         } catch (IOException ex) {
             logger.error("Error reading Simulation {} file {}", simulationID, fileName, ex);
