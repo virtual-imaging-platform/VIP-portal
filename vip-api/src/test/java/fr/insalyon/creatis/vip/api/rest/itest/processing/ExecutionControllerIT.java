@@ -331,7 +331,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
         when(mockSimulationDao.getJobs()).thenReturn(List.of(testTask));
         // normally simulationDao is a prototype-scope bean specific to a job, here as it is a singleton mock
 
-        String testOutput = "blablablastdout\n";
+        String testOutput = "blablablastdout";
 
         mockMvc.perform(
                         get("/rest/executions/" + WORKFLOW_2.getID() + "/stdout").with(baseUser1()))
