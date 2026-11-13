@@ -1,42 +1,32 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.GROUP_APPEND;
-import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.ROOT;
-import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.TRASH_HOME;
-import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.USERS_HOME;
+import fr.insalyon.creatis.vip.api.model.PathProperties;
+import fr.insalyon.creatis.vip.api.model.UploadData;
+import fr.insalyon.creatis.vip.api.model.UploadDataType;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
+import fr.insalyon.creatis.vip.datamanager.models.Data;
+import fr.insalyon.creatis.vip.datamanager.server.business.StorageBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
-import java.util.function.Supplier;
 
-import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import fr.insalyon.creatis.vip.api.exception.ApiError;
-import fr.insalyon.creatis.vip.api.model.PathProperties;
-import fr.insalyon.creatis.vip.api.model.UploadData;
-import fr.insalyon.creatis.vip.api.model.UploadDataType;
-import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.models.Group;
-import fr.insalyon.creatis.vip.core.models.User;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.datamanager.models.Data;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
-import fr.insalyon.creatis.vip.datamanager.server.business.StorageBusiness;
+import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
 
 @Service
 public class DataApiBusiness extends CommonBusiness {
@@ -191,13 +181,12 @@ public class DataApiBusiness extends CommonBusiness {
         return pathProperties;
     }
 
-    /* returns timestamp in seconds from format "Jan 12 2016" */
     private Long getTimeStampFromGridaFormatDate(String gridaFormatDate) {
         if (gridaFormatDate == null || gridaFormatDate.isEmpty()) return null;
-        DateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy", Locale.US);
+        DateTimeFormatter gridaDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
         try {
-            return dateFormat.parse(gridaFormatDate).getTime() / 1000;
-        } catch (ParseException e) {
+            return gridaDateTimeFormatter.parse(gridaFormatDate, LocalDateTime::from).toEpochSecond(ZoneOffset.UTC);
+        } catch (DateTimeParseException e) {
             logger.warn("Error with grida date format : {}. Ignoring it", gridaFormatDate, e);
             return null;
         }
