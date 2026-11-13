@@ -6,11 +6,15 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="icon" type="image/png" href="images/core/vip-logo-without-text.png" />
 
+    <script language="javascript" src="js/home.js">
+        // load first, as this will redirect to index.html if there is no valid VIP session
+    </script>
+
     <script type="text/javascript">
-          // This must be done before SmartClient is loaded.  See:
-          // https://www.smartclient.com/smartclient-release/isomorphic/system/reference/?id=group..simpleNamesMode
-          window.isc_useSimpleNames = false;
-        </script>
+        // This must be done before SmartClient is loaded.  See:
+        // https://www.smartclient.com/smartclient-release/isomorphic/system/reference/?id=group..simpleNamesMode
+        window.isc_useSimpleNames = false;
+    </script>
 
     <meta name='gwt:module' content='fr.insalyon.creatis.vip.portal.Main=fr.insalyon.creatis.vip.portal.Main'>
     <script language="javascript" src="fr.insalyon.creatis.vip.portal.Main/fr.insalyon.creatis.vip.portal.Main.nocache.js"></script>
@@ -28,7 +32,6 @@
     <script language="javascript" src="js/macroParser.js"></script>
     <script language="javascript" src="js/jszip.js"></script>
 
-    <script language="javascript" src="js/home.js"></script>
 </head>
 
 <body>

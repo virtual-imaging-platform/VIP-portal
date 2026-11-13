@@ -99,12 +99,14 @@ function resetPassword() {
     });
 }
 
-function checkSession() {
-    fetch("internal/session").then(function (response) {
-        if (response.ok) {
-            window.location = "home.html";
-        }
-    });
+async function checkSession() {
+    const response = await fetch("internal/session");
+
+    if (response.ok) {
+        window.location.replace('home.html');
+    } else {
+        document.body.style.visibility = 'visible';
+    }
 }
 
 async function checkOidcLoginProviders(){
