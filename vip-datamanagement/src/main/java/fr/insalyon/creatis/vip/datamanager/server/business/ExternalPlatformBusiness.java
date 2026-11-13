@@ -5,14 +5,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.datamanager.server.business.GirderStorageBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.ShanoirStorageBusiness;
 
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.models.User;
@@ -114,16 +112,21 @@ public class ExternalPlatformBusiness {
             throw new VipException(e);
         }
     }
-    public String sanitizeUri(String uriString) {
-        if (uriString == null || uriString.isEmpty()) {
-            return uriString;
+    public String sanitizeVipIoString(String vipIoString) {
+        if (vipIoString == null || vipIoString.isEmpty()) {
+            return vipIoString;
         }
         try {
-            URI uri = new URI(uriString);
+            // /vip/* path contains spaces and () that are illegal for an URI
+            if (vipIoString.startsWith(DataManagerConstants.ROOT)) {
+                return vipIoString;
+            }
+            // otherwise, this should be a valid URI
+            URI uri = new URI(vipIoString);
             String scheme = uri.getScheme();
             
             if (scheme == null) {
-                return uriString;
+                return vipIoString;
             }
 
             if ("shanoir".equals(scheme)) {
@@ -132,19 +135,19 @@ public class ExternalPlatformBusiness {
                 return girderStorageBusiness.adaptGirderUri(uri); 
             }
         } catch (URISyntaxException ex) {
-            logger.warn("Abnormal URI to satinize : {}", uriString);
-            return uriString;
+            logger.warn("Abnormal URI to satinize : {}", vipIoString, ex);
+            return vipIoString;
         }
-        return uriString;
+        return vipIoString;
     }
 
-    public List<String> sanitizeUriList(List<String> uriStringList) {
-        if (uriStringList == null) {
+    public List<String> sanitizeVipIoStringList(List<String> vipIoStringList) {
+        if (vipIoStringList == null) {
             return new ArrayList<>();
         }
         List<String> cleanList = new ArrayList<>();
-        for (String value : uriStringList) {
-            cleanList.add(sanitizeUri(value));
+        for (String value : vipIoStringList) {
+            cleanList.add(sanitizeVipIoString(value));
         }
         return cleanList;
     }
