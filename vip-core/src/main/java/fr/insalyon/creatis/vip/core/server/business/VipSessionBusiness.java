@@ -61,12 +61,13 @@ public class VipSessionBusiness{
             return user;
         } else {
             // still not there -> no user info available -> no user logged in
+            // this should not happen normally in GWT context
             // we clear cookies to avoid blocking account with repeated calls
-            logger.error("No VIP user found in session {}. Attributes : {}",
+            logger.warn("No VIP user found in session {}. Attributes : {}",
                     session.getId(), enumerationToString(session.getAttributeNames()));
             sessionBusiness.clearLoginCookies(response);
-                    
-            throw new CoreException("User not logged in.");  
+
+            return null;
         }
     }
 
