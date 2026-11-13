@@ -290,8 +290,9 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public List<Engine> getEngines() throws VipException {
         authenticateSystemAdministrator(logger);
-        return engineBusiness.get();
+        return engineBusiness.getAll();
     }
+
 
     @Override
     public AppVersion getVersion(String applicationName, String applicationVersion) throws VipException {
