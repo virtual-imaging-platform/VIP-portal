@@ -7,33 +7,33 @@
     <encoder>
       <pattern>%d |%5p |%t | %c{1}:%L - %msg%n %ex{5}</pattern>
     </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <maxIndex>10</maxIndex>
-      <FileNamePattern>${user.home}/.vip/vip.log.%i</FileNamePattern>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- monthly rollover -->
+      <fileNamePattern>${user.home}/.vip/vip.%d{yyyy-MM}.log</fileNamePattern>
+      <!-- keep 18 months' worth of history capped at 5GB total size -->
+      <maxHistory>18</maxHistory>
+      <totalSizeCap>5GB</totalSizeCap>
     </rollingPolicy>
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <MaxFileSize>10MB</MaxFileSize>
-    </triggeringPolicy>
   </appender>
 
 
   <!-- error log file-->
   <appender name="VIP_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${user.home}/.vip/vip-errors.log</file>
+    <encoder>
+      <pattern>%d |%5p |%t | %c{1}:%M:%L - %msg%n %caller{10}</pattern>
+    </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>WARN</level>
     </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- monthly rollover -->
       <fileNamePattern>${user.home}/.vip/vip-errors.%d{yyyy-MM}.log</fileNamePattern>
-      <!-- keep 12 months -->
-      <maxHistory>12</maxHistory>
+      <!-- keep 18 months' worth of history capped at 5GB total size -->
+      <maxHistory>18</maxHistory>
+      <totalSizeCap>5GB</totalSizeCap>
     </rollingPolicy>
-    <encoder>
-      <pattern>%d |%5p |%t | %c{1}:%M:%L - %msg%n %caller{10}</pattern>
-    </encoder>
   </appender>
-
 
   <!-- every thing above INFO is logged in vip.log
        every thing above WARN is ALSO logged in vip_errors.log -->
