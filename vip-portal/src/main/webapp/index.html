@@ -38,7 +38,14 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.13.1/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.13.1/datatables.min.js"></script>
 
-    <!-- For the sign in -->
+    <!-- For the sign in.
+      Makes the body hidden by default, to avoid a blinking if redirected to home.html if conneted
+      The js will make it visible if necessary -->
+    <style>
+        body {
+            visibility: hidden;
+        }
+    </style>
     <script language="javascript" src="js/sign-in.js"></script>
 </head>
 
