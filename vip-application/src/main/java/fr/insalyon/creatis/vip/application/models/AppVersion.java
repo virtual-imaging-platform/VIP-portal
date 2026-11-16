@@ -28,6 +28,8 @@ public class AppVersion implements IsSerializable {
     private boolean visible;
     @NotNull
     private Set<Resource> resources;
+    // Priority of each resource associated with this app version, keyed by resource name.
+    private Map<String, Integer> resourcePriorities;
     @NotNull
     private Set<Tag> tags;
     private Map<String, String> settings;
@@ -46,6 +48,7 @@ public class AppVersion implements IsSerializable {
         this.source = source;
         this.note = note;
         this.resources = new HashSet<>();
+        this.resourcePriorities = new HashMap<>();
         this.tags = new HashSet<>();
         this.settings = settings;
     }
@@ -66,6 +69,7 @@ public class AppVersion implements IsSerializable {
         this.doi = doi;
         this.resources = resources;
         this.tags = tags;
+        this.resourcePriorities = new HashMap<>();
     }
 
     public String getApplicationName() {
@@ -122,6 +126,14 @@ public class AppVersion implements IsSerializable {
         this.resources = resources;
     }
 
+    public Map<String, Integer> getResourcePriorities() { return resourcePriorities; }
+
+    public void setResourcePriorities(Map<String, Integer> resourcePriorities) {
+        this.resourcePriorities = resourcePriorities == null ? new HashMap<>() : new HashMap<>(resourcePriorities);
+    }
+
+    public int getResourcePriority(String resourceName) { return resourcePriorities.getOrDefault(resourceName, 0); }
+
     public void setTags(Set<Tag> tags) {
         this.tags = tags;
     }
@@ -148,7 +160,8 @@ public class AppVersion implements IsSerializable {
                 Objects.equals(tags, other.tags) &&
                 Objects.equals(settings, other.settings) &&
                 Objects.equals(source, other.source) &&
-                Objects.equals(note, other.note);
+                Objects.equals(note, other.note) &&
+                Objects.equals(resourcePriorities, other.resourcePriorities);
     }
 
     @Override
@@ -163,6 +176,7 @@ public class AppVersion implements IsSerializable {
                 tags,
                 settings,
                 source,
-                note);
+                note,
+                resourcePriorities);
     }
 }

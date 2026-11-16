@@ -420,7 +420,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
 
         Mockito.when(server.getVoName()).thenReturn("test-vo-name");
         Mockito.when(server.getServerProxy("test-vo-name")).thenReturn("/path/to/proxy");
-        Mockito.when(webServiceEngine.launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq("{\"default.executor\":\"LOCAL\"}"), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);
+        Mockito.when(webServiceEngine.launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq("{\"default.executor\":\"LOCAL\",\"fallback.resources\":\"[]\"}"), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);
         Mockito.when(webServiceEngine.getStatus(engineEndpoint, workflowId)).thenReturn(WorkflowStatus.Running, (WorkflowStatus) null);
 
         Workflow w = new Workflow(workflowId, baseUser2.getFullName(), fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, "", engineEndpoint, null);
@@ -490,6 +490,6 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
 
         engineBusiness.add(engine);
         resourceBusiness.add(resource);
-        resourceBusiness.associate(resource, appVersionBusiness.getVersion(appName, version));
+        resourceBusiness.associate(resource, appVersionBusiness.getVersion(appName, version), 0);
     }
 }
