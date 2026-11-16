@@ -143,7 +143,7 @@ public class EditVersionLayout extends AbstractFormLayout {
         selectedField.setType(ListGridFieldType.BOOLEAN);
         selectedField.setCanEdit(true);
         selectedField.setWidth(90);
-        selectedField.setEditorType(new CheckboxItem());
+        selectedField.setEditorProperties(new CheckboxItem());
 
         ListGridField resourceNameField = new ListGridField("resourceName", "Resource");
         resourceNameField.setCanEdit(false);
@@ -432,12 +432,12 @@ public class EditVersionLayout extends AbstractFormLayout {
     private Set<Resource> getSelectedResourcesFromGrid() {
         Set<Resource> selected = new HashSet<>();
         for (ListGridRecord record : resourcesGrid.getRecords()) {
-            if (record.getAttributeAsBoolean("selected")) {
-                String name = record.getAttribute("resourceName");
-                if (name == null) continue;
+            if (!record.getAttributeAsBoolean("selected")) continue;
 
-                selected.add(new Resource(name));
-            }
+            String name = record.getAttribute("resourceName");
+            if (name == null) continue;
+
+            selected.add(new Resource(name));
         }
 
         return selected;
@@ -446,12 +446,12 @@ public class EditVersionLayout extends AbstractFormLayout {
     private Map<String, Integer> getSelectedPrioritiesFromGrid() {
         Map<String, Integer> priorities = new HashMap<>();
         for (ListGridRecord record : resourcesGrid.getRecords()) {
-            if (record.getAttributeAsBoolean("selected")) {
-                String name = record.getAttribute("resourceName");
-                if (name == null) continue;
+            if (!record.getAttributeAsBoolean("selected")) continue;
 
-                priorities.put(name, record.getAttributeAsInt("priority"));
-            }
+            String name = record.getAttribute("resourceName");
+            if (name == null) continue;
+
+            priorities.put(name, record.getAttributeAsInt("priority"));
         }
 
         return priorities;

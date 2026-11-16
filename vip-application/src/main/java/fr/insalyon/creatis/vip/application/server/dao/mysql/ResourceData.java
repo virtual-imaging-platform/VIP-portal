@@ -225,9 +225,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
             return results;
 
         } catch (SQLException e) {
-            logger.error("Error getting resource priorities for application "
-                + appVersion.getApplicationName()
-                + " version " + appVersion.getVersion(), e);
+            logger.error("Error getting resource priorities for application {} and version {}", appVersion.getApplicationName(), appVersion.getVersion(), e);
             throw new DAOException(e);
         }
     }
