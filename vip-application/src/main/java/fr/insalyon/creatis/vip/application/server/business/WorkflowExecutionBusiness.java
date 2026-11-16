@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.models.Engine;
@@ -50,16 +52,21 @@ public class WorkflowExecutionBusiness extends CommonBusiness {
             Map<String,String> settings = new HashMap<>(appVersion.getSettings());
             settings.put(ApplicationConstants.DEFAULT_EXECUTOR_GASW, resource.getType().toString());
 
-            // Add ordered resource list for fallback mechanism (types only, comma-separated)
-            String resourcesCSV = orderedResources.stream()
-                .map(r -> r.getType().toString())
-                .collect(Collectors.joining(","));
-            settings.put(ApplicationConstants.FALLBACK_RESOURCES_GASW, resourcesCSV);
+            // Create fallback resources list of (executor type, config path), excluding primary resource
+            List<AbstractMap.SimpleEntry<String, String>> fallbackResourcesList = new ArrayList<>();
+            for (int i = 1; i < orderedResources.size(); i++) {
+                Resource r = orderedResources.get(i);
+                fallbackResourcesList.add(new AbstractMap.SimpleEntry<>(r.getType().toString(), r.getConfiguration()));
+            }
+            // Convert list to JSON string for settings
+            ObjectMapper mapper = new ObjectMapper();
+            String fallbackResourcesJSON = mapper.writeValueAsString(fallbackResourcesList);
+            settings.put(ApplicationConstants.FALLBACK_RESOURCES_GASW, fallbackResourcesJSON);
 
-            String settingsJSON = new ObjectMapper().writeValueAsString(settings);
+            String settingsJSON = mapper.writeValueAsString(settings);
             logger.info("Launching workflow of [{}/{}]", appVersion.getApplicationName(), appVersion.getVersion());
             logger.info("Launching on engine [{}] and resource [{}] (type : [{}])", engine.getName(), resource.getName(), resource.getType());
-            logger.info("Fallback resources: {}", resourcesCSV);
+            logger.info("Fallback resources: {}", fallbackResourcesList);
             logger.info("inputs : {}", inputs);
             logger.info("settings: {}", settingsJSON);
             return this.engine.launch(engine.getEndpoint(), workflowContent, inputs, settingsJSON, resource.getConfiguration(), proxyFileName);
