@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insalyon.creatis.vip.application.models.Engine;
 import fr.insalyon.creatis.vip.application.models.Resource;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
@@ -61,10 +62,10 @@ public class ResourceController {
     @DeleteMapping(value = "{id}")
     public void delete(@PathVariable String id) throws VipException {
         Resource resource = get(id);
-
-        if (resource != null) {
-            resourceBusiness.remove(resource);
+        if (resource == null) {
+            throw new VipException(DefaultError.NOT_FOUND, Resource.class.getSimpleName(), id);
         }
+        resourceBusiness.remove(resource);
     }
 
     @PutMapping(value = "{id}")

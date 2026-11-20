@@ -43,7 +43,7 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
                     try {
                         logger.debug("Cookie session found!");
 
-                        SessionAuthenticationToken token = new SessionAuthenticationToken(null, cookie.getValue(), null, false);
+                        SessionAuthenticationToken token = new SessionAuthenticationToken(null, cookie.getValue(), false);
                         Authentication result = authenticationProvider.authenticate(token);
 
                         logger.debug("Session authentication success for: {}", result);

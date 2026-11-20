@@ -53,6 +53,6 @@ public class SessionAuthenticationProvider extends AbstractAuthenticationProvide
         SpringPrincipalUser springUser = new SpringPrincipalUser(user);
 
         return new SessionAuthenticationToken(
-                springUser, user.getSession(), user.getLevel().name().toUpperCase(), true);
+                springUser, user.getSession(), true);
     }
 }
