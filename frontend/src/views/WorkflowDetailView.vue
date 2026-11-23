@@ -14,6 +14,8 @@ import {
 } from 'lucide-vue-next'
 import AppCard from '@/components/ui/AppCard.vue'
 import AppButton from '@/components/ui/AppButton.vue'
+import WorkflowLogs from '@/components/workflow/WorkflowLogs.vue'
+import JobLogs from '@/components/workflow/JobLogs.vue'
 import { useWorkflowsStore } from '@/stores/workflows.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useFormatters } from '@/composables/useFormatters'
@@ -334,6 +336,10 @@ onUnmounted(() => {
           </table>
         </div>
       </AppCard>
+
+      <WorkflowLogs :wid="wid" :is-running="isPolling" />
+
+      <JobLogs :wid="wid" :is-running="isPolling" />
     </template>
   </div>
 </template>

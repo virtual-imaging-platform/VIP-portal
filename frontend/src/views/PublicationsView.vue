@@ -87,6 +87,7 @@ function normalizeOptional(value: string | null): string | null {
 
 function buildPayload(): PublicationInput {
   return {
+    ...(editingId.value !== null ? { id: editingId.value } : {}),
     title: form.title.trim(),
     authors: form.authors.trim(),
     date: normalizeOptional(form.date),

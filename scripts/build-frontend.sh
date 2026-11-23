@@ -25,6 +25,6 @@ npm run build || die "Failed to build frontend"
 
 [ -d dist ] || die "Dist directory not found"
 
-grep -q "/new_front/" dist/index.html || die "index.html does not contain /new_front/"
+# grep -q "/new_front/" dist/index.html || die "index.html does not contain /new_front/"
 
 ok "Build frontend ended"

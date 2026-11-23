@@ -10,7 +10,7 @@
     <properties>
         <!-- project version. Only to change it here (and in CoreConstants.java
            Follow this practice : https://maven.apache.org/maven-ci-friendly.html-->
-        <revision>4.7</revision>
+        <revision>4.8</revision>
         <changelist/>
         <sha1/>
 
@@ -27,8 +27,8 @@
         <!-- 3rd party dependencies version -->
         <junit.version>5.11.3</junit.version>
         <spring-framework.version>6.2.10</spring-framework.version>
-        <springsecurity.version>6.3.4</springsecurity.version>
-        <springoauth.version>6.3.4</springoauth.version>
+        <springsecurity.version>6.5.11</springsecurity.version>
+        <springoauth.version>6.5.11</springoauth.version>
         <jackson.version>2.18.0</jackson.version>
         <h2database.version>2.4.240</h2database.version>
     </properties>
@@ -167,6 +167,11 @@
             <artifactId>spring-security-test</artifactId>
             <version>${springsecurity.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+            <version>${springsecurity.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>

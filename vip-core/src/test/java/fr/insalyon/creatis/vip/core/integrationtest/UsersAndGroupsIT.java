@@ -890,5 +890,39 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         assertTrue(StringUtils.contains(exception.getMessage(), "Activation failed."));
 
     }
+    @Test
+    public void testSignupThenSignin() throws VipException, GRIDAClientException {
+        clearContext();
+        User newUser = new User("firstName", "lastName", "email10@test.fr", "institution", CountryCode.fr);
+        newUser.setPassword("password");
+        authenticationBusiness.signup(newUser, "");
+
+        assertNotNull(authenticationBusiness.signin("email10@test.fr", "password"));
+        assertThrows(VipException.class,
+                () -> authenticationBusiness.signin("email10@test.fr", "wrong password"));
+    }
+
+    @Test
+    public void testResetPasswordThenSignin() throws VipException {
+        String code = userBusiness.getUser(emailUser1).getCode();
+
+        passwordBusiness.reset(emailUser1, code, "test new password");
+
+        assertNotNull(authenticationBusiness.signin(emailUser1, "test new password"));
+        assertThrows(VipException.class,
+                () -> authenticationBusiness.signin(emailUser1, "testPassword"));
+    }
+
+    @Test
+    public void testSigninRefusedWhenAccountLocked() {
+        // the account is locked after more than 5 failed attempts
+        for (int i = 0; i < 6; i++) {
+            assertThrows(VipException.class,
+                    () -> authenticationBusiness.signin(emailUser3, "wrong password"));
+        }
+        // even the correct password is now refused
+        assertThrows(VipException.class,
+                () -> authenticationBusiness.signin(emailUser3, "testPassword"));
+    }
 
 }

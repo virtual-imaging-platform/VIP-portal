@@ -1,7 +1,9 @@
 package fr.insalyon.creatis.vip.application.models;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
+import fr.insalyon.creatis.vip.core.server.inter.DataViews;
 
 import java.util.Date;
 
@@ -9,6 +11,7 @@ import java.util.Date;
  *
  * @author Rafael Ferreira da Silva
  */
+@JsonView(DataViews.User.class)
 public class Task implements IsSerializable {
 
     private String id;

@@ -1,11 +1,13 @@
 package fr.insalyon.creatis.vip.core.server.business.base;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.security.common.CurrentUserRolesBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ public abstract class CommonBusiness {
     protected Server server;
     protected CorePermissions permissions;
     protected Supplier<User> userSupplier;
+    protected CurrentUserRolesBusiness currentUserRolesBusiness;
     protected PageBuilder pageBuilder;
 
 
@@ -32,6 +35,11 @@ public abstract class CommonBusiness {
     @Autowired
     public void setUserSupplier(Supplier<User> userSupplier) {
         this.userSupplier = userSupplier;
+    }
+
+    @Autowired
+    public void setCurrentUserRolesBusiness(CurrentUserRolesBusiness currentUserRolesBusiness) {
+        this.currentUserRolesBusiness = currentUserRolesBusiness;
     }
 
     @Autowired
@@ -58,6 +66,10 @@ public abstract class CommonBusiness {
 
     public UserLevel getUserLevel() {
         return getUser().getLevel();
+    }
+
+    public boolean userHasRole(String role) {
+        return currentUserRolesBusiness.hasRole(role);
     }
 
     protected void assertStringInputNotNullNotBlank(String value, String inputName, String errorContext) throws VipException {

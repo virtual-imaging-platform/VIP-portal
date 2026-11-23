@@ -83,10 +83,16 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
     @Override
     public String processCall(RPCRequest rpcRequest) throws SerializationException {
         try {
-            // To set up the user in spring security to make it accessible through the Supplier<User> used in updated business's
-            // Necessary from GWT context, as spring security is not activated there
-            SecurityContextHolder.getContext().setAuthentication(
-                sessionAuthenticationProvider.createAuthenticationFromUser(getSessionUser()));
+            // normally it should not happen, but in case of a weird user browser session or cookies, ignore if no
+            // user is found
+            User user = getSessionUser();
+            if (user != null) {
+                // To set up the user in spring security to make it accessible through the Supplier<User> used in
+                // updated business's
+                // Necessary from GWT context, as spring security is not activated there
+                SecurityContextHolder.getContext().setAuthentication(
+                        sessionAuthenticationProvider.createAuthenticationFromUser(user));
+            }
         } catch (CoreException e) {
             doUnexpectedFailure(e);
         }

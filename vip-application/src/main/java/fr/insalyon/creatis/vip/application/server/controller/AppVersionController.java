@@ -95,7 +95,7 @@ public class AppVersionController {
 
     @GetMapping("versions")
     public PrecisePage<AppVersion> list(@RequestParam(defaultValue = "0") @PositiveOrZero int offset,
-            @RequestParam(defaultValue = "10") @Positive @Max(value = 50) int quantity) throws VipException {
+            @RequestParam(defaultValue = "100") @Positive @Max(value = 100) int quantity) throws VipException {
         return appVersionBusiness.get(offset, quantity, null);
     }
 

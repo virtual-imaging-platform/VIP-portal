@@ -33,7 +33,7 @@ public class UserTestUtils {
                 UserLevel.Beginner, CountryCode.fr);
         baseUser1.setFolder("user1");
         baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null,
-                UserLevel.Advanced, null);
+                UserLevel.Advanced, CountryCode.fr);
         baseUser2.setFolder("user2");
         baseUser3 = new User("base3", "User3", "baseuser3@test.tst", null,
                 UserLevel.Beginner, null);

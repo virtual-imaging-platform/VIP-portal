@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
 
   const env = loadEnv(mode, process.cwd(), '')
   const backendUrl = env.VITE_BACKEND_URL || 'http://localhost:8080'
-  const base = mode === 'production' ? (env.VITE_APP_BASE_PATH || './') : '/'
+  const base = mode === 'production' ? './' : '/'
 
   return {
     base,

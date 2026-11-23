@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { appVersionsApi, type BackendAppVersion } from '@/api/appVersions.api'
 import type { AppVersion } from '@/types/appversion.types'

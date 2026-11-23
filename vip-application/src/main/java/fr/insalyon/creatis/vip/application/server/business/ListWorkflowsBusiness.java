@@ -6,7 +6,9 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.monitor.WorkflowStatus;
 import fr.insalyon.creatis.vip.application.models.Application;
 import fr.insalyon.creatis.vip.application.models.Engine;
+import fr.insalyon.creatis.vip.application.models.InOutData;
 import fr.insalyon.creatis.vip.application.models.Workflow;
+import fr.insalyon.creatis.vip.application.models.WorkflowInput;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
@@ -37,17 +39,20 @@ public class ListWorkflowsBusiness extends CommonBusiness {
     private final UserBusiness userBusiness;
     private final PageBuilder pageBuilder;
     private final EngineBusiness engineBusiness;
+    private final WorkflowBusiness workflowBusiness;
 
     @Autowired
     public ListWorkflowsBusiness(WorkflowDAO workflowDAO, ApplicationDAO applicationDAO,
                                  WorkflowExecutionBusiness workflowExecutionBusiness, UserBusiness userBusiness,
-                                 PageBuilder pageBuilder, EngineBusiness engineBusiness) {
+                                 PageBuilder pageBuilder, EngineBusiness engineBusiness,
+                                 WorkflowBusiness workflowBusiness) {
         this.workflowDAO = workflowDAO;
         this.applicationDAO = applicationDAO;
         this.workflowExecutionBusiness = workflowExecutionBusiness;
         this.userBusiness = userBusiness;
         this.pageBuilder = pageBuilder;
         this.engineBusiness = engineBusiness;
+        this.workflowBusiness = workflowBusiness;
     }
 
     @VIPExternalSafe
@@ -71,7 +76,9 @@ public class ListWorkflowsBusiness extends CommonBusiness {
             }
             workflow = parseDbWorkflow(dbWorkflow);
 
-            if ( ! getUser().isSystemAdministrator() && !Objects.equals(workflow.getUserId(), getUser().getId())) {
+            if ( ! getUser().isSystemAdministrator()
+                    && !Objects.equals(workflow.getUserId(), getUser().getId())
+                    && !userHasRole("SERVICE")) {
                 logger.error("unauthorized access to workflow {} by {}", workflowId, getUser().getEmail());
                 throw new VipException(DefaultError.ACCESS_DENIED);
             }
@@ -117,6 +124,14 @@ public class ListWorkflowsBusiness extends CommonBusiness {
     }
 
     @VIPExternalSafe
+    public PrecisePage<Workflow> searchOwnWorkflowsPaginated(
+            int offset, int quantity, String search, String status,
+            Date startDate, Date endDate) throws VipException {
+        return pageBuilder.doPrecise(offset, quantity,
+                searchOwnWorkflows(null, search, status, startDate, endDate, null));
+    }
+
+    @VIPExternalSafe
     public List<Workflow> getAllWorkflows(Date lastDate) throws VipException {
         if ( ! getUser().isSystemAdministrator() ) {
             logger.error("unauthorized access to all workflows by {}", getUser().getEmail());
@@ -141,12 +156,24 @@ public class ListWorkflowsBusiness extends CommonBusiness {
 
     @VIPExternalSafe
     public List<Workflow> searchOwnWorkflows(
-            String applicationName, String status, Date startDate, Date endDate, String tag) throws VipException {
-        fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus wStatus = (status != null) ? fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus.valueOf(status) : null;
+            String applicationName, String search, String status,
+            Date startDate, Date endDate, String tag) throws VipException {
+        fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus wStatus =
+                (status != null) ? fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus.valueOf(status) : null;
 
-        // no need to verify applicationName, if not relevant filter will give nothing
         try {
-            return parseDbWorkflows(workflowDAO.get(getUser().getFullName(), applicationName, wStatus, null, startDate, endDate, tag));
+            List<Workflow> workflows = parseDbWorkflows(
+                    workflowDAO.get(getUser().getFullName(), applicationName, wStatus, null, startDate, endDate, tag));
+
+            if (search != null && !search.isEmpty()) {
+                String lowerSearch = search.toLowerCase();
+                workflows = workflows.stream()
+                        .filter(w -> w.getID().toLowerCase().contains(lowerSearch)
+                                || (w.getWorkflowName() != null && w.getWorkflowName().toLowerCase().contains(lowerSearch))
+                                || (w.getApplicationName() != null && w.getApplicationName().toLowerCase().contains(lowerSearch)))
+                        .collect(Collectors.toList());
+            }
+            return workflows;
         } catch (WorkflowsDBDAOException ex) {
             logger.error("Error searching simulations for user {}", getUserEmail(), ex);
             throw new VipException(ex);
@@ -236,6 +263,9 @@ public class ListWorkflowsBusiness extends CommonBusiness {
     }
 
     private List<Workflow> parseDbWorkflows(List<fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow> dbWorkflowList) throws VipException {
+        if (dbWorkflowList == null) {
+            return Collections.emptyList();
+        }
         List<String> usernameList = dbWorkflowList.stream().map(dbworkflow -> dbworkflow.getUsername()).toList();
         List<User> userList = userBusiness.getByFullnames(usernameList);
         // create map of unique names found
@@ -253,18 +283,23 @@ public class ListWorkflowsBusiness extends CommonBusiness {
 
 
     private Workflow parseDbWorkflow(fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow dbWorkflow) throws VipException {
-        return parseDbWorkflow(dbWorkflow, null);
+        return parseDbWorkflow(dbWorkflow, null, true);
     }
 
     private Workflow parseDbWorkflow(fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow dbWorkflow, Map<String, User> usersByFullname) throws VipException {
+        return parseDbWorkflow(dbWorkflow, usersByFullname, false);
+    }
+
+    private Workflow parseDbWorkflow(fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow dbWorkflow, Map<String, User> usersByFullname, boolean populateInOut) throws VipException {
         Optional<User> workflowUser;
         if (usersByFullname == null) {
             workflowUser = userBusiness.getByFullname(dbWorkflow.getUsername());
         } else {
             workflowUser = Optional.ofNullable(usersByFullname.get(dbWorkflow.getUsername()));
         }
+        Workflow workflow;
         if (workflowUser.isEmpty()) {
-            return new Workflow(
+            workflow = new Workflow(
                     dbWorkflow.getId(),
                     dbWorkflow.getDescription(),
                     dbWorkflow.getApplication(),
@@ -276,7 +311,7 @@ public class ListWorkflowsBusiness extends CommonBusiness {
                     dbWorkflow.getEngine(),
                     dbWorkflow.getTags());
         } else {
-            return new Workflow(
+            workflow = new Workflow(
                     dbWorkflow.getId(),
                     dbWorkflow.getDescription(),
                     dbWorkflow.getApplication(),
@@ -288,6 +323,35 @@ public class ListWorkflowsBusiness extends CommonBusiness {
                     dbWorkflow.getEngine(),
                     dbWorkflow.getTags());
         }
+        if (populateInOut) {
+            try {
+                String folder = getUser().getFolder();
+                List<InOutData> inputData = workflowBusiness.getInputData(workflow.getID(), folder);
+                if (inputData != null && !inputData.isEmpty()) {
+                    workflow.setInputs(inputData.stream()
+                        .collect(Collectors.groupingBy(
+                            InOutData::getProcessor,
+                            Collectors.collectingAndThen(
+                                Collectors.mapping(InOutData::getPath,
+                                    Collectors.toCollection(ArrayList::new)),
+                                WorkflowInput::ofList
+                            )
+                        )));
+                }
+                List<InOutData> outputData = workflowBusiness.getOutputData(workflow.getID(), folder);
+                if (outputData != null && !outputData.isEmpty()) {
+                    workflow.setOutputs(outputData.stream()
+                        .collect(Collectors.groupingBy(
+                            InOutData::getProcessor,
+                            Collectors.mapping(InOutData::getPath,
+                                Collectors.toCollection(ArrayList::new))
+                        )));
+                }
+            } catch (VipException e) {
+                logger.warn("Could not populate inputs/outputs for workflow {}", workflow.getID(), e);
+            }
+        }
+        return workflow;
     }
 
     public List<Workflow> refreshRunningWorkflows(List<Workflow> workflows) throws VipException {

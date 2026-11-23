@@ -156,7 +156,7 @@ public class ApplicationControllerIT extends BaseInternalApiSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.errorCode").value(DefaultError.ACCESS_DENIED.getCode()));
 
         // update app wrong matching ids

@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class CoreConstants implements IsSerializable {
 
 
-    public static final String VERSION = "v4.7";
+    public static final String VERSION = "v4.8";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
@@ -47,9 +47,11 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SIMULATION_ADVANCED_MAX = "simulation.max.advanced";
     public static final String LAB_SIMULATION_PLATFORM_MAX = "simulation.max.platfrom";
     public static final String LAB_SIMULATION_BEGINNER_MAX = "simulation.max.beginner";
+    public static final String LAB_SIMULATION_FOLDER = "workflows.directory";
     public static final String LAB_SIMULATION_DB_HOST = "workflows.db.host";
     public static final String LAB_SIMULATION_DB_PORT = "workflows.db.port";
-    public static final String LAB_SIMULATION_FOLDER = "workflows.directory";
+    public static final String LAB_SIMULATION_DB_USER = "workflows.db.user";
+    public static final String LAB_SIMULATION_DB_PASSWORD = "workflows.db.password";
     public static final String LAB_SIMULATION_EXEC_MODE = "workflows.exec.mode";
     public static final String LAB_APACHE_HOST = "apache.host";
     public static final String LAB_APACHE_SSL_PORT = "apache.ssl.port";
@@ -156,6 +158,8 @@ public class CoreConstants implements IsSerializable {
     // MoteurServerRest
     public static final String MOTEUR_REST_PASSWORD = "moteur.rest.password";
     public static final String HOST_URL = "host.url";
+    // MIME type
+    public static final String TEXT_PLAIN_UTF8 = "text/plain;charset=UTF-8";    
 
     // permissions
     public static final String NOT_RIGHT = "You do not have the right to do that!";

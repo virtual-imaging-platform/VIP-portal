@@ -1,13 +1,4 @@
-export interface Group {
-  name: string
-  publicGroup: boolean
-  type: 'RESOURCE' | 'APPLICATION' | string
-  auto: boolean
-}
-
-export interface GroupWithRole extends Group {
-  role: string
-}
+import type { Group } from './group.types'
 
 export interface UserSuggestion {
   id: string
@@ -26,5 +17,4 @@ export interface UserSuggestion {
   termsOfUse?: number
   lastUpdatePublications?: number
   groups?: Group[]
-  groupsWithRoles?: GroupWithRole[]
 }

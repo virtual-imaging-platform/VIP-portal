@@ -207,8 +207,8 @@ public class ExecutionBusiness {
             List<String> dbInputs = simulationBusiness.getJobInputs(s.getID(), jobName, userFolder);
             List<String> dbOutputs = simulationBusiness.getJobOutputs(s.getID(), jobName, userFolder);
 
-            List<String> jobInputs = externalPlatformBusiness.sanitizeUriList(dbInputs);
-            List<String> jobOutputs = externalPlatformBusiness.sanitizeUriList(dbOutputs);
+            List<String> jobInputs = externalPlatformBusiness.sanitizeVipIoStringList(dbInputs);
+            List<String> jobOutputs = externalPlatformBusiness.sanitizeVipIoStringList(dbOutputs);
 
             // Build the data structure 
             Map<String, Object> jobData = new HashMap<>();
@@ -441,7 +441,7 @@ public class ExecutionBusiness {
                 executionId, currentUserProvider.get().getFolder());
         for (InOutData output : outputs) {
             String outputPath = output.getPath();
-            pathResults.add(dataApiBusiness.getPathProperties(outputPath));
+            pathResults.add(dataApiBusiness.getFilePathProperties(outputPath));
         }
         return pathResults;
     }
@@ -472,7 +472,7 @@ public class ExecutionBusiness {
             return;
         }
         Workflow s = listWorkflowsBusiness.getNotRefreshedWorkflow(executionId);
-        if (s.getUserFullName().equals(user.getFullName())) {
+        if (s.getUserFullName() != null && s.getUserFullName().equals(user.getFullName())) {
             return;
         }
         logger.error("Permission denied for {} on exec {}", user, executionId);

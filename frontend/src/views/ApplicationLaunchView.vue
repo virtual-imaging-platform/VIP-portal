@@ -12,6 +12,7 @@ import { useNotificationsStore } from '@/stores/notifications.store'
 import { useWorkflowsStore } from '@/stores/workflows.store'
 import type { Application } from '@/types/application.types'
 import type { AppVersion } from '@/types/appversion.types'
+import type { WorkflowInputPayload } from '@/types/workflow.types'
 import { rememberRecentApplication } from '@/utils/recentApplications'
 import { useBoutiquesLaunchForm } from '@/composables/useBoutiquesLaunchForm'
 import { useDuplicatedLaunchInputs } from '@/composables/useDuplicatedLaunchInputs'
@@ -128,10 +129,8 @@ async function onLaunchSubmit() {
     version: selectedVersion.value.version,
   })
 
-  const inputs: Record<string, { type: string; values: string[] }> = {}
+  const inputs: Record<string, WorkflowInputPayload> = {}
   for (const input of payload.inputs) {
-    const inputMeta = inputParams.value.find((p) => p.id === input.id)
-    const type = inputMeta?.type === 'Boolean' ? 'Flag' : inputMeta?.type ?? 'String'
     const values = input.values
       .filter((v) => v.value != null && v.value !== '')
       .map((v) => {
@@ -139,12 +138,12 @@ async function onLaunchSubmit() {
         return String(v.value)
       })
     if (values.length > 0) {
-      inputs[input.id] = { type, values }
+      inputs[input.id] = { values }
     }
   }
 
   if (payload.resultsDirectory) {
-    inputs['results-directory'] = { type: 'File', values: [payload.resultsDirectory] }
+    inputs['results-directory'] = { values: [payload.resultsDirectory] }
   }
 
   const workflow = await workflowsStore.launchWorkflow({

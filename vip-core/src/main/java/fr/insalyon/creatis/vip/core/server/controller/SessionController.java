@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +41,11 @@ public class SessionController {
         User user = userProvider.get();
         Session session = sessionBusiness.getSession(user);
 
-        try {
-            // renew existing cookies
-            sessionBusiness.createLoginCookies(request, response, session);
-            userBusiness.updateUserLastLogin(user.getEmail());
+        // renew existing cookies
+        sessionBusiness.createLoginCookies(request, response, session);
+        userBusiness.updateUserLastLogin(user.getEmail());
 
-            return session;
-        } catch (UnsupportedEncodingException e) {
-            throw new VipException("Failed to retrieve user session!", e);
-        }
+        return session;
     }
 
     @PostMapping
@@ -62,7 +57,7 @@ public class SessionController {
 
             sessionBusiness.createLoginCookies(request, response, session);
             return session;
-        } catch (UnsupportedEncodingException | VipException e) {
+        } catch (VipException e) {
             if (e.getMessage().startsWith("Authentication failed")) {
                 throw new VipException(DefaultError.BAD_CREDENTIALS);
             }
@@ -72,7 +67,6 @@ public class SessionController {
 
     @DeleteMapping
     public void deleteSession(HttpServletRequest request, HttpServletResponse response) throws VipException {
-        sessionBusiness.signout();
-        sessionBusiness.clearLoginCookies(response);
+        sessionBusiness.signout(request, response);
     }
 }

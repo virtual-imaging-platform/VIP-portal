@@ -4,6 +4,7 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -22,7 +23,7 @@ public interface UserDAO {
      * @return
      * @throws DAOException 
      */
-    public boolean authenticate(String email, String password) throws DAOException;
+    public boolean authenticate(String email, String password, PasswordEncoder passwordEncoder) throws DAOException;
 
     public boolean activate(String email, String code) throws DAOException;
 
@@ -37,8 +38,6 @@ public interface UserDAO {
     public void remove(String email) throws DAOException;
 
     public void definePassword(String email, String password) throws DAOException;
-
-    public void updatePassword(String email, String currentPassword, String newPassword) throws DAOException;
 
     void updateEmail(String oldEmail, String newEmail) throws DAOException;
 

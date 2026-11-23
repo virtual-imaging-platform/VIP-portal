@@ -93,7 +93,7 @@ export const useMessagesStore = defineStore('messages', () => {
     }, {})
 
     // Ensure all fetched available groups are represented even if they have no messages
-    availableGroups.value.forEach((group: any) => {
+    availableGroups.value.forEach((group) => {
       if (!grouped[group.name]) {
         grouped[group.name] = []
       }
@@ -145,7 +145,9 @@ export const useMessagesStore = defineStore('messages', () => {
         availableGroups.value = []
       }
     } else {
-      availableGroups.value = (authStore.user?.groupsWithRoles as any) ?? authStore.user?.groups ?? []
+      availableGroups.value = (authStore.user?.groups ?? []).filter(
+        (g) => g.name && authStore.user?.groupsMap?.[g.name],
+      )
     }
 
     if (availableGroups.value.length === 0) {

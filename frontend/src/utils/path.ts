@@ -1,12 +1,17 @@
 export function getFrontendBase(): string {
   if (typeof window === 'undefined') return '/'
-  const path = window.location.pathname
-  const idx = path.indexOf('/new_front')
-  if (idx === -1) return '/'
-  const end = path.indexOf('/', idx + 1)
-  return end !== -1 ? path.slice(0, end + 1) : path.slice(0, idx + '/new_front'.length) + '/'
+  const script = document.querySelector<HTMLScriptElement>('script[type="module"][src]')
+  if (!script) return '/'
+  const parts = new URL(script.src).pathname.split('/')
+  parts.pop()
+  parts.pop()
+  return parts.join('/') + '/'
 }
 
 export function getBackendBase(): string {
-  return getFrontendBase().replace(/new_front\/$/, '')
+  const base = getFrontendBase()
+  if (base === '/') return '/'
+  const parts = base.split('/').filter(Boolean)
+  parts.pop()
+  return '/' + parts.join('/') + (parts.length > 0 ? '/' : '')
 }

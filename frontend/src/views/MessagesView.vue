@@ -22,15 +22,21 @@ const { formatRelativeTime } = useFormatters()
 
 const isAdmin = computed(() => authStore.user?.level === 'Administrator')
 
+const isDeveloper = computed(() => authStore.user?.level === 'Developer')
+
+const canSendUserMessage = computed(() => isAdmin.value || isDeveloper.value)
+
 const canSendGroupMessage = computed(() => {
   if (isAdmin.value) return true
-  return authStore.user?.groupsWithRoles?.some((g) => g.role === 'Admin') ?? false
+  return Object.values(authStore.user?.groupsMap ?? {}).some((role) => role === 'Admin')
 })
+
+const canSendMessage = computed(() => canSendUserMessage.value || canSendGroupMessage.value)
 
 function canDeleteGroupMessage(groupName: string | undefined): boolean {
   if (isAdmin.value) return true
   if (!groupName) return false
-  return authStore.user?.groupsWithRoles?.some((g) => g.role === 'Admin' && g.name === groupName) ?? false
+  return authStore.user?.groupsMap?.[groupName] === 'Admin'
 }
 
 const showComposeModal = ref(false)
@@ -96,6 +102,9 @@ async function sendMessage() {
 
 function openComposeModal() {
   resetForm()
+  if (!canSendUserMessage.value && canSendGroupMessage.value) {
+    composeMode.value = 'groups'
+  }
   showComposeModal.value = true
 }
 
@@ -220,7 +229,8 @@ watch(
           } else {
             // For normal users, only suggest groups where they are an Admin
             if (activeQuery.value === query) {
-              const myAdminGroups = authStore.user?.groupsWithRoles?.filter((g) => g.role === 'Admin') ?? []
+              const myAdminGroups =
+                authStore.user?.groups?.filter((g) => authStore.user?.groupsMap?.[g.name] === 'Admin') ?? []
               groupSuggestions.value = myAdminGroups.filter((g) =>
                 g.name.toLowerCase().includes(query.toLowerCase()),
               )
@@ -275,7 +285,7 @@ watch(composeMode, (mode) => {
           {{ messagesStore.unreadCount }}
         </AppBadge>
       </h1>
-      <AppButton @click="openComposeModal">
+      <AppButton v-if="canSendMessage" @click="openComposeModal">
         <Plus class="h-4 w-4" />
         New message
       </AppButton>
@@ -527,7 +537,7 @@ watch(composeMode, (mode) => {
           </button>
         </div>
         <form class="mt-4 space-y-4" @submit.prevent="sendMessage">
-          <div v-if="canSendGroupMessage" class="flex flex-wrap gap-2">
+          <div v-if="canSendUserMessage && canSendGroupMessage" class="flex flex-wrap gap-2">
             <AppButton
               type="button"
               :variant="composeMode === 'users' ? 'primary' : 'secondary'"

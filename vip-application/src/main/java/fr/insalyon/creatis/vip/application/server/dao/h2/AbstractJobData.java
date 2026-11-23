@@ -56,7 +56,7 @@ public abstract class AbstractJobData {
                 // if tcp, add server and port
                 // otherwise, its a local file, only the path is needed
                 dbUrl.append("//")
-                        .append(server.getWorkflowsHost())
+                        .append(server.getWorkflowsDbHost())
                         .append(":9092/");
             }
             dbUrl.append(server.getWorkflowsPath())
@@ -64,7 +64,10 @@ public abstract class AbstractJobData {
                     .append(dbPath)
                     .append("/db/jobs");
 
-            connection = DriverManager.getConnection(dbUrl.toString(), "gasw", "gasw");
+            connection = DriverManager.getConnection(
+                    dbUrl.toString(),
+                    server.getWorkflowsDbUser(),
+                    server.getWorkflowsDbPassword());
             connection.setAutoCommit(true);
 
         } catch (ClassNotFoundException | SQLException ex) {

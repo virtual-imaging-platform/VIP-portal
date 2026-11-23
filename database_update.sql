@@ -52,3 +52,7 @@ ALTER TABLE VIPAppVersions ADD note TEXT;
 ALTER TABLE VIPUsers ADD id VARCHAR(8) UNIQUE;
 /* becareful the uuids generated here are hex based (limitation of sql functions) */
 UPDATE VIPUsers SET id = SUBSTRING(UUID(), 1, 8) WHERE id IS NULL;
+
+-- v4.8
+ALTER TABLE VIPUsers MODIFY pass VARCHAR(120);
+

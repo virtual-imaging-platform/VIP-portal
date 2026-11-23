@@ -1,0 +1,11 @@
+This file lists the changes to apply to an existing VIP-portal installation on each release.
+
+# v4.8
+Password hashing changes
+- apply request in database_update.sql
+- get vip-scripts/migration_password/vip-password-migration.jar
+curl -L -O -H "Authorization: Bearer $GITHUB_TOKEN" https://raw.githubusercontent.com/virtual-imaging-platform/vip-scripts/master/migration_password/vip-password-migration.jar
+export VIP_DB_URL=jdbc:mariadb://localhost:3306/vip
+export VIP_DB_USER=vip
+export VIP_DB_PASSWORD=
+java -jar vip-password-migration.jar

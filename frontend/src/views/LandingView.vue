@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import {
   ArrowRight,
@@ -9,7 +9,9 @@ import {
   Users,
   BookOpen,
   ExternalLink,
-  Calendar
+  Calendar,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-vue-next'
 
 import { getGroupBadgeColor } from '@/utils/groupColor'
@@ -33,6 +35,7 @@ const topPublications = ref<Publication[]>([])
 async function loadPublicApplications() {
   try {
     topApplications.value = await applicationsApi.getPublic()
+    appPage.value = 0
   } catch (error) {
     console.error('Failed to load public applications:', error)
     topApplications.value = []
@@ -42,10 +45,39 @@ async function loadPublicApplications() {
 async function loadPublicPublications() {
   try {
     topPublications.value = await publicationsApi.getPublic()
+    pubPage.value = 0
   } catch (error) {
     console.error('Failed to load public publications:', error)
     topPublications.value = []
   }
+}
+
+const CAROUSEL_PAGE_SIZE = 9
+
+const appPage = ref(0)
+const pubPage = ref(0)
+
+const appPages = computed(() =>
+  Array.from({ length: Math.ceil(topApplications.value.length / CAROUSEL_PAGE_SIZE) }, (_, i) =>
+    topApplications.value.slice(i * CAROUSEL_PAGE_SIZE, (i + 1) * CAROUSEL_PAGE_SIZE),
+  ),
+)
+
+const pubPages = computed(() =>
+  Array.from({ length: Math.ceil(topPublications.value.length / CAROUSEL_PAGE_SIZE) }, (_, i) =>
+    topPublications.value.slice(i * CAROUSEL_PAGE_SIZE, (i + 1) * CAROUSEL_PAGE_SIZE),
+  ),
+)
+
+const visibleApps = computed(() => appPages.value[appPage.value] ?? [])
+const visiblePubs = computed(() => pubPages.value[pubPage.value] ?? [])
+
+function goToAppPage(page: number) {
+  appPage.value = Math.min(Math.max(page, 0), Math.max(appPages.value.length - 1, 0))
+}
+
+function goToPubPage(page: number) {
+  pubPage.value = Math.min(Math.max(page, 0), Math.max(pubPages.value.length - 1, 0))
 }
 
 const frontendBase = getFrontendBase()
@@ -70,7 +102,7 @@ const team = [
     role: 'Research Engineer',
     org: 'CREATIS',
     url: null,
-    photo: '/team/bertrand_pautet.jpg',
+    photo: `${frontendBase}team/photo_bertrand.png`,
   },
   {
     name: 'Guillaume Vinet',
@@ -85,13 +117,6 @@ const team = [
     org: 'CREATIS',
     url: null,
     photo: `${frontendBase}team/mayssa_rouissi.png`,
-  },
-  {
-    name: 'Bertrand Patet',
-    role: '',
-    org: 'CREATIS',
-    url: null,
-    photo: `${frontendBase}team/photo_bertrand.png`,
   },
   {
     name: 'Hippolyte Blot',
@@ -363,29 +388,68 @@ onUnmounted(() => {
           </RouterLink>
         </div>
 
-        <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div
-            v-for="app in topApplications"
-            :key="app.name"
-            class="group relative rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-primary-200"
-          >
-            <div class="flex items-start gap-4">
-              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-primary-600 to-primary-800 text-white text-lg font-bold shadow">
-                {{ app.name.charAt(0) }}
-              </div>
-              <div class="min-w-0">
-                <div class="flex items-center gap-2">
-                  <h3 class="truncate text-base font-bold text-gray-900">{{ app.name }}</h3>
+        <div class="mt-10">
+          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div
+              v-for="app in visibleApps"
+              :key="app.name"
+              class="group relative flex h-44 flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-primary-200"
+            >
+              <div class="flex items-start gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-primary-600 to-primary-800 text-white text-lg font-bold shadow">
+                  {{ app.name.charAt(0) }}
                 </div>
-                <AppBadge :variant="getGroupBadgeColor(app.groups?.[0]?.name ?? 'Uncategorized')" class="mt-1">
-                  {{ app.groups?.[0]?.name ?? 'Uncategorized' }}
-                </AppBadge>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <h3 class="truncate text-base font-bold text-gray-900">{{ app.name }}</h3>
+                  </div>
+                  <AppBadge :variant="getGroupBadgeColor(app.groups?.[0]?.name ?? 'Uncategorized')" class="mt-1">
+                    {{ app.groups?.[0]?.name ?? 'Uncategorized' }}
+                  </AppBadge>
+                </div>
               </div>
-            </div>
 
-            <p class="mt-4 line-clamp-2 text-sm text-gray-500 leading-relaxed">
-              {{ app.citation }}
-            </p>
+              <p class="mt-4 line-clamp-2 text-sm text-gray-500 leading-relaxed">
+                {{ app.citation }}
+              </p>
+            </div>
+          </div>
+
+          <div
+            v-if="appPages.length > 1"
+            class="mt-6 flex items-center justify-center gap-4"
+          >
+            <button
+              type="button"
+              :disabled="appPage === 0"
+              class="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:border-primary-300 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="Previous applications"
+              @click="goToAppPage(appPage - 1)"
+            >
+              <ChevronLeft class="h-4 w-4" />
+            </button>
+            <div class="flex items-center gap-2">
+              <button
+                v-for="(_, index) in appPages"
+                :key="index"
+                type="button"
+                :class="[
+                  'h-2.5 rounded-full transition-all',
+                  index === appPage ? 'w-6 bg-primary-600' : 'w-2.5 bg-gray-300 hover:bg-gray-400',
+                ]"
+                :aria-label="`Go to applications page ${index + 1}`"
+                @click="goToAppPage(index)"
+              />
+            </div>
+            <button
+              type="button"
+              :disabled="appPage >= appPages.length - 1"
+              class="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:border-primary-300 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="Next applications"
+              @click="goToAppPage(appPage + 1)"
+            >
+              <ChevronRight class="h-4 w-4" />
+            </button>
           </div>
         </div>
       </div>
@@ -413,38 +477,77 @@ onUnmounted(() => {
           </a>
         </div>
 
-        <div class="mt-10 grid gap-5 sm:grid-cols-2">
-          <a
-            v-for="pub in topPublications"
-            :key="pub.id"
-            :href="pub.doi ? `https://doi.org/${pub.doi}` : undefined"
-            target="_blank"
-            rel="noopener"
-            class="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-primary-200"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50">
-                <BookOpen class="h-5 w-5 text-primary-600" />
+        <div class="mt-10">
+          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <a
+              v-for="pub in visiblePubs"
+              :key="pub.id"
+              :href="pub.doi ? `https://doi.org/${pub.doi}` : undefined"
+              target="_blank"
+              rel="noopener"
+              class="group flex h-56 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-primary-200"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50">
+                  <BookOpen class="h-5 w-5 text-primary-600" />
+                </div>
+                <ExternalLink class="h-4 w-4 shrink-0 text-gray-300 transition group-hover:text-primary-400" />
               </div>
-              <ExternalLink class="h-4 w-4 shrink-0 text-gray-300 transition group-hover:text-primary-400" />
-            </div>
 
-            <h3 class="mt-4 text-sm font-semibold leading-snug text-gray-900 group-hover:text-primary-700 transition">
-              {{ pub.title }}
-            </h3>
-            <p class="mt-2 text-xs text-gray-400">{{ pub.authors }}</p>
+              <h3 class="mt-4 line-clamp-3 text-sm font-semibold leading-snug text-gray-900 group-hover:text-primary-700 transition">
+                {{ pub.title }}
+              </h3>
+              <p class="mt-2 text-xs text-gray-400">{{ pub.authors }}</p>
 
-            <div class="mt-4 flex flex-wrap items-center gap-2">
-              <span v-if="pub.typeName" class="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700">
-                <BookOpen class="h-3 w-3" />
-                {{ pub.typeName }}
-              </span>
-              <span v-if="pub.date" class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-500">
-                <Calendar class="h-3 w-3" />
-                {{ pub.date }}
-              </span>
+              <div class="mt-4 flex flex-wrap items-center gap-2">
+                <span v-if="pub.typeName" class="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700">
+                  <BookOpen class="h-3 w-3" />
+                  {{ pub.typeName }}
+                </span>
+                <span v-if="pub.date" class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-500">
+                  <Calendar class="h-3 w-3" />
+                  {{ pub.date }}
+                </span>
+              </div>
+            </a>
+          </div>
+
+          <div
+            v-if="pubPages.length > 1"
+            class="mt-6 flex items-center justify-center gap-4"
+          >
+            <button
+              type="button"
+              :disabled="pubPage === 0"
+              class="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:border-primary-300 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="Previous publications"
+              @click="goToPubPage(pubPage - 1)"
+            >
+              <ChevronLeft class="h-4 w-4" />
+            </button>
+            <div class="flex items-center gap-2">
+              <button
+                v-for="(_, index) in pubPages"
+                :key="index"
+                type="button"
+                :class="[
+                  'h-2.5 rounded-full transition-all',
+                  index === pubPage ? 'w-6 bg-primary-600' : 'w-2.5 bg-gray-300 hover:bg-gray-400',
+                ]"
+                :aria-label="`Go to publications page ${index + 1}`"
+                @click="goToPubPage(index)"
+              />
             </div>
-          </a>
+            <button
+              type="button"
+              :disabled="pubPage >= pubPages.length - 1"
+              class="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:border-primary-300 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="Next publications"
+              @click="goToPubPage(pubPage + 1)"
+            >
+              <ChevronRight class="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </section>

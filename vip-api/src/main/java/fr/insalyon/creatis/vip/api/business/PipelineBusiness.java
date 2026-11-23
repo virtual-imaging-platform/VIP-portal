@@ -2,7 +2,9 @@ package fr.insalyon.creatis.vip.api.business;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -119,6 +121,19 @@ public class PipelineBusiness {
         return pipelines;
     }
 
+    private List<BoutiquesDescriptor> appsToPipelinesDescriptors(List<Application> applications) throws VipException {
+        List<BoutiquesDescriptor> descriptors = new ArrayList<>();
+        for (Application a : applications) {
+            List<AppVersion> versions = appVersionBusiness.getVersions(a.getName());
+            for (AppVersion av : versions) {
+                if (isApplicationVersionUsableInApi(av)) {
+                    descriptors.add(boutiquesBusiness.parseBoutiquesString(av.getDescriptor()));
+                }
+            }
+        }
+        return descriptors;
+    }
+
     /**
      * List all the pipeline the user can access
      */
@@ -136,6 +151,12 @@ public class PipelineBusiness {
     public List<Pipeline> listPublicPipelines() throws VipException {
         List<Application> applications = appVersionBusiness.getPublicApplications();
         return appsToPipelines(applications);
+    }
+
+    // could use appVersionBusiness directly in controller ?
+    public List<BoutiquesDescriptor> listPublicPipelinesDescriptor() throws VipException {
+        List<Application> applications = appVersionBusiness.getPublicApplications();
+        return appsToPipelinesDescriptors(applications);
     }
 
     // ********************* Basic stuff **************************************

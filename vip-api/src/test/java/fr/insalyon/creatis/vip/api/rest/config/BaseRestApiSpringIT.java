@@ -29,6 +29,7 @@ import fr.insalyon.creatis.vip.application.integrationtest.SpringApplicationTest
 import fr.insalyon.creatis.vip.application.models.AppVersion;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowExecutionBusiness;
@@ -73,6 +74,7 @@ abstract public class BaseRestApiSpringIT extends BaseWebSpringIT {
     @Autowired protected ApplicationBusiness applicationBusiness;
     @Autowired protected EngineBusiness engineBusiness;
     @Autowired protected AppVersionBusiness appVersionBusiness;
+    @Autowired protected BoutiquesBusiness boutiquesBusiness;
     @Autowired protected FileUtil fileUtil;
 
     @BeforeEach

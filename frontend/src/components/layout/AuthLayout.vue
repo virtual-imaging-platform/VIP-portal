@@ -6,7 +6,7 @@
       class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 items-center justify-center p-12"
     >
       <div class="max-w-lg text-white">
-        <div class="flex items-center gap-3 mb-8">
+        <router-link to="/" class="flex items-center gap-3 mb-8 hover:opacity-80 transition-opacity">
           <div
             class="flex h-14 w-14 items-center justify-center rounded-xl bg-white backdrop-blur-sm text-white font-bold text-lg"
           >
@@ -17,7 +17,7 @@
             />
           </div>
           <span class="text-2xl font-bold">Virtual Imaging Platform</span>
-        </div>
+        </router-link>
         <h2 class="text-4xl font-bold leading-tight mb-6">
           Lorem ipsum dolor, sit amet consectetur adipisicing elit
         </h2>

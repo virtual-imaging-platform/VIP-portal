@@ -13,7 +13,7 @@ export interface BackendAppVersion {
   visible: boolean
   resources: { name: string; status: boolean; configuration: string }[]
   tags: Tag[]
-  settings: {}[]
+  settings: object[]
   source: string | null
   note: string | null
 }
@@ -53,7 +53,7 @@ export interface CreateAppVersionPayload {
 
 export const appVersionsApi = {
 
-  getAll: (offset = 0, quantity = 50) => {
+  getAll: (_offset = 0, _quantity = 50) => {
     return backendClient
       .get<PrecisePage<BackendAppVersionRaw>>(
         `/internal/applications/versions`
@@ -64,7 +64,7 @@ export const appVersionsApi = {
       }))
   },
     
-  getAllForApplication: (applicationId: string, offset = 0, quantity = 50) => {
+  getAllForApplication: (applicationId: string, _offset = 0, _quantity = 50) => {
     return backendClient
       .get<PrecisePage<BackendAppVersionRaw>>(
         `/internal/applications/${encodeURIComponent(applicationId)}/versions`

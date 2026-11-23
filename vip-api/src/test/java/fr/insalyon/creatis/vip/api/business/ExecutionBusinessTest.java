@@ -84,7 +84,7 @@ public class ExecutionBusinessTest {
                 "simuName",
                 "appName",
                 "1.0",
-                creator,
+                creator.getFullName(),
                 status.toString(),
                 new java.util.Date(),
                 null,

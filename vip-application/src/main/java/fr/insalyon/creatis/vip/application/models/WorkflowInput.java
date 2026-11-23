@@ -1,16 +1,15 @@
 package fr.insalyon.creatis.vip.application.models;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import fr.insalyon.creatis.boutiques.model.Input;
-import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesInput;
+import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.core.server.inter.DataViews;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @JsonView(DataViews.User.class)
-public class WorkflowInput {
+public class WorkflowInput implements IsSerializable {
 
     private List<String> values;
     @Size(max=3)
@@ -41,7 +40,7 @@ public class WorkflowInput {
     }
 
     public void setValues(List<String> values) {
-        this.values = values;
+        this.values = new ArrayList<>(values);
     }
 
     public List<Double> getInterval() {
@@ -49,6 +48,6 @@ public class WorkflowInput {
     }
 
     public void setInterval(List<Double> interval) {
-        this.interval = interval;
+        this.interval = new ArrayList<>(interval);
     }
 }

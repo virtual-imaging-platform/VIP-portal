@@ -93,15 +93,8 @@ function buildUpdatePayload(): ProfileUpdatePayload | null {
 
   return {
     id: profile.value.id,
-    firstName: profileForm.firstName.trim(),
-    lastName: profileForm.lastName.trim(),
-    email: profileForm.email.trim(),
     institution: profileForm.institution.trim(),
     countryCode: profileForm.countryCode.trim().toLowerCase(),
-    maxRunningSimulations: profile.value.maxRunningSimulations,
-    level: profile.value.level,
-    termsOfUse: profile.value.termsOfUse,
-    lastUpdatePublications: profile.value.lastUpdatePublications,
     groups: mapSelectedGroups(),
   }
 }
@@ -388,9 +381,9 @@ onMounted(async () => {
         </div>
 
         <div class="mt-4 grid gap-4 md:grid-cols-2">
-          <AppInput v-model="profileForm.firstName" label="First name" placeholder="First name" />
-          <AppInput v-model="profileForm.lastName" label="Last name" placeholder="Last name" />
-          <AppInput v-model="profileForm.email" label="Email" type="email" placeholder="you@example.com" />
+          <AppInput :model-value="profileForm.firstName" label="First name" disabled />
+          <AppInput :model-value="profileForm.lastName" label="Last name" disabled />
+          <AppInput :model-value="profileForm.email" label="Email" type="email" disabled />
           <AppInput v-model="profileForm.countryCode" label="Country code" placeholder="fr" />
           <div class="md:col-span-2">
             <AppInput v-model="profileForm.institution" label="Institution" placeholder="Your institution" />

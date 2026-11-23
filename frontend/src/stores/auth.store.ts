@@ -45,8 +45,6 @@ export const useAuthStore = defineStore('auth', () => {
       session.value = vipSession;
       await loadCurrentUser();
       return vipSession;
-    } catch (error) {
-      throw error; // Throw to be handled by the caller (such as LoginView)
     } finally {
       isLoading.value = false;
     }

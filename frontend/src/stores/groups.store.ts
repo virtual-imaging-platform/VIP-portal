@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Group } from '@/types/group.types'
 import { groupsApi } from '@/api/groups.api'

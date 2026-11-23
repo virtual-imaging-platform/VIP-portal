@@ -10,6 +10,7 @@ import fr.insalyon.creatis.vip.core.server.inter.DataViews;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ public class Workflow implements IsSerializable {
     private WorkflowStatus status;
     private Map<String,WorkflowInput> inputs;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Map<String,String> outputs;
+    private Map<String,List<String>> outputs;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String userId;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -180,11 +181,11 @@ public class Workflow implements IsSerializable {
         this.inputs = inputs;
     }
 
-    public Map<String, String> getOutputs() {
+    public Map<String, List<String>> getOutputs() {
         return outputs;
     }
 
-    public void setOutputs(Map<String, String> outputs) {
+    public void setOutputs(Map<String, List<String>> outputs) {
         this.outputs = outputs;
     }
 }

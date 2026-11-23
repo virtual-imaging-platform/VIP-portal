@@ -1,5 +1,7 @@
 package fr.insalyon.creatis.vip.application.server.controller;
 
+import java.util.Date;
+
 import fr.insalyon.creatis.vip.application.models.Workflow;
 import fr.insalyon.creatis.vip.application.server.business.ListWorkflowsBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowLaunchBusiness;
@@ -11,6 +13,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -35,8 +38,13 @@ public class WorkflowController {
     public PrecisePage<Workflow> list(
             @RequestParam(defaultValue = "0") @PositiveOrZero int offset,
             @RequestParam(defaultValue = "10") @Positive @Max(value = 50) int quantity,
-            @RequestParam(defaultValue = "true") boolean refreshed) throws VipException {
-        PrecisePage<Workflow> workflows = listWorkflowsBusiness.getCurrentUserWorkflowsPaginated(offset, quantity, null);
+            @RequestParam(defaultValue = "true") boolean refreshed,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) throws VipException {
+        PrecisePage<Workflow> workflows = listWorkflowsBusiness.searchOwnWorkflowsPaginated(
+                offset, quantity, search, status, startDate, endDate);
         if (refreshed) {
             listWorkflowsBusiness.refreshRunningWorkflows(workflows.data);
         }

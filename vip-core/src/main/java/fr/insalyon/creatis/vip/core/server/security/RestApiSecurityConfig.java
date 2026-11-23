@@ -1,7 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.security;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,9 +11,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.withDefaults;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -78,25 +78,29 @@ public class RestApiSecurityConfig {
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         // Spring Security configuration for /rest API endpoints, common to both API key and OIDC authentications.
-        // Note that it is required to used AntPathRequestMatcher.antMatcher() everywhere below,
-        // otherwise Spring uses MvcRequestMatcher as the default requestMatchers implementation.
+        // Explicit PathPatternRequestMatcher is used everywhere below (AntPathRequestMatcher is deprecated
+        // for removal since Spring Security 6.5).
+        PathPatternRequestMatcher.Builder rest = withDefaults().basePath("/rest");
         http
-                .securityMatcher(antMatcher("/rest/**"))
+                .securityMatcher(rest.matcher("/**"))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(antMatcher("/rest/platform")).permitAll()
-                        .requestMatchers(antMatcher("/rest/authenticate")).permitAll()
-                        .requestMatchers(antMatcher("/rest/session")).permitAll()
-                        .requestMatchers(new RegexRequestMatcher("/rest/pipelines\\?public", "GET")).permitAll()
-                        .requestMatchers(antMatcher("/rest/publications")).permitAll()
-                        .requestMatchers(antMatcher("/rest/reset-password")).permitAll()
-                        .requestMatchers(antMatcher("/rest/register")).permitAll()
-                        .requestMatchers(antMatcher("/rest/executions/{executionId}/summary")).hasAnyRole("SERVICE")
-                        .requestMatchers(antMatcher("/rest/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
-                        .requestMatchers(antMatcher("/rest/admin/**")).hasAnyRole("ADMINISTRATOR")
-                        .requestMatchers(antMatcher("/rest/**")).authenticated()
+                        .requestMatchers(rest.matcher("/platform")).permitAll()
+                        .requestMatchers(rest.matcher("/authenticate")).permitAll()
+                        .requestMatchers(rest.matcher("/session")).permitAll()
+                        .requestMatchers(new RegexRequestMatcher("/rest/pipelines\\?public(?:&format=boutiques)?$", "GET")).permitAll()
+                        .requestMatchers(rest.matcher("/publications")).permitAll()
+                        .requestMatchers(rest.matcher("/reset-password")).permitAll()
+                        .requestMatchers(rest.matcher("/register")).permitAll()
+                        .requestMatchers(rest.matcher("/executions/{executionId}/summary")).hasAnyRole("SERVICE")
+                        .requestMatchers(rest.matcher("/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
+                        .requestMatchers(rest.matcher("/admin/**")).hasAnyRole("ADMINISTRATOR")
+                        .requestMatchers(rest.matcher("/**")).authenticated()
                         .anyRequest().permitAll()
                 )
-                .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(vipAuthenticationEntryPoint))
+                .exceptionHandling((exceptionHandling) ->
+                        exceptionHandling
+                                .authenticationEntryPoint(vipAuthenticationEntryPoint)
+                                .accessDeniedHandler(vipAuthenticationEntryPoint))
                 // session must be activated otherwise OIDC auth info will be lost when accessing /rest/loginOIDC
                 // .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .anonymous((anonymous) -> anonymous.disable())
@@ -128,14 +132,4 @@ public class RestApiSecurityConfig {
                 vipAuthenticationEntryPoint, apikeyAuthenticationProvider);
     }
 
-    /*
-        Do not use the default firewall (StrictHttpFirewall) because it blocks
-        "//" in url and it is used in gwt rpc calls
-     */
-    @Bean
-    public DefaultHttpFirewall httpFirewall() {
-        DefaultHttpFirewall firewall = new DefaultHttpFirewall();
-        firewall.setAllowUrlEncodedSlash(true);
-        return firewall;
-    }
 }

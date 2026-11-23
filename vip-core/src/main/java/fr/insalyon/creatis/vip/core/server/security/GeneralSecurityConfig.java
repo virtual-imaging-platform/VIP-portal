@@ -10,10 +10,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.RestClientAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -56,7 +58,7 @@ public class GeneralSecurityConfig {
                             .baseUri("/oauth2/authorize-client")
                             .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository()))
                     .tokenEndpoint((token)->token
-                            .accessTokenResponseClient(new DefaultAuthorizationCodeTokenResponseClient()))
+                            .accessTokenResponseClient(new RestClientAuthorizationCodeTokenResponseClient()))
                     .defaultSuccessUrl("/rest/loginOIDC", true)
                     .failureUrl("/loginFailure"));
         }
@@ -64,13 +66,13 @@ public class GeneralSecurityConfig {
     }
 
     /*
-        Do not use the default firewall (StrictHttpFirewall) because it blocks
-        "//" in url and it is used in gwt rpc calls
+        Use the StrictHttpFirewall but allow "//" in url as it is used in gwt rpc calls
+        This should be removed once GWT is out
      */
     @Bean
-    public DefaultHttpFirewall httpFirewall() {
-        DefaultHttpFirewall firewall = new DefaultHttpFirewall();
-        firewall.setAllowUrlEncodedSlash(true);
+    public HttpFirewall httpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+        firewall.setAllowUrlEncodedDoubleSlash(true);
         return firewall;
     }
 }

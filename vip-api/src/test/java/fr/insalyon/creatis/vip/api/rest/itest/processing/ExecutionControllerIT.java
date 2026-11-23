@@ -5,14 +5,8 @@ import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.WORKFLOW_1;
 import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.WORKFLOW_2;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser2;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,13 +19,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcToken;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -68,6 +62,9 @@ import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import fr.insalyon.creatis.vip.core.models.Group;
 import fr.insalyon.creatis.vip.core.models.GroupType;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 /**
  * Test method on platform path
@@ -161,6 +158,33 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 // Check that the returned execution is the good one
                 .andExpect(jsonPath("$.status").value("Finished"))
                 .andExpect(jsonPath("$.identifier").value("execId2"));
+    }
+
+    @Test
+    public void serviceAccountShouldGetAnyExecution() throws Exception {
+        when(workflowDAO.get(eq(WORKFLOW_2.getID()))).thenReturn(w2, w2, null);
+
+        createUser(baseUser2);
+        RequestPostProcessor springSecurityUser =
+                SecurityMockMvcRequestPostProcessors.authentication(new OidcToken(baseUser2, null, AuthorityUtils.createAuthorityList("ROLE_SERVICE")));
+
+        // perform a getWorkflows()
+        mockMvc.perform(
+                        get("/rest/executions/" + WORKFLOW_2.getID() + "/summary").with(springSecurityUser))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                // Check that the returned execution is the good one
+                .andExpect(jsonPath("$.status").value("Finished"))
+                .andExpect(jsonPath("$.identifier").value("execId2"));
+
+        // forbidden without the service account
+
+        mockMvc.perform(
+                        get("/rest/executions/" + WORKFLOW_2.getID() + "/summary").with(baseUser2()))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
     }
 
     @Test
@@ -301,7 +325,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
         when(mockSimulationDao.getJobs()).thenReturn(List.of(testTask));
         // normally simulationDao is a prototype-scope bean specific to a job, here as it is a singleton mock
 
-        String testOutput = "blablablastdout\n";
+        String testOutput = "blablablastdout";
 
         mockMvc.perform(
                         get("/rest/executions/" + WORKFLOW_2.getID() + "/stdout").with(baseUser1()))
@@ -344,7 +368,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
 
         when(workflowDAO.get(eq(WORKFLOW_2.getID()))).thenReturn(w2, (Workflow) null);
         Output output = new Output(new OutputID("workflowID", resultPath, "processor"), DataType.URI, "port");
-        when(outputDAO.get(eq(WORKFLOW_2.getID()))).thenReturn(Arrays.asList(output), (List<Output>) null);
+        when(outputDAO.get(eq(WORKFLOW_2.getID()))).thenReturn(Arrays.asList(output), Arrays.asList(output), (List<Output>) null);
 
         Mockito.when(server.getDataManagerUsersHome()).thenReturn("/root/user");
         Mockito.when(gridaClient.getPathInfo(resultPath)).thenReturn(new GridPathInfo(true, GridData.Type.File));
@@ -358,7 +382,9 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$[*]", hasSize(1)))
                 .andExpect(jsonPath("$[0].path", equalTo("/vip/Home/path/to/result.res")))
-                .andExpect(jsonPath("$[0].size", equalTo(42)));
+                .andExpect(jsonPath("$[0].size", nullValue()));
+
+        Mockito.verify(gridaClient, Mockito.never()).getFolderData(Mockito.anyString(), Mockito.anyBoolean());
     }
 
 
