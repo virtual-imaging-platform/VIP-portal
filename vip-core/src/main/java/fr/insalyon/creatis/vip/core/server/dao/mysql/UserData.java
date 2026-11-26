@@ -191,7 +191,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
         +               "code, confirmed, folder, session, registration, "
         +               "last_login, level, country_code, max_simulations, "
         +               "termsUse, lastUpdatePublications, failed_authentications, account_locked, apikey "
-        +               "FROM VIPUsers");
+        +               "FROM VIPUsers ");
         List<Object> params = new ArrayList<>();
 
         buildSearchQuery(searchCriteria)
