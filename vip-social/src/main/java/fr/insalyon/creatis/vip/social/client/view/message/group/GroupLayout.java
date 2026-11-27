@@ -60,6 +60,7 @@ public class GroupLayout extends VLayout {
 
         moreDataBoxLayout = new MoreDataBoxLayout("messages");
         moreDataBoxLayout.addClickHandler(new ClickHandler() {
+            @Override
             public void onClick(ClickEvent event) {
                 messagesLayout.removeMember(moreDataBoxLayout);
                 loadData(lastDate);
@@ -81,10 +82,12 @@ public class GroupLayout extends VLayout {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<List<GroupMessage>> callback = new AsyncCallback<List<GroupMessage>>() {
+            @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to get list of messages:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<GroupMessage> result) {
 
                 if (!result.isEmpty()) {
@@ -111,6 +114,7 @@ public class GroupLayout extends VLayout {
 
             Label composeLabel = WidgetUtil.getLabel("New Message", SocialConstants.ICON_COMPOSE, 15, Cursor.HAND);
             composeLabel.addClickHandler(new ClickHandler() {
+                @Override
                 public void onClick(ClickEvent event) {
                     new GroupComposerWindow(groupName).show();
                 }
@@ -120,6 +124,7 @@ public class GroupLayout extends VLayout {
 
         Label refreshLabel = WidgetUtil.getLabel("Refresh", SocialConstants.ICON_REFRESH, 15, Cursor.HAND);
         refreshLabel.addClickHandler(new ClickHandler() {
+            @Override
             public void onClick(ClickEvent event) {
                 loadData();
             }

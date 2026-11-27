@@ -30,6 +30,7 @@ public class WorkflowIT extends BaseSpringIT {
     private Job job;
 
     @BeforeEach
+    @Override
     public void setUp() throws DAOException, VipException {
 
         workflow = new Workflow("execId1", "Exec test 1", "pipelineTest1", "3",

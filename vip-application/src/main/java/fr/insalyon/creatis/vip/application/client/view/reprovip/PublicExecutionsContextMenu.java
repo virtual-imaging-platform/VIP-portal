@@ -75,6 +75,7 @@ public class PublicExecutionsContextMenu extends Menu {
 
     public void createReproVipDirectory(String experienceName) {
         reproVipServiceAsync.createReproVipDirectory(experienceName, new AsyncCallback<>() {
+            @Override
             public void onFailure(Throwable caught) {
                 SC.warn("Error creating ReproVip directory: " + caught.getMessage());
             }

@@ -50,6 +50,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Autowired private SessionBusiness sessionBusiness;
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         setAdminContext();

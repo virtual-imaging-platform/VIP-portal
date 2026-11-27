@@ -62,6 +62,7 @@ public class MenuLayout extends VLayout {
 
         label.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 SocialTab socialTab = (SocialTab) Layout.getInstance().getTab(SocialConstants.TAB_SOCIAL);
                 socialTab.setLayout(layout);

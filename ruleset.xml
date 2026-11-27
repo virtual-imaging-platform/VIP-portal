@@ -1,15 +1,46 @@
 <?xml version="1.0"?>
+<ruleset name="VIP-PMD-Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
 
-<ruleset name="PMD-Rules">
-    <description>
-        The rulesets we want to use in pmd. For a detailed description of pmd rulesets:
-        http://pmd.sourceforge.net/rules/index.html
-    </description>
-    <rule ref="category/java/security.xml/HardCodedCryptoKey" />
-    <rule ref="category/java/security.xml/InsecureCryptoIv" />
-
+    <rule ref="category/java/errorprone.xml/UnconditionalIfStatement"/>
+    <rule ref="category/java/errorprone.xml/IdempotentOperations"/>
+    <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop"/>
+    <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor"/>
+    <rule ref="category/java/errorprone.xml/ClassCastExceptionWithToArray"/>
+    <rule ref="category/java/errorprone.xml/AvoidUsingOctalValues"/>
+    <rule ref="category/java/errorprone.xml/DoNotTerminateVM"/>
+    <rule ref="category/java/errorprone.xml/DoNotCallGarbageCollectionExplicitly"/>
+    <rule ref="category/java/errorprone.xml/AvoidCatchingNPE"/>
+    <rule ref="category/java/errorprone.xml/NonCaseLabelInSwitch"/>
+    <rule ref="category/java/bestpractices.xml/WhileLoopWithLiteralBoolean"/>
+    <rule ref="category/java/performance.xml/StringInstantiation"/>
+    <rule ref="category/java/bestpractices.xml/PrimitiveWrapperInstantiation"/>
+    
+    <!-- security -->
+    <rule ref="category/java/security.xml/HardCodedCryptoKey"/>
+    <rule ref="category/java/security.xml/InsecureCryptoIv"/>
+   
+    <!-- never used -->
     <rule ref="category/java/bestpractices.xml/UnusedFormalParameter"/>
     <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
     <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
     <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod"/>
+
+    <!--bugs probables-->
+    <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings"/>
+    <rule ref="category/java/errorprone.xml/BrokenNullCheck"/>
+    <rule ref="category/java/errorprone.xml/MisplacedNullCheck"/>
+    <rule ref="category/java/errorprone.xml/AvoidCatchingThrowable"/>
+    <rule ref="category/java/errorprone.xml/EmptyCatchBlock"/>
+    <rule ref="category/java/errorprone.xml/ImplicitSwitchFallThrough"/>
+    <rule ref="category/java/errorprone.xml/AvoidLosingExceptionInformation"/>
+    <rule ref="category/java/errorprone.xml/ComparisonWithNaN"/>
+    <rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices"/>
+    <rule ref="category/java/errorprone.xml/AssignmentToNonFinalStatic"/>
+    <rule ref="category/java/errorprone.xml/ReturnEmptyCollectionRatherThanNull"/>
+    <rule ref="category/java/bestpractices.xml/LiteralsFirstInComparisons"/>
+    <rule ref="category/java/bestpractices.xml/MissingOverride"/>
+
 </ruleset>

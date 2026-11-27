@@ -306,6 +306,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>3.28.0</version>
+            <configuration>
+                <rulesets>
+                    <ruleset>${maven.multiModuleProjectDirectory}/ruleset.xml</ruleset>
+                </rulesets>
+                <includeTests>true</includeTests>
+                <failOnViolation>true</failOnViolation>
+            </configuration>
+        </plugin>
         </plugins>
     </build>
 

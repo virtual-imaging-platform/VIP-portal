@@ -85,6 +85,7 @@ public class PathSelectionWindow extends Window {
         
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
+            @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 String type = event.getRecord().getAttributeAsString("icon");
                 String name = event.getRecord().getAttributeAsString("name");
@@ -100,6 +101,7 @@ public class PathSelectionWindow extends Window {
         });
         grid.addCellContextClickHandler(new CellContextClickHandler() {
 
+            @Override
             public void onCellContextClick(CellContextClickEvent event) {
                 event.cancel();
                 name = event.getRecord().getAttributeAsString("name");
@@ -120,6 +122,7 @@ public class PathSelectionWindow extends Window {
         selectButton.setIcon(CoreConstants.ICON_ACTIVE);
         selectButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 name = grid.getSelectedRecord().getAttributeAsString("name");
                 selectValueAndDestroy(toolStrip.getPath() + "/" + name);
@@ -130,6 +133,7 @@ public class PathSelectionWindow extends Window {
         cancelButton.setIcon(CoreConstants.ICON_DELETE);
         cancelButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 destroy();
             }
@@ -150,6 +154,7 @@ public class PathSelectionWindow extends Window {
         selectItem.setIcon(CoreConstants.ICON_ACTIVE);
         selectItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 selectValueAndDestroy(toolStrip.getPath() + "/" + name);
             }

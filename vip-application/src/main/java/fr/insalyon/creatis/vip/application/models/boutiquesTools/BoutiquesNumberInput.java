@@ -52,6 +52,7 @@ public class BoutiquesNumberInput extends BoutiquesInput{
     /**
      * @return Double representing this input's default value, or null if there is not any
      */
+    @Override
     public Double getDefaultValue() {
         return this.defaultValue;
     }

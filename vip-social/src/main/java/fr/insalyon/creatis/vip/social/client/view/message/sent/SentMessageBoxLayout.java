@@ -97,6 +97,7 @@ public class SentMessageBoxLayout extends HLayout {
 
         mainLayout.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 new SentMessageViewerWindow(message).show();
             }
@@ -136,6 +137,7 @@ public class SentMessageBoxLayout extends HLayout {
         removeImg.setPrompt("Remove");
         removeImg.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 remove();
             }
@@ -149,16 +151,19 @@ public class SentMessageBoxLayout extends HLayout {
 
         SC.confirm("Do you really want to remove this message?", new BooleanCallback() {
 
+            @Override
             public void execute(Boolean value) {
 
                 if (value != null && value) {
                     SocialServiceAsync service = SocialService.Util.getInstance();
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                        @Override
                         public void onFailure(Throwable caught) {
                             Layout.getInstance().setWarningMessage("Unable to remove message:<br />" + caught.getMessage());
                         }
 
+                        @Override
                         public void onSuccess(Void result) {
                             destroy();
                         }

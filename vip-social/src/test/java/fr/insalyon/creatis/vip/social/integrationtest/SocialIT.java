@@ -33,6 +33,7 @@ public class SocialIT extends BaseSpringIT {
     private MessageBusiness messageBusiness;
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         setAdminContext();

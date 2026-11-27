@@ -61,6 +61,7 @@ public abstract class ApplicationsTileGrid extends TileGrid {
             private static final int MAX_LINES = 3;
             private static final String SEPARATOR_REGEX = "[ \\-_+]";
 
+            @Override
             public String format(Object value, Record record, DetailViewerField field) {
                 String[] words = value.toString().split("(?=" + SEPARATOR_REGEX + "[a-zA-Z0-9])", -1);
                 StringBuilder finalName = new StringBuilder();

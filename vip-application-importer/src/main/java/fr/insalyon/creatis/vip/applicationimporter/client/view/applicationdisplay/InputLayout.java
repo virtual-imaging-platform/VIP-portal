@@ -42,7 +42,7 @@ public class InputLayout extends InputOutputLayout {
             if (bi.getValueKey() != null) {
                 commandLineLayout.addMember(new LocalTextField("Value key", false, false, bi.getValueKey()));
             }
-            if (bi.getCommandLineFlag() != null && !bi.getCommandLineFlag().equals("")) {
+            if (bi.getCommandLineFlag() != null && !"".equals(bi.getCommandLineFlag())) {
                 commandLineLayout.addMember(new LocalTextField("Command-line flag", false, false, bi.getCommandLineFlag()));
             }
             if (bi.getDefaultValue() != null) {

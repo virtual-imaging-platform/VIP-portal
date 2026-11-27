@@ -32,6 +32,7 @@ public class GateLabData extends AbstractJobData implements GateLabDAO {
      * @return
      * @throws DAOException 
      */
+    @Override
     public long getNumberParticles() throws DAOException {
 
         try {
@@ -68,6 +69,7 @@ public class GateLabData extends AbstractJobData implements GateLabDAO {
      * 
      * @throws DAOException 
      */
+    @Override
     public void StopWorkflowSimulation() throws DAOException {
         
         try {

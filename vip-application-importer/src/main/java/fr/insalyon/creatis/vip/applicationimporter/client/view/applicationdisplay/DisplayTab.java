@@ -197,7 +197,7 @@ public class DisplayTab extends Tab {
             String[] imageTag = containerImage.split(":");
             if (imageTag.length != 2) {
                 warnings.add("Wrong number of ':'");
-            } else if (imageTag[1].equals("latest")) {
+            } else if ("latest".equals(imageTag[1])) {
                 warnings.add("Tag 'latest' shouldn't be used");
             }
         }

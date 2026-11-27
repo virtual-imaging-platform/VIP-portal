@@ -132,6 +132,7 @@ public class MessageBoxLayout extends HLayout {
     private void remove() {
 
         SC.confirm("Do you really want to remove this message?", new BooleanCallback() {
+            @Override
             public void execute(Boolean value) {
 
                 if (value != null && value) {
